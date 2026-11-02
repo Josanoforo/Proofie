@@ -1,0 +1,5 @@
+{% extends "_base.html" %}
+{% block title %}Two case dates - Proofie{% endblock %}
+{% block content %}<div class="page"><h1>Two dates for case {{ dispute_id }}</h1><p>Delivery estimate is a seller-recorded sale fact. The response deadline comes from PayPal's dispute record.</p>
+<dl><dt>Recorded delivery estimate</dt><dd>{{ result.delivery_date or "Not recorded" }}</dd><dt>PayPal response deadline</dt><dd>{{ result.deadline or "Not supplied by PayPal" }}</dd></dl>
+<p data-state="{{ result.state }}">{{ result.message }}</p><p>This comparison is guidance for your review; it does not change or send anything.</p><p><a href="/disputes/{{ dispute_id }}">Return to the case</a></p></div>{% endblock %}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Proofie{% endblock %}</title>
+<link rel="stylesheet" href="/static/app.css">
+{% block head_extra %}{% endblock %}
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="/disputes"><span class="brand-mark" aria-hidden="true"></span>Proofie</a>
+  <span class="env-tag">PayPal sandbox &middot; assistant only, you review everything</span>
+</header>
+<main>
+{% block content %}{% endblock %}
+</main>
+<footer class="site-footer" data-state="footer">Independent project. Not affiliated with or endorsed by PayPal.
+{%- if hosted_demo() %}
+  <p class="hosted-demo-note" data-state="hosted-demo">{{ hosted_demo_sentence }}</p>
+{%- endif %}
+</footer>
+</body>
+</html>

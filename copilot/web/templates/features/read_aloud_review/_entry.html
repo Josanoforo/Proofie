@@ -1,0 +1,32 @@
+{% set spoken_text = read_aloud_review_text(claims, send_summary.tracking_number, send_summary.carrier) %}
+<section class="panel" data-read-aloud-review>
+<h3>Listen to the exact text for PayPal</h3><p>This reads the current outgoing notes, including the standard prefix. It does not approve or send anything.</p>
+<label for="read-aloud-language">Language of this package</label><select id="read-aloud-language" data-voice-language><option value="en">English</option><option value="es">Español</option></select>
+<button class="btn btn-secondary" type="button" data-speak-package data-text="{{ spoken_text }}">Read aloud</button><p role="status" aria-live="polite" data-speech-status>Choose a language, then start playback.</p>
+<script>
+(() => {
+  const root = document.currentScript.closest("[data-read-aloud-review]");
+  const button = root.querySelector("[data-speak-package]");
+  const language = root.querySelector("[data-voice-language]");
+  const status = root.querySelector("[data-speech-status]");
+  button.addEventListener("click", () => {
+    if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+      status.textContent = "Speech synthesis is unavailable in this browser.";
+      return;
+    }
+    const prefix = language.value.toLowerCase();
+    const voice = window.speechSynthesis.getVoices().find(v => v.localService === true && v.lang.toLowerCase().startsWith(prefix));
+    if (!voice) {
+      status.textContent = "No verified local " + (prefix === "es" ? "Spanish" : "English") + " voice is available in this browser.";
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(button.dataset.text);
+    utterance.voice = voice;
+    utterance.lang = voice.lang;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+    status.textContent = "Reading the exact current package notes with local voice " + voice.name + ".";
+  });
+})();
+</script>
+</section>

@@ -1,0 +1,254 @@
+{
+ "dispute_id": "PP-R-HZY-10190493",
+ "create_time": "2026-10-07T16:30:23.351Z",
+ "update_time": "2026-11-01T23:00:13.452Z",
+ "disputed_transactions": [
+  {
+   "buyer_transaction_id": "7BC307411R768410U",
+   "seller_transaction_id": "7C262589SW742781N",
+   "create_time": "2026-10-07T15:15:05.000Z",
+   "transaction_status": "REVERSED",
+   "gross_amount": {
+    "currency_code": "USD",
+    "value": "28.00"
+   },
+   "buyer": {
+    "email": "[email]",
+    "payer_id": "[redacted]",
+    "name": "[redacted]"
+   },
+   "seller": {
+    "email": "[email]",
+    "merchant_id": "[redacted]",
+    "name": "[redacted]"
+   },
+   "items": [
+    {
+     "item_name": "DEMO DATA - SBX3-4",
+     "item_description": "DEMO DATA - SBX3-4",
+     "item_quantity": "1",
+     "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+     "item_type": "SERVICE"
+    }
+   ],
+   "seller_protection_eligible": true,
+   "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+  }
+ ],
+ "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+ "status": "RESOLVED",
+ "dispute_amount": {
+  "currency_code": "USD",
+  "value": "28.00"
+ },
+ "dispute_state": "RESOLVED",
+ "dispute_outcome": {
+  "outcome_code": "RESOLVED_BUYER_FAVOUR",
+  "outcome_reason": "INELIGIBLE_SELLER_PROTECTION_POLICY",
+  "amount_refunded": {
+   "currency_code": "USD",
+   "value": "28.00"
+  }
+ },
+ "adjudications": [
+  {
+   "type": "RECOVER_FROM_SELLER",
+   "adjudication_time": "2026-11-01T22:57:42.335Z",
+   "reason": "INELIGIBLE_SELLER_PROTECTION_POLICY",
+   "dispute_life_cycle_stage": "CHARGEBACK"
+  }
+ ],
+ "money_movements": [
+  {
+   "affected_party": "BUYER",
+   "amount": {
+    "currency_code": "USD",
+    "value": "28.00"
+   },
+   "initiated_time": "2026-11-01T22:59:05.575Z",
+   "type": "CREDIT",
+   "reason": "DISPUTE_SETTLEMENT"
+  },
+  {
+   "affected_party": "SELLER",
+   "amount": {
+    "currency_code": "USD",
+    "value": "28.00"
+   },
+   "initiated_time": "2026-11-01T22:59:05.575Z",
+   "type": "DEBIT",
+   "reason": "DISPUTE_SETTLEMENT"
+  },
+  {
+   "affected_party": "SELLER",
+   "amount": {
+    "currency_code": "USD",
+    "value": "1.63"
+   },
+   "initiated_time": "2026-11-01T22:59:05.575Z",
+   "type": "DEBIT",
+   "reason": "DISPUTE_SETTLEMENT_FEE"
+  }
+ ],
+ "fund_movements": [
+  {
+   "party": "RECEIVER",
+   "amount": {
+    "currency_code": "USD",
+    "value": "26.37"
+   },
+   "initiated_time": "2026-10-07T16:33:34.000Z",
+   "type": "DEBIT",
+   "reason": "HOLD_PLACED"
+  },
+  {
+   "party": "RECEIVER",
+   "amount": {
+    "currency_code": "USD",
+    "value": "26.37"
+   },
+   "initiated_time": "2026-11-01T22:59:04.000Z",
+   "type": "CREDIT",
+   "reason": "HOLD_RELEASED"
+  },
+  {
+   "party": "BUYER",
+   "amount": {
+    "currency_code": "USD",
+    "value": "28.00"
+   },
+   "initiated_time": "2026-11-01T22:59:05.575Z",
+   "type": "CREDIT",
+   "reason": "DISPUTE_SETTLEMENT"
+  },
+  {
+   "party": "SELLER",
+   "amount": {
+    "currency_code": "USD",
+    "value": "28.00"
+   },
+   "initiated_time": "2026-11-01T22:59:05.575Z",
+   "type": "DEBIT",
+   "reason": "DISPUTE_SETTLEMENT"
+  }
+ ],
+ "dispute_life_cycle_stage": "CHARGEBACK",
+ "dispute_channel": "INTERNAL",
+ "messages": [
+  {
+   "posted_by": "BUYER",
+   "time_posted": "2026-10-07T16:30:23.351Z",
+   "content": "1",
+   "documents": [
+    {
+     "name": "[redacted]",
+     "url": "https://api-m.sandbox.paypal.com/v2/content/documents/DIS-010-11f1-c26c-64760a30-ba49-6883789a8c3f/files/1/download"
+    }
+   ]
+  },
+  {
+   "posted_by": "SELLER",
+   "time_posted": "2026-10-07T16:38:45.343Z",
+   "content": "DEMO DATA (sandbox test). Partial refund offer."
+  },
+  {
+   "posted_by": "SELLER",
+   "time_posted": "2026-10-07T16:39:57.944Z",
+   "content": "DEMO DATA (sandbox test). Message from the seller."
+  }
+ ],
+ "extensions": {
+  "merchant_contacted": true,
+  "merchant_contacted_outcome": "NOT_FIXED",
+  "buyer_contacted_time": "2026-10-07T16:30:22.245Z"
+ },
+ "evidences": [
+  {
+   "evidence_type": "CREATE",
+   "documents": [
+    {
+     "name": "[redacted]",
+     "url": "https://api-m.sandbox.paypal.com/v2/content/documents/DIS-010-11f1-c26c-64760a30-ba49-6883789a8c3f/files/1/download"
+    }
+   ],
+   "notes": "1",
+   "source": "SUBMITTED_BY_BUYER",
+   "date": "2026-10-07T16:30:23.351Z",
+   "dispute_life_cycle_stage": "INQUIRY"
+  },
+  {
+   "evidence_type": "OTHER",
+   "notes": "DEMO DATA (sandbox test). Escalating for review.",
+   "source": "SUBMITTED_BY_SELLER",
+   "date": "2026-10-07T16:41:13.972Z",
+   "action_info": {
+    "action": "ESCALATE"
+   },
+   "dispute_life_cycle_stage": "INQUIRY"
+  },
+  {
+   "evidence_type": "PROOF_OF_FULFILLMENT",
+   "evidence_info": {
+    "tracking_info": [
+     {
+      "carrier_name": "MEX_ESTAFETA",
+      "tracking_number": "SBX3-SYNTH-0000001"
+     }
+    ]
+   },
+   "notes": "DEMO DATA (sandbox test with synthetic documents). Synthetic fulfilment proof.",
+   "source": "SUBMITTED_BY_SELLER",
+   "date": "2026-10-07T17:02:02.356Z",
+   "action_info": {
+    "action": "PROVIDE_EVIDENCE"
+   },
+   "dispute_life_cycle_stage": "CHARGEBACK"
+  }
+ ],
+ "offer": {
+  "buyer_requested_amount": {
+   "currency_code": "USD",
+   "value": "28.00"
+  },
+  "seller_offered_amount": {
+   "currency_code": "USD",
+   "value": "10.00"
+  },
+  "offer_type": "REFUND",
+  "history": [
+   {
+    "offer_time": "2026-10-07T16:38:45.343Z",
+    "actor": "SELLER",
+    "event_type": "PROPOSED",
+    "offer_type": "REFUND",
+    "offer_amount": {
+     "currency_code": "USD",
+     "value": "10.00"
+    }
+   }
+  ]
+ },
+ "refund_details": {
+  "allowed_refund_amount": {
+   "currency_code": "USD",
+   "value": "28.00"
+  },
+  "transactions": [
+   {
+    "id": "71V49299859522917",
+    "gross_amount": {
+     "currency_code": "USD",
+     "value": "28.00"
+    },
+    "create_time": "2026-11-01T22:59:05.000Z"
+   }
+  ]
+ },
+ "links": [
+  {
+   "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-HZY-10190493",
+   "rel": "self",
+   "method": "GET"
+  }
+ ]
+}

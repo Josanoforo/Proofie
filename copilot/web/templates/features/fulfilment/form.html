@@ -1,0 +1,141 @@
+{% extends "_base.html" %}
+{% from "_components.html" import tag, breadcrumbs, button, link_button, mono_id, field_error %}
+{% from "_form_fields.html" import error_summary, required_note, carrier_field, tracking_field, field %}
+{% from "features/fulfilment/_notices.html" import already_notice %}
+{% block title %}{% if form_errors %}Error: {% endif %}Tracking at the sale: {{ capture_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('Tracking at the sale', '/fulfilment'), ('Sale ' ~ capture_id, None)]) }}{% endblock %}
+{% block content %}
+{{ error_summary(form_errors) }}
+<h1>Tracking at the sale: <span class="h1-id" translate="no">{{ capture_id }}</span></h1>
+{{ already_notice(notice, capture_id) }}
+{% if reads.payment_read == 'not_found' %}<p class="notice" data-state="payment-not-found">PayPal found no payment with transaction ID {{ mono_id(capture_id) }}. Check the ID in your PayPal activity.</p>
+{% elif reads.payment_read == 'failed' %}<p class="notice" data-state="payment-read-failed">Proofie could not read this payment from PayPal. Try again in a minute.</p>{% endif %}
+{% if existing %}
+{% set row = existing.row %}
+<p class="notice" data-state="existing-file">{% if existing.status == 'unknown' %}Proofie sent a tracking request for this sale on {{ row.created_at|when }} and PayPal did not confirm it. Look at the file before you send anything else. {% else %}You already have a tracking file for this sale, saved on {{ row.created_at|when }} (<span data-status="{{ existing.status }}">{{ tag(existing.kind, existing.label) }}</span>). {% endif %}<a href="/fulfilment/{{ capture_id }}/file/{{ row.id }}">View the tracking file</a>.</p>
+{% if feature_enabled("buyer_note") %}<p data-state="pre-dispute-buyer-note"><a href="/fulfilment/{{ capture_id }}/buyer-note">Prepare a copy-only buyer note</a> from this saved local shipment record. It is not sent.</p>{% endif %}
+{% endif %}
+<section class="panel" data-state="sale-facts" aria-label="What PayPal shows about tracking for this sale">
+{% if error_page %}<p data-state="not-reread">This page did not ask PayPal again. Your entries are kept.</p>
+{% elif transaction.tracking_number %}<p data-state="paypal-tracking">PayPal shows tracking {{ mono_id(transaction.tracking_number) }} for this sale (read when this page opened). Continue only to add a different tracking number.</p>
+{% elif reads.tracking_read == 'failed' %}<p data-state="paypal-tracking">Could not read PayPal's tracking for this sale.</p>
+{% elif reads.payment_read == 'ok' %}<p data-state="paypal-tracking">PayPal shows no tracking for this sale.</p>{% endif %}
+{% if shipment_policy.available %}<p data-state="signature-requirement">Signed receipt: {{ shipment_policy.signature }}.</p>{% endif %}
+<p>Only PayPal decides whether protection applies.</p>
+</section>
+{% if feature_enabled("ship_moment_capture") %}{% include "features/ship_moment_capture/_entry.html" %}{% endif %}
+{% if feature_enabled("season_prep") %}{% include "features/season_prep/_entry.html" %}{% endif %}
+{% if feature_enabled("sale_readiness") %}
+<section class="panel" id="sale-readiness" data-state="sale-readiness">
+<h2>Sale readiness</h2>
+{% if not from_dispute %}<p>Open this sale from a dispute's detail page to load the existing case documents and link this transaction to that case.</p>
+{% elif sale_readiness_error %}<p role="alert">{{ sale_readiness_error }}</p>
+{% elif sale_readiness_view %}
+<p>Dispute <span translate="no">{{ sale_readiness_dispute }}</span> · transaction <span translate="no">{{ capture_id }}</span></p>
+{% if feature_enabled("sale_lesson") %}<p data-state="seller-lesson-link"><a href="/sale-lessons?kind={{ sale_readiness_terms.get('kind','') }}">Read seller lessons{% if sale_readiness_terms.get('kind') %} for {{ sale_readiness_terms.get('kind') }} sales{% endif %}</a>. Notes are seller-authored and do not state why a case closed.</p>{% endif %}
+<p><small>{{ sale_readiness_view.source_label }}</small></p>
+{% if not sale_readiness_view.result %}<h3>Open readiness gaps</h3><ul>{% for gap in sale_readiness_view.gaps %}<li>{{ gap }}</li>{% endfor %}</ul>{% endif %}
+{% if sale_readiness_view.result %}
+<p data-state="sale-readiness-status">{{ sale_readiness_view.result.status }}. Listing value {{ sale_readiness_view.result.currency }} {{ sale_readiness_view.result.price_cents }} cents.</p>
+{% if sale_readiness_view.gaps %}<h3>Open gaps</h3><ul>{% for gap in sale_readiness_view.gaps %}<li>{{ gap }}</li>{% endfor %}</ul>{% else %}<p>No checklist gaps are recorded.</p>{% endif %}
+<h3>Case documents linked by seller classification</h3><table><thead><tr><th>Document</th><th>Type</th><th>Package attachment</th><th>Source</th></tr></thead><tbody>{% for doc in sale_readiness_view.documents %}<tr><td><a href="/disputes/{{ sale_readiness_dispute }}#document-{{ doc.id }}">{{ doc.filename }}</a> (ID {{ doc.id }})</td><td>{{ doc.seller_classified_kind or 'Not classified' }}</td><td>{{ 'Attached to selected package' if doc.attached_to_latest_package else 'Not attached to selected package' }}</td><td>Proofie case row; contents not independently authenticated</td></tr>{% else %}<tr><td colspan="4">No case documents are stored.</td></tr>{% endfor %}</tbody></table>
+ {% if sale_readiness_view.result.tracking_payload %}<h3>Tracking preparation payload</h3><dl><dt>Carrier</dt><dd>{{ sale_readiness_view.result.tracking_payload.carrier }}{% if sale_readiness_view.result.tracking_payload.carrier_name_other %} — seller-supplied name: {{ sale_readiness_view.result.tracking_payload.carrier_name_other }}{% endif %}</dd><dt>Tracking reference</dt><dd>{{ sale_readiness_view.result.tracking_payload.tracking_number }}</dd><dt>Ship-to</dt><dd>{% for key,value in sale_readiness_view.result.tracking_payload.ship_to.items() %}{{ value }}{% if not loop.last %}, {% endif %}{% endfor %}</dd></dl><p>{{ sale_readiness_view.result.tracking_payload.status }}. This page does not register tracking.</p><p>{{ sale_readiness_view.result.tracking_payload.source_label }}</p>{% if sale_readiness_view.result.tracking_payload.carrier_warning %}<p role="note">Carrier risk warning: {{ sale_readiness_view.result.tracking_payload.carrier_warning }} Carrier name and tracking reference are seller-supplied; no carrier response or acceptance is verified.</p>{% endif %}{% endif %}
+{% endif %}
+{% if sale_readiness_package_url %}<p><a href="{{ sale_readiness_package_url }}">Review this same case's evidence package</a></p>{% else %}<p>No evidence package exists for this case yet.</p>{% endif %}
+<h3>Record sale terms and classify case documents</h3><p>This form requires Sale type, Buyer reference, Description, Listing price, and Currency code to save. Other fields are optional for this form save; checklist gaps may remain. These are Proofie form requirements, not PayPal requirements. Entries are seller statements saved only for this dispute and transaction. A selected document type links its existing Proofie case row to the stated buyer and this transaction; it does not verify document contents.</p>
+<form method="post" action="/fulfilment/{{ capture_id }}/readiness">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="dispute_id" value="{{ sale_readiness_dispute }}">{% if sale_readiness_package_id %}<input type="hidden" name="from_package" value="{{ sale_readiness_package_id }}">{% endif %}
+{% set t = sale_readiness_terms %}
+<label for="readiness-kind">Sale type <strong class="field-mark">Required</strong></label><select id="readiness-kind" name="kind" required><option value="">Choose type</option>{% for code,label in [('physical','Physical goods'),('digital','Digital goods'),('service','Service')] %}<option value="{{ code }}"{% if t.get('kind') == code %} selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+<label for="readiness-buyer">Buyer reference <strong class="field-mark">Required</strong></label><input id="readiness-buyer" name="buyer_ref" required value="{{ t.get('buyer_ref','') }}">
+<label for="readiness-description">Description <strong class="field-mark">Required</strong></label><input id="readiness-description" name="description" required value="{{ t.get('description','') }}">
+<label for="readiness-variant">Variant</label><input id="readiness-variant" name="variant" value="{{ t.get('variant','') }}">
+<label for="readiness-price">Listing price <strong class="field-mark">Required</strong></label><input id="readiness-price" name="price_amount" inputmode="decimal" required value="{% if t.get('price_cents') is not none %}{{ t.get('price_cents') // 100 }}.{{ '%02d'|format(t.get('price_cents') % 100) }}{% endif %}">
+<label for="readiness-currency">Currency code <strong class="field-mark">Required</strong></label><input id="readiness-currency" name="currency" required value="{{ t.get('currency', transaction.total_currency or '') }}">
+<label for="readiness-date">Expected date</label><input id="readiness-date" type="date" name="expected_date" value="{{ t.get('expected_date','') }}">
+<label for="readiness-returns">Return or cancellation terms</label><textarea id="readiness-returns" name="returns">{{ t.get('returns','') }}</textarea>
+<label for="readiness-contact">Seller contact reference</label><input id="readiness-contact" name="contact" value="{{ t.get('contact','') }}">
+<label for="readiness-terms-version">Terms version</label><input id="readiness-terms-version" name="terms_version" value="{{ t.get('terms_version','') }}">
+<label for="readiness-acceptance">Buyer acceptance reference</label><input id="readiness-acceptance" name="acceptance_ref" value="{{ t.get('acceptance_ref','') }}">
+<label for="readiness-carrier">Carrier (physical only)</label><input id="readiness-carrier" name="carrier" value="{{ t.get('carrier','') }}">
+<label for="readiness-tracking">Tracking number (physical only)</label><input id="readiness-tracking" name="tracking_number" value="{{ t.get('tracking_number','') }}">
+{% for key,label in [('name','Ship-to name'),('street','Ship-to street'),('city','Ship-to city'),('region','Ship-to region'),('postal_code','Ship-to postal code'),('country','Ship-to country')] %}<label for="ship-to-{{ key }}">{{ label }}</label><input id="ship-to-{{ key }}" name="ship_to_{{ key }}" value="{{ t.get('ship_to',{}).get(key,'') }}">{% endfor %}
+<h4>Existing case documents</h4>{% for doc in sale_readiness_documents %}<label for="evidence-kind-{{ doc.id }}">{{ doc.filename }} (ID {{ doc.id }})</label><select id="evidence-kind-{{ doc.id }}" name="evidence_kind_{{ doc.id }}"><option value="">Not linked</option>{% for kind in ['order','tracking','delivery','purchase','access','agreement','acceptance','performance'] %}<option value="{{ kind }}"{% if t.get('evidence_kinds',{}).get(doc.id|string) == kind %} selected{% endif %}>{{ kind|title }}</option>{% endfor %}</select>{% else %}<p>No documents available to classify.</p>{% endfor %}
+{{ button("Save seller terms and refresh checklist", kind="secondary") }}</form>
+{% endif %}
+</section>
+{% endif %}
+<form method="post" action="/fulfilment/{{ capture_id }}/preview" data-state="tracking-form" novalidate>
+{{ required_note(3, true) }}
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+{% if from_token %}<input type="hidden" name="from_token" value="{{ from_token }}">{% endif %}
+{% if from_dispute %}<input type="hidden" name="from_dispute" value="{{ from_dispute }}">{% endif %}
+{% if dispute_suggestion %}<p class="notice" data-state="dispute-values">{% if dispute_suggestion.used %}{{ dispute_suggestion.used_sentence }}{% else %}{{ dispute_suggestion.sentence }} <a href="{{ suggestion_href }}">Use these values</a>{% endif %}</p>
+{% endif %}
+{{ carrier_field(values.carrier or '', values.carrier_other_name or '', form_errors.get('carrier'), form_errors.get('carrier_other_name'), mark='Required') }}
+{{ tracking_field(values.tracking_number or '', form_errors.get('tracking_number'), mark='Required') }}
+<div class="field">
+<label for="field-status">Shipment status <strong class="field-mark">Required</strong></label>
+<p class="field-hint" id="hint-status">Choose Shipped unless the carrier's tracking page shows the parcel as delivered.</p>
+{% if form_errors.get('status') %}{{ field_error('error-status', form_errors['status']) }}{% endif %}
+{% set status_codes = statuses|map(attribute=0)|list %}
+<select id="field-status" name="status" aria-required="true" aria-describedby="hint-status{% if form_errors.get('status') %} error-status{% endif %}"{% if form_errors.get('status') %} aria-invalid="true"{% endif %}>
+<option value=""{% if not values.status %} selected{% endif %}>Choose the shipment status</option>
+{%- if values.status and values.status not in status_codes %}
+<option value="{{ values.status }}" selected>Your entry: {{ values.status }}</option>
+{%- endif %}
+{%- for code, label in statuses %}
+<option value="{{ code }}"{% if values.status == code %} selected{% endif %}>{{ label }}</option>
+{%- endfor %}
+</select>
+</div>
+<details id="declared-address"{% if address_open %} open{% endif %}>
+<summary>Add the address you shipped to (optional)</summary>
+<p>Proofie compares it with the address PayPal has for this sale. It is saved as your statement, not PayPal's.</p>
+{{ field('declared_line1', 'Street', values.declared_line1 or '', error=form_errors.get('declared_line1'), autocomplete='off') }}
+{{ field('declared_city', 'City', values.declared_city or '', error=form_errors.get('declared_city'), autocomplete='off') }}
+{{ field('declared_state', 'State', values.declared_state or '', error=form_errors.get('declared_state'), autocomplete='off') }}
+{{ field('declared_postal_code', 'Postal code', values.declared_postal_code or '', error=form_errors.get('declared_postal_code'), autocomplete='off', width='w10') }}
+<div class="field">
+<label for="field-declared_country_code">Country</label>
+{% if form_errors.get('declared_country_code') %}{{ field_error('error-declared_country_code', form_errors['declared_country_code']) }}{% endif %}
+<select id="field-declared_country_code" name="declared_country_code"{% if form_errors.get('declared_country_code') %} aria-invalid="true" aria-describedby="error-declared_country_code"{% endif %}>
+<option value=""{% if not values.declared_country_code %} selected{% endif %}>Choose the country</option>
+{%- if values.declared_country_code and values.declared_country_code not in ('MX', 'US', 'OTHER') %}
+<option value="{{ values.declared_country_code }}" selected>Your entry: {{ values.declared_country_code }}</option>
+{%- endif %}
+<option value="MX"{% if values.declared_country_code == 'MX' %} selected{% endif %}>Mexico</option>
+<option value="US"{% if values.declared_country_code == 'US' %} selected{% endif %}>United States</option>
+<option value="OTHER"{% if values.declared_country_code == 'OTHER' %} selected{% endif %}>Other country</option>
+</select>
+</div>
+{{ field('declared_country_other', 'Country code (only if you chose Other country)', values.declared_country_other or '', hint='Two letters, for example CA.', error=form_errors.get('declared_country_other'), autocomplete='off', width='w10') }}
+</details>
+<div class="actions">{{ button('Review what will be sent', large=True) }}</div>
+</form>
+<details data-state="sale-reference">
+<summary>What PayPal requires for this sale</summary>
+<section class="panel" data-state="shipment-policy" aria-labelledby="shipment-policy-title">
+<h2 id="shipment-policy-title">What PayPal requires for this sale</h2>
+<p>This is information from PayPal's published program. It does not decide whether protection applies to this sale; only PayPal decides.</p>
+{% if shipment_policy.available %}
+<p>Rule set: <a href="{{ shipment_policy.source_url }}">{{ shipment_policy.source_title|mark_spanish }}</a>.</p>
+{% if shipment_policy.lines %}<ul>{% for line in shipment_policy.lines %}<li><strong>{{ line.label }}</strong> — {{ line.kind }}.<p>{{ line.citation|mark_spanish }} · <a href="{{ shipment_policy.source_url }}">Source</a></p></li>{% endfor %}</ul>{% else %}<p>This rule set lists no requirement lines for this step.</p>{% endif %}
+<p>Signed receipt: {{ shipment_policy.signature }}.</p>
+{% if shipment_policy.other_requirements %}<h3>PayPal also requires (Proofie does not check this)</h3><ul>{% for line in shipment_policy.other_requirements %}<li>{{ line }}</li>{% endfor %}</ul>{% endif %}
+{% else %}<p>A supported Seller Protection rule set is not available for this country.</p>{% endif %}
+</section>
+{% if not error_page %}
+{% set missing = 'Could not read PayPal' if reads.payment_read == 'failed' else 'Not returned by PayPal' %}
+<h3>What PayPal shows for this sale</h3>
+<table class="fulfilment-transaction" data-state="transaction">
+  <caption class="visually-hidden">What PayPal shows for this sale</caption>
+  <tr><th scope="row">Payment date</th><td>{{ transaction.payment_date[:10]|datewords if transaction.payment_date else missing }}</td></tr>
+  <tr><th scope="row">Amount</th><td>{{ transaction.amount or missing }}</td></tr>
+  <tr><th scope="row">Recipient</th><td>{{ transaction.recipient_name or missing }}</td></tr>
+  <tr><th scope="row">Shipping address</th><td>{% if transaction.shipping_address %}{% for k, v in transaction.shipping_address.items() %}{{ v }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}{{ missing }}{% endif %}</td></tr>
+  <tr><th scope="row">Tracking already in PayPal</th><td>{{ transaction.tracking_number or ('Could not read PayPal' if reads.tracking_read == 'failed' else 'none') }}</td></tr>
+</table>
+{% endif %}
+</details>
+{% endblock %}

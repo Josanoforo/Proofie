@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "incomplete_dev2",
+ "type": "incomplete",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0007",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 6000,
+  "amount_display": "60.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000007"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1007\nOrder date: 2026-09-29 13:20\nTotal paid: 60.00 USD\nPayPal capture id: EV2CAPTURE0000007",
+  "doc_chat": "[2026-09-30 10:00] Seller: We shipped your order yesterday, it should arrive soon.\n[2026-09-30 10:05] Buyer: ok"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_chat": "buyer_chat.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "tracking",
+    "any_of": [
+     "tracking",
+     "guía",
+     "guia",
+     "waybill"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "Only the seller's word that it shipped, with no carrier or tracking number."
+}

@@ -1,0 +1,18 @@
+<section class="panel" id="buyer-page" data-state="buyer-page-entry">
+<h2>One-view buyer page</h2>
+{% if hosted_demo() %}<p>Hosted demo uses fictitious sample information only. <a href="/buyer/demo">Preview the sample buyer page</a>.</p>
+{% else %}
+<p>This link is available only after a dispute exists; creating a buyer page directly from a sale before a dispute is not supported yet. The page is served by this Proofie instance. A loopback URL such as 127.0.0.1 or localhost works only on this device, so a buyer on another device cannot open it unless you independently provide an authorized, reachable address. Proofie does not host or send the link. Hosted pages contain fictitious sample data only.</p>
+<p>For an existing dispute, prepare a local page for this case. The buyer link is added as a proposal to a seller-reviewed message draft when the current PayPal snapshot allows a message. Nothing is sent automatically.</p>
+<form method="post" action="/disputes/{{ norm.dispute_id }}/buyer-page" enctype="multipart/form-data" novalidate>
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<div class="field"><label for="buyer-description">Item description (no buyer or PayPal identifiers)</label><input id="buyer-description" name="description" maxlength="240" required></div>
+<div class="field"><label for="buyer-tracking-status">Tracking status from your record</label><select id="buyer-tracking-status" name="tracking_status" required><option value="">Choose a status</option><option>Preparing</option><option>Shipped</option><option>In transit</option><option>Delivered</option></select></div>
+<div class="field"><label for="buyer-eta">Expected delivery date, if known</label><input id="buyer-eta" name="expected_delivery" type="date"></div>
+<div class="field"><label for="buyer-locale">Buyer notice language</label><select id="buyer-locale" name="locale"><option value="en">English</option><option value="es">Español</option></select></div>
+<div class="field"><label for="buyer-photo">Packing photo, optional (JPEG or PNG, up to 2 MB)</label><input id="buyer-photo" name="packing_photo" type="file" accept="image/jpeg,image/png"></div>
+<button class="btn btn-secondary" type="submit">Create link and message proposal</button>
+</form>
+<p><a href="/disputes/{{ norm.dispute_id }}/buyer-ledger">Read buyer responses from the local ledger</a></p>
+{% endif %}
+</section>

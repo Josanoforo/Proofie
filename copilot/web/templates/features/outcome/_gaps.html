@@ -1,0 +1,27 @@
+{% from "_components.html" import tag, limitation_text %}
+{#- After a confirmed send the checks are information, not problems: neutral words, no red. If PayPal lists provide-evidence again the normal problem styling returns. -#}
+{% set after_send = (file.send_attempts | selectattr('state', 'equalto', 'confirmed') | list | length > 0) and ('provide-evidence' not in read.links) %}
+{% set check_words = {'tracking_number': 'Tracking number', 'carrier': 'Carrier', 'delivery_status': 'Delivery status',
+   'delivery_date': 'Delivery date', 'destination': 'Delivery place', 'full_address': 'Full street address',
+   'signature': 'Signed proof of delivery', 'receiver_name': 'Who received the shipment',
+   'capture_date': 'Date the proof was captured', 'dates_coherent': 'Ship date before delivery date',
+   'branch_pickup': 'Delivered at a branch', 'document_integrity': 'Documents are readable', 'case_request': 'Evidence PayPal asked for'} %}
+{% set neutral_words = {'missing': 'not found in your documents', 'conflict': "does not match PayPal's data"} %}
+<h2>{% if rc3_reviewing|default(false) %}Evidence checks made by Proofie{% elif after_send %}Checked again after sending (for information){% else %}What was missing, and what can be added{% endif %}</h2>
+<div data-state="gaps"{% if after_send %} data-neutral="yes"{% endif %}>
+{% if gaps.at_send_recorded %}
+<h3>When it was sent</h3>
+<ul data-state="missing-at-send">{% for m in gaps.missing_at_send %}<li data-check="{{ m.id }}">{{ check_words.get(m.id, 'Another check') }}: {% if after_send %}{{ neutral_words.get(m.state, m.state) }}{% else %}{{ tag(state_kind(m.state),state_label(m.state)) }}{% endif %}<details><summary>Technical details</summary>{{ m.id }}: {{ m.state }}</details></li>{% endfor %}</ul>
+{% else %}
+<p data-state="at-send-note"><strong>When it was sent:</strong> {% if gaps.at_send_note == 'not recorded at send time' %}Proofie did not record the checks at send time.{% else %}{{ gaps.at_send_note }}{% endif %}</p>
+{% endif %}
+<h3>Now</h3>
+{% if gaps.missing_now %}
+<ul data-state="missing-now">{% for m in gaps.missing_now %}{% set label = check_words[m.id] if m.id == 'receiver_name' else m.label %}{% set shown = REVIEWING_NEUTRAL_TEXT if rc3_reviewing|default(false) and m.action != 'none' else m.message %}<li data-check="{{ m.id }}">{% if after_send %}{{ label }}: {{ neutral_words.get(m.state, m.state) }}. <small>{{ shown }}</small>{% else %}{{ label }}. {{ tag(state_kind(m.state),state_label(m.state)) }}: {{ shown }}{% endif %}</li>{% endfor %}</ul>
+{% else %}<p data-state="nothing-missing">Nothing is missing or in conflict in the current evaluation.</p>{% endif %}
+{% if not rc3_reviewing|default(false) %}<h3>What could be added</h3>
+{% if gaps.addable %}
+<ul data-state="addable">{% for a in gaps.addable %}<li><a href="{{ a.href }}">{{ a.text }}</a></li>{% endfor %}</ul>
+{% else %}<p>Nothing to add.</p>{% endif %}{% endif %}
+{% if gaps.limitations %}<ul class="outcome-limitations">{% for lim in gaps.limitations %}<li>{{ limitation_text(lim) }}</li>{% endfor %}</ul>{% endif %}
+</div>

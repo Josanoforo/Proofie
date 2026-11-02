@@ -1,0 +1,10 @@
+SYNTHETIC / DEMO DATA - fictitious. Not a real carrier document.
+
+FEDEX-STYLE SIGNED DELIVERY LETTER (template)
+Delivery proof / Comprobante de entrega
+Tracking no.: DEMO-FDX-000001
+Ship date: 2026-09-11          Delivery date: 2026-09-14 10:42
+Status: Entregado / Delivered
+Delivered to: Calle Falsa 123 Col Demo, Ciudad de Mexico, CDMX, 06600
+Received by: Ana Demo          Signature: on file, viewable online at the carrier site
+Captured: 2026-09-30

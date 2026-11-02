@@ -1,0 +1,27 @@
+{% if appeal_workspace and appeal_workspace.recovery %}
+{% set recovery = appeal_workspace.recovery %}
+<section aria-labelledby="recovery-heading" data-state="appeal-recovery">
+  <h3 id="recovery-heading">Next step after the outcome</h3>
+  <dl><dt>Current appeal availability</dt><dd>{{ recovery.eligibility }} — {{ recovery.eligibility_reason }}</dd>
+      <dt>Evidence comparison</dt><dd>{{ recovery.evidence_novelty }}. {% if recovery.evidence_novelty == 'unknown' %}An original or its bytes are unavailable, so a complete comparison is not possible.{% elif recovery.evidence_novelty == 'new' %}At least one readable original has different bytes from the confirmed package.{% elif recovery.evidence_novelty == 'duplicate' %}Readable originals match the confirmed package bytes.{% else %}No readable current originals were found.{% endif %}</dd></dl>
+  <p>{{ recovery.next_action }}</p>
+  {% if appeal_workspace.proposed_evidence %}
+  <h4>Compare and select case evidence</h4>
+  <ul>{% for row in appeal_workspace.proposed_evidence %}
+    <li>{{ row.name }} — {{ row.delta }} · source {{ row.source_id }} · SHA-256 <code>{{ row.sha256 }}</code>
+      {% if row.same_content_as %} · matches {{ row.same_content_as }}{% endif %}
+      {% if row.packages %} · attached to {% for package in row.packages %}<a href="/disputes/{{ dispute_id }}/packages/{{ package.id }}#attachments">package v{{ package.version }}</a>{% if not loop.last %}, {% endif %}{% endfor %}{% else %} · not attached to a recorded package{% endif %}
+      {% if not hosted_demo() %} · <a href="/disputes/{{ dispute_id }}/documents/{{ row.id.split(':')[1] }}/original">Open original</a>{% endif %}
+    </li>{% endfor %}</ul>
+  {% endif %}
+  {% if appeal_workspace.unavailable_sources %}<p>Unavailable for comparison:</p><ul>{% for row in appeal_workspace.unavailable_sources %}<li>{{ row.name }} — {{ row.status }}</li>{% endfor %}</ul>{% endif %}
+  {% if recovery.packages %}<p>To select evidence, open a package and use its existing attachment controls: {% for package in recovery.packages %}<a href="/disputes/{{ dispute_id }}/packages/{{ package.id }}#attachments">package v{{ package.version }}</a>{% if not loop.last %}, {% endif %}{% endfor %}. Review the package and appeal preview before deciding.</p>{% endif %}
+  {% if recovery.lesson_enabled %}
+    <h4>Lesson for another sale</h4>
+    {% if recovery.lesson %}<p>Seller interpretation for {{ recovery.lesson.sale_type }}: {{ recovery.lesson.seller_lesson }}. This is not a PayPal-confirmed cause.</p>
+    {% elif recovery.captures %}<p>Record your own interpretation for a future sale. The case and sale reference will be checked again:</p><ul>{% for capture in recovery.captures %}<li><a href="/disputes/{{ dispute_id }}/sale-lesson?capture_id={{ capture }}">Record a lesson for sale {{ capture }}</a></li>{% endfor %}</ul>
+    {% else %}<p>No sale reference is available from the current outcome read; a lesson cannot be linked yet.</p>{% endif %}
+  {% endif %}
+  <p><small>{{ recovery.source }}. {{ recovery.provider_confirmation }} Availability is not a promise of acceptance; review the evidence and existing appeal preview.</small></p>
+</section>
+{% endif %}

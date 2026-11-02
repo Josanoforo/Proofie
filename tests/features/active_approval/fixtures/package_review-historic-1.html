@@ -1,0 +1,352 @@
+{% extends "_base.html" %}
+{% from "_components.html" import banner, checked_bar, tag %}
+{% from "_form_fields.html" import error_summary %}
+{% set form_errors = form_errors|default({}) %}
+{% set form_values = form_values|default({}) %}
+{% block title %}{% if form_errors %}Error: {% endif %}Review package{% endblock %}
+{% block content %}
+{{ error_summary(form_errors, ['delivery_date','ship_date','capture_date']) }}
+<p><a class="back-link" href="/disputes/{{ dispute_id }}">&larr; <span class="mono-id">{{ dispute_id }}</span></a></p>
+<h1>Review evidence package{% if package %} (v{{ package.version }}){% endif %}</h1>
+{% if package %}<nav aria-label="More package views"><ul>
+{% if feature_enabled("claims") %}<li><a href="/disputes/{{ dispute_id }}/packages/{{ package.id }}/claims-review">Review statements against their sources</a></li>{% endif %}
+{% if feature_enabled("package_print") %}<li><a href="/disputes/{{ dispute_id }}/packages/{{ package.id }}/print">Print the evidence package</a></li>{% endif %}
+{% if feature_enabled("outcome") %}<li><a href="/disputes/{{ dispute_id }}/outcome">Read PayPal's answer</a></li>{% endif %}
+</ul></nav>{% endif %}
+{% if package %}<p class="step-note"><small>Step 3 of 6: review the package</small></p>{% endif %}
+
+{% if not package %}
+{% call banner("error", "package-not-found", "This package could not be found") %}
+  <p>It may have been removed, or it belongs to another dispute. Nothing was changed.</p>
+  <p class="actions"><a class="btn" href="/disputes/{{ dispute_id }}">&larr; Back to {{ dispute_id }}</a></p>
+{% endcall %}
+{% else %}
+
+{{ checked_bar(checked_at, "/disputes/" ~ dispute_id ~ "/packages/" ~ package.id, "Refresh from PayPal") }}
+
+{% call banner(send_state.kind, send_state.state, send_status) %}
+  {% if send_state.state == "result-uncertain" %}
+  <p>We do not know whether PayPal has this evidence. It is not an error and not a success. Nothing will be sent again automatically. <strong>Check again</strong> only asks PayPal (read-only).</p>
+  {% elif send_state.state == "confirmed" %}
+  <p>Confirmed by PayPal's own record of this dispute (not by this page).</p>
+  {% elif send_state.state == "rejected" %}
+  <p>PayPal refused this evidence. Fix what the message says, then approve and send again.</p>
+  {% elif send_state.state == "blocked" %}
+  <p>This was not sent: the app stopped it before it reached PayPal. Fix what the message says, then send again.</p>
+  {% elif send_state.state == "abandoned" %}
+  <p>You marked this attempt as not received. To send this content you need to edit it first (that makes a new version).</p>
+  {% endif %}
+  <form method="post" action="/disputes/{{ dispute_id }}/packages/{{ package.id }}/check" data-guard-submit>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit" class="btn{% if send_state.state != 'result-uncertain' %} btn-secondary{% endif %}" data-sending-text="Checking PayPal…">Check again</button>
+  </form>
+{% endcall %}
+<!-- R1 B9: GET-only re-check against PayPal, never a send - distinct from "Send to PayPal" below,
+     which is the real send route (POST provide-evidence). -->
+
+{% if send_summary.earlier_confirmed %}
+{% call banner("info", "earlier-send-confirmed", "An earlier version of this package was already received by PayPal") %}
+  <p>An earlier version was sent and PayPal showed it as received ({% for e in send_summary.earlier_confirmed %}{{ e.when }}{% if not loop.last %}; {% endif %}{% endfor %}). That confirmation covers only the content sent then, not this version. Sending this version would be a new submission.</p>
+{% endcall %}
+{% endif %}
+
+<section class="panel" id="where-it-stands" data-state="where-it-stands">
+  <h2>Where this package stands</h2>
+  {% set states = check_rows|map(attribute='tag_state')|list %}
+  <p>{{ tag('bad' if 'bad' in states else 'warn' if 'warn' in states else 'ok', 'Needs attention' if 'bad' in states else 'Some facts cannot be verified' if 'warn' in states else 'Checks complete') }}</p>
+  <h3>What we know, what is missing, what does not match</h3>
+  <ul>
+  {% for title, items in check_groups %}{% if items %}
+    <li data-check-group="{{ title }}"><strong><a href="#check-{{ items[0].id }}">{{ title }} ({{ items|length }})</a>:</strong> {% for c in items %}<a href="#check-{{ c.id }}">{{ check_labels[c.id] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+      {% if title == "Missing" %}&middot; <a href="#shipment-details">Type the details</a> or <a href="/disputes/{{ dispute_id }}#documents">add a document</a>
+      {% elif title == "Does not match" %}&middot; <a href="#check-{{ items[0].id }}">Review the difference</a>
+      {% elif title == "Present but we cannot verify" %}&middot; <a href="#shipment-details">Type the details</a>{% endif %}</li>
+  {% endif %}{% endfor %}
+  </ul>
+  <h3>What will be sent</h3>
+  <ul data-state="will-send">
+    <li>{{ send_summary.claims_count }} {{ 'statement' if send_summary.claims_count == 1 else 'statements' }} from the list below</li>
+    <li>Tracking: {% if send_summary.sendable %}{{ send_summary.tracking_number }}{% if send_summary.carrier %} ({{ send_summary.carrier }}){% endif %}{% else %}<span data-state="no-tracking">none yet, so this cannot be sent. <a href="#shipment-details">Type the tracking number</a> or upload the carrier's document.</span>{% endif %}</li>
+    <li>Attachments: {% if send_summary.attachments %}{{ send_summary.attachments | join(", ") }}{% else %}none (<a href="#attachments">attach a document</a>){% endif %}</li>
+  </ul>
+  <h3>What PayPal confirmed</h3>
+  {% if send_state.state == "confirmed" %}<p data-state="paypal-confirmed">{{ send_status }}</p>
+  {% if send_summary.current_confirmation %}<p data-state="readback-confirmed">Confirmed by reading the dispute back from PayPal at <time>{{ send_summary.current_confirmation }}</time> (Mexico City time).</p>{% endif %}
+  {% elif send_state.state == "result-uncertain" %}<p data-state="paypal-confirmed-none">PayPal has not confirmed this content yet: the result is still unknown. Use Check again.</p>
+  {% else %}<p data-state="paypal-confirmed-none">PayPal has not confirmed anything for this content.</p>{% endif %}
+</section>
+
+{% if send_summary.has_unconfirmed %}<details>
+  <summary>Why is sending blocked?</summary>
+  <p>Sending is blocked while an earlier attempt for this dispute is unconfirmed, because that attempt may already have reached PayPal.</p>
+  <p>Try <strong>Check again</strong> above first - it may resolve on its own. If you have independently
+  checked <strong>PayPal's Resolution Center</strong> for this dispute and the earlier attempt genuinely is
+  not there, you may confirm that below and proceed. This does not change anything about this package - it
+  only marks the earlier attempt as acknowledged, so it stops blocking.</p>
+  <form method="post" action="/disputes/{{ dispute_id }}/packages/{{ package.id }}/confirm-not-received">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <p class="form-convention">Fields marked Required must be completed.</p>
+    <label><input type="checkbox" name="confirmed" value="on" required>
+      I checked PayPal's Resolution Center: the earlier attempt is not there. <strong class="field-mark">Required</strong></label>
+    <button type="submit" class="btn-secondary">Confirm</button>
+  </form>
+</details>{% endif %}
+
+
+{% if package.review_flags %}
+{% call banner("warn", "review-flags", "Before you send") %}
+  <ul>{% for f in package.review_flags %}<li>{{ f }}</li>{% endfor %}</ul>
+  <p>Review these notices before deciding what to send. <a href="#approval">Go to approval</a></p>
+{% endcall %}
+{% endif %}
+
+{% if package.source == "ai" and not package.validation_ok %}
+{% call banner("warn", "ai-unchecked", "The AI answer could not be checked") %}
+  <p>The AI assistant's answer did not pass our checks, so none of it should be trusted as written. Start by hand: <a href="#shipment-details">type the details</a> and add your own statements below, or go back to the dispute and generate the draft again.</p>
+  <p class="actions"><a href="/disputes/{{ dispute_id }}">&larr; Back to the dispute to try again</a></p>
+{% endcall %}
+{% endif %}
+
+{% if unreadable_documents %}
+{% call banner("warn", "extraction-failed", "Some documents could not be read") %}
+{% for d in unreadable_documents %}
+  <p>We couldn't read {{ d.filename }}. Type the values below or upload a text PDF. <a href="#shipment-details">Type the details</a></p>
+{% endfor %}
+{% endcall %}
+{% endif %}
+
+{% if context_limitations %}
+{% call banner("info", "paypal-limitations", "What PayPal could not tell us") %}
+  <ul>{% for l in context_limitations %}<li>{{ l }}</li>{% endfor %}</ul>
+  <p>These checks stay "cannot verify" until you add the missing detail yourself. <a href="#shipment-details">Type the details</a></p>
+{% endcall %}
+{% endif %}
+
+{# C3 (table 2's UI copy spec): label and hint per field. A hint that contradicts a check in copilot/core/checklist.py is not shipped (empty). #}
+{% set shipment_fields = [
+  ("tracking_number", "Tracking number", "The number printed on the carrier's receipt or tracking page."),
+  ("carrier", "Carrier", "For example FedEx or Estafeta. If we do not recognise it, it is sent as \"Other\"."),
+  ("delivery_status", "Delivery status", "For example \"delivered\". \"In transit\" is shown as in transit, never as delivered."),
+  ("delivery_date", "Delivery date", "The delivery date shown on the carrier's proof."),
+  ("ship_date", "Ship date", "The date the carrier picked up the parcel."),
+  ("postal_code", "Postal code", "The postal code of the delivery address."),
+  ("city", "City", "The city of the delivery address."),
+  ("state", "State", "The state of the delivery address."),
+  ("street", "Street", "Only needed if your document shows a street address."),
+  ("receiver_name", "Receiver name", "Who received the package. For information only."),
+  ("signature", "Signature", "Can the signature be viewed online on the carrier's site? Some countries' rules ask for it above a limit; check the signature row below."),
+  ("delivery_type", "Delivery type", "Choose branch pickup if the parcel was collected at a carrier branch. This is Proofie's own risk flag, not a PayPal rule."),
+  ("capture_date", "Date the proof was captured", "The day you saved or photographed the proof, not the delivery date.")] %}
+{# Select fields: the stored value is exactly what checklist.py compares (_signature via _SIG, _branch). First option is empty and stores nothing. #}
+{% set select_options = {
+  "signature": [("online", "Viewable online"), ("paper_only", "Paper only"),
+                ("aggregator_portal", "Tracking portal only"), ("none", "Not viewable online")],
+  "delivery_type": [("home", "Home delivery"), ("branch_pickup", "Branch pickup")]} %}
+{% from "_form_fields.html" import date_fields, error_summary %}
+{% set needed = ['delivery_status','delivery_date','postal_code','city','state'] %}
+{% set signature_check = checks|selectattr('id','equalto','signature')|list %}
+{% if signature_check and signature_check[0].state != 'not_applicable' %}{% set needed = needed + ['signature'] %}{% endif %}
+{% set dates = ['delivery_date','ship_date','capture_date'] %}
+{% macro shipment_input(name, label, hint) %}
+{% set current = manual_fields.get(name, {}).get('value', '') %}
+{% set mark = 'Required by the loaded policy' if name == 'signature' and signature_required else 'Required to send' if name == 'tracking_number' or (name == 'carrier' and feature_enabled('carrier_required')) else 'Needed' if name in needed or name == 'carrier' else '' %}
+{% if name in dates %}{{ date_fields(name, label, current, form_values, form_errors, mark, hint) }}
+{% else %}
+<div class="field">
+<label for="field-{{ name }}">{{ label }}{% if mark %} <strong class="field-mark">{{ mark }}</strong>{% endif %}</label>
+{% if form_errors.get(name) %}<p class="field-error" id="error-{{ name }}">{{ form_errors[name] }}</p>{% endif %}
+{% if hint %}<p class="field-hint" id="hint-{{ name }}">{{ hint }}</p>{% endif %}
+{% if name in select_options %}
+<select id="field-{{ name }}" name="{{ name }}" aria-describedby="hint-{{ name }}{% if form_errors.get(name) %} error-{{ name }}{% endif %}"{% if form_errors.get(name) %} aria-invalid="true"{% endif %}>
+<option value=""{% if not form_values.get(name,current) %} selected{% endif %}>Not stated</option>
+{% for value, text in select_options[name] %}<option value="{{ value }}"{% if form_values.get(name,current) == value %} selected{% endif %}>{{ text }}</option>{% endfor %}
+{% if current and current not in select_options[name]|map('first') %}<option value="{{ current }}" selected>{{ current }}</option>{% endif %}
+</select>
+{% else %}
+<input type="text" id="field-{{ name }}" name="{{ name }}" value="{{ form_values.get(name,current) }}" aria-describedby="hint-{{ name }}{% if form_errors.get(name) %} error-{{ name }}{% endif %}"{% if form_errors.get(name) %} aria-invalid="true"{% endif %}>
+{% endif %}</div>
+{% endif %}
+{% endmacro %}
+<h2 id="shipment-details">Shipment details</h2>
+{% if delivery_scan_pending %}<p class="field-hint" data-state="delivery-scan-hint">If the deadline allows, wait for the carrier's delivery scan before sending.</p>{% endif %}
+<p>Fields marked Required block the send. Fields marked Needed turn a check red until you fill them. Everything else is optional.</p>
+<p>You can save incomplete details; fields marked Required must be present before sending. Your entries are labelled as yours, not PayPal's. For the destination, enter a postal code or both city and state.</p>
+{% if payment_date %}<p id="field-payment_date">Payment date: {{ payment_date[:10]|datewords }}{% if form_errors.get('payment_date') %}<span class="field-error">{{ form_errors['payment_date'] }}</span>{% endif %}</p>{% endif %}
+<form method="post" action="/disputes/{{ dispute_id }}/manual-fields">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<input type="hidden" name="package_id" value="{{ package.id if package else '' }}">
+{% for name,label,hint in shipment_fields if name in ['tracking_number','carrier'] %}{{ shipment_input(name,label,hint) }}{% endfor %}
+{% for name,label,hint in shipment_fields if name in needed %}{{ shipment_input(name,label,hint) }}{% endfor %}
+<details data-state="optional-details" open><summary>Optional details that help the checks</summary>
+{% for name,label,hint in shipment_fields if name not in ['tracking_number','carrier'] and name not in needed %}{{ shipment_input(name,label,hint) }}{% endfor %}
+</details>
+<p class="actions"><button type="submit" class="btn-secondary">Save shipment details</button></p>
+</form>
+
+{# RULES-US1: PayPal's published words matched by code on this dispute's reason/channel; information only, no action, no verdict. #}
+{% if eligibility_notes %}
+<section class="panel" id="eligibility-notes" data-state="eligibility-note">
+  <h2>Eligibility notes</h2>
+  <p>{{ eligibility_effect }}</p>
+  {% for n in eligibility_notes %}
+  <div data-eligibility-note="{{ n.id }}">
+    <p><small>This dispute: {{ n.matched_on | join("; ") }}</small></p>
+    <blockquote lang="{{ n.quote_lang }}">{% if n.lead_in %}<p>{{ n.lead_in }}</p>{% endif %}<p>{{ n.quote }}</p></blockquote>
+    <p><small>Source: {{ n.citation_text }}{% if n.citation_url or rules_source_url %} · <a href="{{ n.citation_url or rules_source_url }}" rel="noopener">Read the full terms on PayPal</a>{% endif %}</small></p>
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+<h2 id="checks">Checks</h2>
+{% if no_rule_set_line %}<p data-state="no-rule-set">{{ no_rule_set_line }}</p>
+{% else %}<p class="checked-at">Rules: <a href="{{ rules_source_url }}">{{ rules_source_title }}</a></p>{% endif %}
+{% include "_rule_source.html" %}
+<table class="stack">
+<thead><tr><th>Check</th><th>Status</th><th>Why</th><th>What you can do</th></tr></thead>
+<tbody>
+{% for row in check_rows %}{% set c = row.check %}
+<tr id="check-{{ c.id }}" data-check="{{ c.id }}" data-check-state="{{ c.state }}" data-tag-state="{{ row.tag_state }}">
+  <td data-label="Check">{{ row.label }}</td>
+  <td data-label="Status">{{ tag(row.tag_state, 'Not started' if row.tag_state == 'todo' else row.state_label) }}{% if c.risk %} <span class="risk">&#9888; Puts your Seller Protection at risk</span>{% endif %}<br><small data-basis>Because: {{ row.basis_label }}</small></td>
+  <td data-label="Why">{{ c.seller_message }}{% if check_notes.get(c.id) %} <em>({{ check_notes[c.id] }})</em>{% endif %}</td>
+  <td data-label="What you can do">{% if row.actions %}<ul class="row-actions">{% for a in row.actions %}
+    {% if a.kind == "exclude" %}<li><form method="post" action="{{ a.href }}" data-guard-submit><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit">{{ a.label }}</button></form></li>
+    {% else %}<li><a href="{{ a.href }}">{{ a.label }}</a></li>{% endif %}
+  {% endfor %}</ul>{% else %}&mdash;{% endif %}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<h2 id="statements">What we're saying, and where it comes from</h2>
+{% if claims|length == 0 %}
+<p>No statements yet.</p>
+{% else %}
+<ul class="claims">
+{% for c in claims %}
+<li class="claim-card" data-basis="{{ c.basis }}" data-claim="{{ c.id }}">
+  <p class="claim-text">{{ c.text }}</p>
+  <p class="claim-meta">
+    <span class="chip{% if c.basis == 'model_interpretation' %} chip-warn chip-suggested{% endif %}">{{ c.basis_label }}</span>
+    <span data-source>Source: {{ c.source_labels | join("; ") }}</span>
+    {% if c.edited_by_human %}<span>(edited by you)</span>{% endif %}
+  </p>
+  {% if c.suggested_field %}
+    {% if c.confirmed_value %}
+      <p class="claim-meta">Confirmed by you: {{ c.suggested_field.replace('_', ' ') }} = {{ c.confirmed_value }}</p>
+    {% else %}
+      <form method="post" action="/disputes/{{ dispute_id }}/documents/{{ c.document_id }}/confirm-reading">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="package_id" value="{{ package.id }}">
+        <input type="hidden" name="field_name" value="{{ c.suggested_field }}">
+        <input type="hidden" name="value" value="{{ c.suggested_value }}">
+        <button type="submit" class="btn-secondary">Yes, the image shows this ({{ c.suggested_field.replace('_', ' ') }} = {{ c.suggested_value }})</button>
+      </form>
+    {% endif %}
+  {% endif %}
+  <form method="post" class="claim-edit" action="/disputes/{{ dispute_id }}/packages/{{ package.id }}/claims/{{ c.id }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <p>Fields marked Required must be filled in before saving.</p>
+    <div id="field-claim-{{ c.id }}"><label for="claim-{{ c.id }}">Edit this statement <strong class="field-mark">Required</strong></label>
+    {% set claim_key = 'claim-' ~ c.id %}{% if form_errors.get(claim_key) %}<p class="field-error" id="error-{{ claim_key }}">{{ form_errors[claim_key] }}</p>{% endif %}
+    <input type="text" id="claim-{{ c.id }}" name="text" value="{{ form_values.get(claim_key,c.text) }}" required{% if form_errors.get(claim_key) %} aria-invalid="true" aria-describedby="error-{{ claim_key }}"{% endif %}></div>
+    <button type="submit" class="btn-secondary">Save</button>
+  </form>
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<form method="post" class="add-claim" action="/disputes/{{ dispute_id }}/packages/{{ package.id }}/claims">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <p>Fields marked Required must be filled in before saving.</p>
+  <div id="field-new-claim"><label for="new-claim">Add a statement yourself <strong class="field-mark">Required</strong></label>
+  {% if form_errors.get('new-claim') %}<p class="field-error" id="error-new-claim">{{ form_errors['new-claim'] }}</p>{% endif %}
+  <input type="text" id="new-claim" name="text" value="{{ form_values.get('new-claim','') }}" required{% if form_errors.get('new-claim') %} aria-invalid="true" aria-describedby="error-new-claim"{% endif %}></div>
+  <button type="submit" class="btn-secondary">Add</button>
+</form>
+
+<h2 id="attachments">Attachments</h2>
+<p>PayPal accepts PDF, PNG, JPEG or GIF, under 10 MB each, 50 MB total per send.</p>
+{% if documents|length == 0 %}
+<p>No documents uploaded yet.</p>
+{% else %}
+<table class="stack">
+<thead><tr><th>Document</th><th>Type</th><th>Size</th><th></th></tr></thead>
+<tbody>
+{% for d in documents %}
+<tr>
+  <td data-label="Document">{{ d.filename }}</td>
+  <td data-label="Type">{{ d.content_type }}</td>
+  <td data-label="Size">{{ (d.size_bytes / 1024) | round(1) }} KB</td>
+  <td>
+    {% if d.id in attached_ids %}
+    <form method="post" action="/disputes/{{ dispute_id }}/packages/{{ package.id }}/detach/{{ d.id }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit">Detach from the response</button>
+    </form>
+    {% else %}
+    <form method="post" action="/disputes/{{ dispute_id }}/packages/{{ package.id }}/attach/{{ d.id }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit">Attach to the response</button>
+    </form>
+    {% endif %}
+  </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+
+<h2 id="approval">Approval</h2>
+{%- if false %}{% include "features/active_approval/_entry.html" %}{% endif %}
+{%- if hosted_demo() %}
+<p data-state="hosted-shared-send">Anything you send here goes to the shared sandbox dispute; the next visitor will see it.</p>
+{%- endif %}
+{% if approval %}
+<p data-state="approved">Approved {{ approval.approved_at | cdmx }}{% if approval.sufficiency_override %} (sent anyway: "{{ approval.sufficiency_override }}"){% endif %}. What is approved is exactly the content listed under "What will be sent"; any edit clears this approval.</p>
+{% if send_state.state == "confirmed" %}
+<p data-state="already-received">PayPal already has this exact content. There is nothing new to send.</p>
+{% elif send_state.state not in ("approved", "prepared", "rejected", "blocked") %}
+<p data-state="send-withheld">{% if send_state.state == "result-uncertain" %}A send of this content may already have reached PayPal, so there is no Send button until you use Check again above and see what PayPal has.{% else %}This content cannot be sent as it is. Edit it (that makes a new version) and approve again.{% endif %}</p>
+{% else %}
+{% if send_summary and send_summary.sendable %}
+<p data-state="send-note">This sends the approved content to the PayPal sandbox once. If you change anything first, the approval is cleared. Nothing is sent again automatically. Once sent, this evidence cannot be withdrawn through Proofie.</p>
+<form method="post" action="/disputes/{{ dispute_id }}/packages/{{ package.id }}/send" data-guard-submit>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <button type="submit" class="btn" data-sending-text="Sending…">Send evidence to PayPal</button>
+</form>
+{% else %}
+<div data-state="send-needs-tracking"><button type="button" class="btn" aria-disabled="true" aria-describedby="send-tracking-reason">Send evidence to PayPal</button><p id="send-tracking-reason">There is no tracking number yet, so there is nothing to send. <a href="#shipment-details">Type the shipment details</a> or <a href="/disputes/{{ dispute_id }}#documents">add a document</a>, then approve again.</p></div>
+{% endif %}
+{% endif %}
+{% else %}
+{% if send_summary.approval_cleared %}
+{% call banner("warn", "approval-cleared", "Approval cleared because the content changed") %}
+  {% if send_summary.approval_stale %}<p>The content that would be sent no longer matches what you approved (for example the tracking number or an attachment changed). The old approval cannot be used. Review "What will be sent" above, then approve again.</p>
+  {% else %}<p>You approved an earlier version of this package. Approval is tied to the exact content, so it was cleared. Review what will be sent above, then approve again.</p>{% endif %}
+{% endcall %}
+{% endif %}
+{%- if true %}
+<form method="post" action="/disputes/{{ dispute_id }}/packages/{{ package.id }}/approve">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  {% if package.review_flags %}
+  <p>Fields marked Required must be filled in before approving.</p><p><label for="package-override">If you want to proceed despite the notices above, explain why <strong class="field-mark">Required while a notice is open</strong>:<br>
+  <input id="package-override" type="text" name="sufficiency_override" required></label></p>
+  {% endif %}
+  <p data-state="approve-note">Approving does not send anything. Sending is a separate step: nothing reaches PayPal until you press "Send evidence to PayPal".</p>
+  <button type="submit" class="btn">Approve this package</button>
+</form>
+{%- endif %}
+{% endif %}
+
+<details>
+<summary>Technical details</summary>
+<pre>validation_ok: {{ package.validation_ok }}
+model: {{ package.model }}
+effective_next_step: {{ package.effective_next_step }}
+documents used: {{ names }}</pre>
+</details>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% from "_components.html" import post_button -%}
+<section data-state="appeal-preview">
+<h3>Review the appeal</h3>
+<p>This is exactly what Proofie will send to PayPal. Nothing is sent until you approve it below. PayPal accepts an appeal only with new information.</p>
+<details><summary>Technical details</summary><pre data-state="request-body">{{ body_text }}</pre></details>
+<ul data-state="appeal-attachments">{% for a in preview.attachments %}<li>{{ a.filename }}</li>{% else %}<li>No attachments.</li>{% endfor %}</ul>
+<details><summary>Technical details</summary><p>Approval fingerprint (the request and the sha256 of each attachment): <code data-state="request-sha256">{{ preview.sha256 }}</code></p></details>
+{% if active_appeal_approval %}{% if appeal_receipt_id %}
+<p data-state="appeal-receipt">This appeal has an action-specific approval, valid for five minutes and one attempt only.</p>
+{{ post_button("/disputes/" ~ dispute_id ~ "/outcome/appeal/register", "Send this approved appeal once", csrf_token, kind="primary", sends=True, sending="Sending to PayPal…", fields=(("package_id", package_id), ("approval_sha256", preview.sha256), ("appeal_receipt_id", appeal_receipt_id)), form_state="confirm-form") }}
+{% else %}
+<p>Review the body, attachments and sources for this appeal. A package evidence approval does not authorize an appeal.</p>
+{{ post_button("/disputes/" ~ dispute_id ~ "/outcome/appeal/preview", "Approve this appeal only; send nothing yet", csrf_token, kind="primary", fields=(("package_id", package_id), ("review_sha256", appeal_review_sha256), ("decision", "approve_appeal")), form_state="appeal-approve-form") }}
+{% endif %}{% else %}
+{{ post_button("/disputes/" ~ dispute_id ~ "/outcome/appeal/register", "Approve and send the appeal to PayPal", csrf_token, kind="primary", sends=True, sending="Sending to PayPal…", fields=(("package_id", package_id), ("approval_sha256", preview.sha256)), form_state="confirm-form") }}{% endif %}
+</section>

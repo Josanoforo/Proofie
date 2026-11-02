@@ -1,0 +1,43 @@
+{
+ "case_id": "contradictory_heldout2",
+ "type": "contradictory",
+ "set": "heldout",
+ "dispute": {
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true,
+  "dispute_id": "PP-R-EVAL-0104",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED"
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2104\nOrder date: 2026-10-01 10:00\nTotal paid: 25.00 USD\nPayPal capture id: DEMOTXN0000000001",
+  "doc_shipping": "Carrier: Estafeta\nTracking number: DEMO9200000104\n2026-10-03  Delivered. Signed for",
+  "doc_invoice": "Commercial invoice\nOrder TS-DEMO-2104\nItem total: 32.50 USD\nShipping: included\nGrand total: 32.50 USD"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_shipping": "shipping_tracking.txt",
+  "doc_invoice": "invoice.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "TS-DEMO-2104",
+   "DEMO9200000104"
+  ],
+  "forbidden_claims": [],
+  "expected_conflicts": [
+   "25.00",
+   "32.50",
+   "amount",
+   "total"
+  ],
+  "expected_missing": [],
+  "expected_action": "ask_seller"
+ },
+ "notes": "Round-2 heldout: carrier/tracking/date all agree and show real delivery; the contradiction is the amount (order confirmation says 25.00 USD, matching the dispute; the invoice says 32.50 USD) - a different contradiction axis than the original pair (carrier/date)."
+}

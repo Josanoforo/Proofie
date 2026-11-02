@@ -1,0 +1,44 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs, link_button, tag %}
+{% block title %}Case history: {{ dispute_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('Case history', None)]) }}{% endblock %}
+{% block content %}
+<section id="case-history" data-state="case-history" data-case="{{ dispute_id }}">
+<h1>Case history</h1>
+<p>Dispute {{ dispute_id }}. This is your record of what Proofie saved for this case, oldest first. It shows what was recorded, not what PayPal decided.</p>
+<p><a class="btn-link" href="/disputes/{{ dispute_id }}">Back to the case</a></p>
+
+{% if not events %}
+<section class="panel" id="history-empty" data-state="history-empty"><h2>Nothing is recorded yet</h2>
+<p>Proofie has not saved any work, send attempt or PayPal answer for this case. Entries appear here as you prepare a package, approve it or send it.</p></section>
+{% else %}
+<section class="panel" id="history-kinds" aria-labelledby="history-kinds-title"><h2 id="history-kinds-title">Four kinds of entry</h2>
+<ul>
+<li><strong>Local work</strong>: something done in Proofie, such as preparing, editing or approving. Nothing reached PayPal.</li>
+<li><strong>Send attempted</strong>: Proofie recorded an attempt before it called PayPal.</li>
+<li><strong>PayPal response</strong>: what PayPal answered to a send.</li>
+<li><strong>Later read from PayPal</strong>: Proofie read PayPal's record afterwards; the time and the source are shown.</li>
+</ul></section>
+
+{% if versions %}
+<section class="panel" id="history-versions" aria-labelledby="history-versions-title"><h2 id="history-versions-title">Package versions</h2>
+<table><caption class="visually-hidden">Package versions of this case</caption>
+<thead><tr><th scope="col">Version</th><th scope="col">Prepared</th><th scope="col">Approval</th><th scope="col">Send state recorded</th></tr></thead>
+<tbody>{% for v in versions %}<tr><th scope="row"><a href="/disputes/{{ dispute_id }}/packages/{{ v.package_id }}">Package v{{ v.number }}</a></th><td>{{ v.created_at|when }} {{ v.how }}</td><td>{{ v.approval }}</td><td>{{ tag(v.send_kind, v.send_label) }}</td></tr>{% endfor %}</tbody></table></section>
+{% endif %}
+
+<section id="history-events" aria-labelledby="history-events-title"><h2 id="history-events-title">Entries in time order</h2>
+<ol class="history-list">
+{% for e in events %}<li class="history-item" data-kind="{{ e.kind }}">
+<p><strong class="history-kind">{{ kinds[e.kind] }}</strong> · {{ e.at|when }}</p>
+<p>{{ e.text }}</p>
+{% if e.source %}<p>Source: {{ e.source }}. Read at {{ e.at|when }}.</p>{% endif %}
+{% for line in e.detail %}<p>{{ line }}</p>{% endfor %}
+{% if e.hashes %}<details><summary>Hashes and manifest</summary>
+<p>A hash does not prove authenticity. It shows that the content is the same as when it was recorded.</p>
+<dl>{% for label, value in e.hashes %}<dt>{{ label }}</dt><dd><code>{{ value }}</code></dd>{% endfor %}</dl></details>{% endif %}
+</li>{% endfor %}
+</ol></section>
+{% endif %}
+</section>
+{% endblock %}

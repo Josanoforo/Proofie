@@ -1,0 +1,10 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs %}
+{% block title %}Seller lessons - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Seller lessons', None)]) }}{% endblock %}
+{% block content %}
+<h1>Seller lessons for the next sale</h1>
+<p>These are seller-authored views of what may have contributed, grouped by sale type. The recorded PayPal outcome is shown separately; it is not a PayPal-confirmed cause.</p>
+<form method="get"><label for="sale-kind">Sale type</label><select id="sale-kind" name="kind"><option value="">All</option>{% for key in ['physical','digital','service'] %}<option value="{{ key }}"{% if kind == key %} selected{% endif %}>{{ key|title }}</option>{% endfor %}</select><button class="btn btn-primary" type="submit">Filter</button></form>
+{% for row in lessons %}<section class="panel"><h2>{{ row.sale_type|title }} sale · case {{ row.dispute_id }}</h2><p>{{ row.seller_lesson }}</p><p>PayPal outcome: {{ row.paypal_outcome_code }} · saved {{ row.created_at }} UTC</p></section>{% else %}<p>No seller lessons saved for this type.</p>{% endfor %}
+{% endblock %}

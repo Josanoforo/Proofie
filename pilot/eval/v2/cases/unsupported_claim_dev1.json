@@ -1,0 +1,45 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "unsupported_claim_dev1",
+ "type": "unsupported_claim",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0036",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 3500,
+  "amount_display": "35.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000036"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1036\nOrder date: 2026-09-28 12:00\nTotal paid: 35.00 USD\nPayPal capture id: EV2CAPTURE0000036",
+  "doc_note": "Seller's statement\nThe parcel was delivered on 2026-10-02. I am sure of it."
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_note": "seller_statement.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "carrier_proof",
+    "any_of": [
+     "tracking",
+     "carrier",
+     "proof",
+     "guía",
+     "guia"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [],
+  "must_cite_tracking": null
+ },
+ "notes": "Only the seller's own statement of delivery, no carrier record."
+}

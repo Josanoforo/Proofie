@@ -1,0 +1,44 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "contradictory_heldout2",
+ "type": "contradictory",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0019",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000019"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1019\nOrder date: 2026-10-03 12:00\nTotal paid: 32.50 USD\nPayPal capture id: EV2CAPTURE0000019",
+  "doc_shipping": "Carrier: UPS\nTracking No.: 1ZEV20000000019\n2026-10-07 10:20  Delivered"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_shipping": "ups_tracking.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [],
+  "conflicts": [
+   {
+    "id": "amount",
+    "any_of": [
+     "amount",
+     "total",
+     "32.50",
+     "25.00"
+    ]
+   }
+  ],
+  "forbidden": [],
+  "must_cite_tracking": null
+ },
+ "notes": "The order total (32.50) is not the disputed amount (25.00): possibly another order."
+}

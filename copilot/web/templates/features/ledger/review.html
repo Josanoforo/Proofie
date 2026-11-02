@@ -1,0 +1,26 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs %}
+{% block title %}What this app recorded: {{ dispute_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('What this app recorded', None)]) }}{% endblock %}
+{% block content %}
+<section id="ledger">
+<h1>What this app recorded</h1>
+<p>This local record lists what was prepared, what you reviewed and what was sent, in order. It does not replace PayPal's current record.</p>
+<p><a href="/disputes/{{ dispute_id }}/ledger.json">Download the same record as JSON</a></p>
+{%- set actor_words = {'vendor': 'By you', 'app': 'By Proofie', 'system': 'By Proofie', 'ai': 'Written by AI (local model)', 'paypal': 'Read from PayPal'} %}
+<ol>{% for record in data.records %}<li><strong>{{ record.label }}</strong>
+<p>{{ record.timestamp | when if record.timestamp else "Time unknown" }}; <span data-actor="{{ record.actor }}">{% if record.metadata.get('via') == 'mcp' %}Requested by a connected AI assistant (MCP){% else %}{{ actor_words.get(record.actor, 'Not available') }}{% endif %}</span>.</p>
+{% if record.metadata.get('edited_by_human') == 1 %}<p>The current statement was edited by the seller. Earlier text is unavailable.</p>{% endif %}
+{% if record.origin == 'approvals' %}<p>Your approval{% if record.metadata.invalidated %}, cleared{% endif %}. An approval is not a receipt from PayPal.</p>{% endif %}
+{% if record.metadata.get('package_id') %}<p><a href="/disputes/{{ dispute_id }}/packages/{{ record.metadata.package_id }}">Review package</a></p>{% endif %}
+<details><summary>Technical details</summary><pre>{{ record | tojson(indent=2) }}</pre></details>
+</li>{% else %}<li>No local records found.</li>{% endfor %}</ol>
+<h2>What this record cannot show</h2>
+{% set source_names = {'documents':'Documents','packages':'Evidence packages','claims':'Statements','document_confirmations':'Document reading confirmations','package_attachments':'Package attachments','approvals':'Package approvals','audit_log':'Recorded app actions','manual_fields':'Shipment details','auto_prep':'Preparation results','send_attempts':'Send attempts','draft_messages':'Draft messages','outcome_appeals':'Appeal attempts','resolution_actions':'Offers and messages','webhook_events':'Webhook events','active_approval_receipts':'Individual statement reviews'} %}
+<ul data-state="ledger-limitations">{% for limitation in data.limitations %}
+{% set source_name = source_names.get(limitation.split(':', 1)[0]) %}
+<li>{% if source_name and limitation.endswith(': no stored source table; history unavailable.') %}{{ source_name }}: no saved history is available.{% elif source_name and limitation.endswith(': stored source shape could not be read; no data inferred.') %}{{ source_name }}: the saved records could not be read; no details were inferred.{% else %}{{ limitation }}{% endif %}</li>
+{% endfor %}</ul>
+<details><summary>Technical details — complete record</summary><pre id="ledger-data">{{ data | tojson(indent=2) }}</pre></details>
+</section>
+{% endblock %}

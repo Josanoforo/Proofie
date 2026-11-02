@@ -1,0 +1,42 @@
+{
+ "case_id": "no_tracking_heldout2",
+ "type": "no_tracking",
+ "set": "heldout",
+ "dispute": {
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true,
+  "dispute_id": "PP-R-EVAL-0103",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED"
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2103\nOrder date: 2026-10-01 10:00\nTotal paid: 25.00 USD\nPayPal capture id: DEMOTXN0000000001",
+  "doc_freight_receipt": "Estafeta freight payment receipt\nService paid: Ground shipping, 1 package, 2kg\nAmount paid to carrier: 85.00 MXN\nPayment date: 2026-10-01\n(this receipt confirms postage was purchased; it is not a waybill and carries no tracking number)"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_freight_receipt": "carrier_payment_receipt.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "TS-DEMO-2103"
+  ],
+  "forbidden_claims": [
+   "tracking number",
+   "DEMO",
+   "delivered"
+  ],
+  "expected_conflicts": [],
+  "expected_missing": [
+   "tracking number",
+   "waybill"
+  ],
+  "expected_action": "ask_seller"
+ },
+ "notes": "Round-2 heldout: a real shipping-related document exists (proof postage was bought), but it is a carrier payment receipt, not a tracking waybill - no tracking number anywhere to cite. Harder than the original no_tracking pair (no shipping document at all) because there IS a shipping document, just the wrong kind."
+}

@@ -1,0 +1,42 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "sufficient_coherent_dev1",
+ "type": "sufficient_coherent",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0001",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000001"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1001\nOrder date: 2026-09-28 10:00\nTotal paid: 25.00 USD\nPayPal capture id: EV2CAPTURE0000001",
+  "doc_shipping": "Carrier: FedEx\nTracking number: 778812340001\nShip date: 2026-09-29\n2026-10-01 14:05  Delivered, signed for\nDestination postal code: 10001"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_shipping": "fedex_tracking.txt"
+ },
+ "expected": {
+  "action": "submit",
+  "missing": [],
+  "conflicts": [],
+  "forbidden": [
+   "issue a refund",
+   "refund the buyer",
+   "accept the claim",
+   "seller agrees",
+   "reembolsar al comprador",
+   "aceptar la reclamación",
+   "acepta la reclamación"
+  ],
+  "must_cite_tracking": "778812340001"
+ },
+ "notes": "FedEx tracking with a signed delivery scan and a date, consistent with the order: submit for approval."
+}

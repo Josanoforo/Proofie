@@ -1,0 +1,41 @@
+{
+ "case_id": "irrelevant_docs_dev",
+ "type": "irrelevant_docs",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EVAL-0009",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2009\nOrder date: 2026-10-01 10:00\nTotal paid: 25.00 USD\nPayPal capture id: DEMOTXN0000000001",
+  "doc_unrelated": "Store order number: TS-OTHER-9999\nOrder date: 2026-05-01 10:00\nTotal paid: 80.00 USD\nCarrier: UPS\nTracking number: 1Z8880009999\n2026-05-03  Delivered"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_unrelated": "unrelated_receipt.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "TS-DEMO-2009"
+  ],
+  "forbidden_claims": [
+   "1Z8880009999",
+   "TS-OTHER-9999"
+  ],
+  "expected_conflicts": [],
+  "expected_missing": [
+   "tracking",
+   "shipping"
+  ],
+  "expected_action": "ask_seller"
+ },
+ "notes": "A real shipping/tracking document exists, but for a completely different order (TS-OTHER-9999, a different amount): the model must not borrow that tracking number for THIS dispute."
+}

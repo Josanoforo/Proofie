@@ -1,0 +1,41 @@
+{% from "_components.html" import tag, button, post_button, done_banner, tip %}
+<section id="documents" aria-labelledby="documents-title"><h2 id="documents-title">Documents</h2>
+<p class="field-hint" data-state="upload-storage-note" data-safety="files-local">Files stay in your configured Proofie data folder. {% call tip("Where uploaded files stay") %}Uploading saves the original file and extracted text in the configured Proofie data folder. Leaving a file out of checks does not delete it. Preparing a package sends nothing to PayPal; the send is a separate step after you review and approve the package.{% endcall %}</p>
+{% if done %}{{ done_banner(done.key, done.text, undo=done.undo, csrf_token=csrf_token) }}{% endif %}
+{% if rc3_reviewing or buyer_closed or listed %}<p>{{ tag('na','Document changes are not available') }} {% if buyer_closed %}The buyer closed this case.{% elif rc3_reviewing %}PayPal is reviewing this claim.{% else %}{{ once_per_dispute }}{% endif %} Existing documents remain readable below. <a href="{{ ws_url('overview') }}#summary">Review the case status</a>.</p>{% endif %}
+{% if documents|length == 0 %}
+<p data-state="no-documents">{% if rc3_reviewing or buyer_closed or listed %}No documents uploaded.{% else %}No documents uploaded yet. Scanned images may need you to type the details yourself in the package.{% endif %}</p>
+{% else %}
+{%- set type_words = {'application/pdf': 'PDF', 'image/png': 'PNG', 'image/jpeg': 'JPEG', 'image/gif': 'GIF'} %}
+<table class="stack">
+<caption class="visually-hidden">Documents uploaded for this dispute</caption>
+<thead><tr><th scope="col">File</th><th scope="col">Type</th><th scope="col">Text extracted</th><th scope="col">Used by checks</th><th scope="col">In PayPal</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+<tbody>
+{% for d in documents %}
+<tr{% if d.excluded %} class="is-excluded"{% endif %}>
+  <td data-label="File">{{ d.filename }}{% if not hosted_demo() %} · <a href="/disputes/{{ norm.dispute_id }}/documents/{{ d.id }}/original">Open original</a>{% endif %}</td>
+  <td data-label="Type">{{ type_words.get(d.content_type, d.content_type) }}</td>
+  <td data-label="Text extracted">{{ "Yes" if d.extraction_ok else "No. Type the details yourself in the package." }}</td>
+  <td data-label="Used by checks">{{ "No - excluded" if d.excluded else ("Yes" if d.extraction_ok else "No") }}</td>
+  <td data-label="In PayPal">{% if d.id in sent_docs %}Sent to PayPal{% if sent_docs[d.id] %}, confirmed {{ sent_docs[d.id]|when }}{% endif %}{% else %}Not sent{% endif %}</td>
+  {%- if not rc3_reviewing and not buyer_closed and not listed and d.id not in sent_docs %}
+  <td data-label="Actions">{{ post_button("/disputes/" ~ norm.dispute_id ~ "/documents/" ~ d.id ~ "/" ~ ("include" if d.excluded else "exclude"), "Use in the checks again" if d.excluded else "Leave out of the checks", csrf_token, kind="link", hidden=d.filename) }}
+  </td>
+  {%- else %}
+  <td data-label="Actions">No action available</td>
+  {%- endif %}
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+{% if not rc3_reviewing and not buyer_closed and not listed %}<form method="post" action="/disputes/{{ norm.dispute_id }}/documents" enctype="multipart/form-data" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="field">
+    <label for="upload-file">Choose a document</label>
+    <p class="field-hint" id="hint-upload-file">PDF, PNG, JPEG or GIF, under 10 MB each; 50 MB in total per send. Examples: carrier receipt, label showing the tracking number, signature confirmation.</p>
+    <input type="file" id="upload-file" name="file" accept=".pdf,.png,.jpg,.jpeg,.gif" required aria-required="true" aria-describedby="hint-upload-file">
+  </div>
+  <p class="actions">{% if feature_enabled('seller_shortcuts') and not packages %}{{ button("Upload and prepare the package", kind="primary", name="then", value="prepare", sending="Preparing…") }} {% endif %}{{ button("Upload the document", kind="secondary", sending="Uploading…") }}</p>
+</form>{% endif %}
+</section>

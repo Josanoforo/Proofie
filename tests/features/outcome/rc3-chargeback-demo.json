@@ -1,0 +1,115 @@
+{
+  "allowed_response_options": {
+    "accept_claim": {
+      "accept_claim_types": [
+        "REFUND"
+      ]
+    }
+  },
+  "create_time": "2026-10-12T19:35:00.000Z",
+  "dispute_amount": {
+    "currency_code": "USD",
+    "value": "25.00"
+  },
+  "dispute_channel": "INTERNAL",
+  "dispute_id": "PP-R-ABC-12345678",
+  "dispute_life_cycle_stage": "CHARGEBACK",
+  "dispute_state": "UNDER_PAYPAL_REVIEW",
+  "disputed_transactions": [
+    {
+      "buyer": {
+        "email": "SYNTHETIC",
+        "name": "SYNTHETIC",
+        "payer_id": "[redacted]"
+      },
+      "buyer_transaction_id": "DEMOCAPTURE000001",
+      "create_time": "2026-10-12T19:35:00.000Z",
+      "gross_amount": {
+        "currency_code": "USD",
+        "value": "25.00"
+      },
+      "items": [
+        {
+          "item_description": "SYNTHETIC",
+          "item_name": "SYNTHETIC",
+          "item_quantity": "0",
+          "item_type": "DIGITAL_DOWNLOAD",
+          "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED"
+        }
+      ],
+      "seller": {
+        "email": "SYNTHETIC",
+        "merchant_id": "[redacted]",
+        "name": "SYNTHETIC"
+      },
+      "seller_protection_eligible": true,
+      "seller_protection_type": "EXPANDED_SELLER_PROTECTION",
+      "seller_transaction_id": "DEMOCAPTURE000001",
+      "transaction_status": "HELD"
+    }
+  ],
+  "evidences": [
+    {
+      "date": "2026-10-12T19:35:00.000Z",
+      "dispute_life_cycle_stage": "INQUIRY",
+      "documents": [
+        {
+          "name": "SYNTHETIC",
+          "url": "SYNTHETIC"
+        }
+      ],
+      "evidence_type": "CREATE",
+      "notes": "0",
+      "source": "SUBMITTED_BY_BUYER"
+    }
+  ],
+  "extensions": {
+    "buyer_contacted_time": "2026-10-12T19:35:00.000Z",
+    "merchant_contacted": true,
+    "merchant_contacted_outcome": "NO_RESPONSE"
+  },
+  "fund_movements": [
+    {
+      "amount": {
+        "currency_code": "USD",
+        "value": "25.00"
+      },
+      "initiated_time": "2026-10-12T19:35:00.000Z",
+      "party": "RECEIVER",
+      "reason": "HOLD_PLACED",
+      "type": "DEBIT"
+    }
+  ],
+  "links": [
+    {
+      "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-ABC-12345678",
+      "method": "GET",
+      "rel": "self"
+    },
+    {
+      "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-ABC-12345678/accept-claim",
+      "method": "POST",
+      "rel": "accept_claim"
+    },
+    {
+      "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-ABC-12345678/provide-supporting-info",
+      "method": "POST",
+      "rel": "provide_supporting_info"
+    }
+  ],
+  "offer": {
+    "buyer_requested_amount": {
+      "currency_code": "USD",
+      "value": "25.00"
+    }
+  },
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "refund_details": {
+    "allowed_refund_amount": {
+      "currency_code": "USD",
+      "value": "25.00"
+    }
+  },
+  "status": "UNDER_REVIEW",
+  "update_time": "2026-10-12T19:35:00.000Z"
+}

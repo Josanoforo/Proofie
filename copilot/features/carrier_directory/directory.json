@@ -1,0 +1,96 @@
+{
+  "schema": "proofie-carrier-directory/1",
+  "carriers": [
+    {
+      "id": "estafeta_mx",
+      "name": "Estafeta",
+      "markets": ["MX"],
+      "tracking_format": "Official site describes a 22-digit guide number or a 10-digit tracking code.",
+      "tracking_url": "https://www.estafeta.com/Herramientas/Rastreo",
+      "proof_note": "No general signature claim is made here; review the actual shipment record and service.",
+      "source_url": "https://www.estafeta.com/soporte-a-rastreos"
+    },
+    {
+      "id": "dhl_mx",
+      "name": "DHL Express (Mexico tracking page)",
+      "markets": ["MX"],
+      "tracking_format": "DHL Mexico says tracking IDs may contain numbers and letters; minimum 5 characters; format depends on business unit.",
+      "tracking_url": "https://www.dhl.com/mx-es/home/rastreo.html",
+      "proof_note": "No Mexico-wide signature claim is verified here; check the selected DHL service and shipment record.",
+      "source_url": "https://www.dhl.com/mx-es/home/rastreo.html"
+    },
+    {
+      "id": "fedex_mx",
+      "name": "FedEx (Mexico)",
+      "markets": ["MX", "US"],
+      "tracking_format": "Enter the air waybill or tracking number supplied for the shipment; no single format is asserted.",
+      "tracking_url": "https://www.fedex.com/es-mx/tracking.html",
+      "proof_note": "FedEx says a signed proof-of-delivery letter with signature image is available for FedEx Express when data is available; release agreements can mean no signature is available.",
+      "source_url": "https://www.fedex.com/es-mx/customer-support/faq/receiving/tracking-questions/fedex-proof-of-delivery.html"
+    },
+    {
+      "id": "ups_us",
+      "name": "UPS (United States tracking)",
+      "markets": ["US"],
+      "tracking_format": "UPS examples include 1Z followed by characters, 12 digits, T followed by digits, and 9 digits; other formats exist.",
+      "tracking_url": "https://www.ups.com/track",
+      "proof_note": "UPS Signature Required shipments are signed for, but digital release can permit no-signature delivery in eligible cases; service and authorization matter.",
+      "source_url": "https://www.ups.com/us/en/support/shipping-support/shipping-services/signature-requirements"
+    },
+    {
+      "id": "usps_us",
+      "name": "USPS",
+      "markets": ["US"],
+      "tracking_format": "Use the USPS tracking number on the mailpiece; this directory does not validate a number pattern.",
+      "tracking_url": "https://tools.usps.com/go/TrackConfirmAction_input",
+      "proof_note": "USPS says proof of delivery with signature is available only when Signature Confirmation or another listed eligible service is purchased or included; it is not a default for every item.",
+      "source_url": "https://faq.usps.com/articles/Knowledge/What-is-Proof-of-Delivery"
+    },
+    {
+      "id": "correos_mx",
+      "name": "Correos de México / MEXPOST",
+      "markets": ["MX"],
+      "tracking_format": "For tracked mail, Correos describes two letters, nine digits, and two letters; formats depend on the selected postal service.",
+      "tracking_url": "https://www.correosdemexico.gob.mx/SSLServicios/SeguimientoEnvio/Seguimiento.aspx",
+      "proof_note": "MEXPOST lists an optional acknowledgment of receipt for national shipments; do not assume it is included in every postal service.",
+      "source_url": "https://portal.correosdemexico.com.mx/portal/pagina/atencion-a-clientes/preguntas-frecuentes.html",
+      "service_source_url": "https://www.correosdemexico.gob.mx/DatosAbiertos/Normateca/SUS/coM/CO4.pdf"
+    },
+    {
+      "id": "paquetexpress_mx",
+      "name": "Paquetexpress",
+      "markets": ["MX"],
+      "tracking_format": "Official FAQ accepts a tracking code, guide number, or reference; no single character pattern is asserted.",
+      "tracking_url": "https://www.paquetexpress.com.mx/pxconnect-rastreo/",
+      "proof_note": "No general signature or signed proof-of-delivery rule is asserted; check the purchased service and its shipment record.",
+      "source_url": "https://www.paquetexpress.com.mx/preguntas-frecuentes/"
+    },
+    {
+      "id": "redpack_mx",
+      "name": "Redpack",
+      "markets": ["MX"],
+      "tracking_format": "The official page shows numeric guide examples and also offers tracking by client number plus reference; examples are not a universal format.",
+      "tracking_url": "https://www.redpack.com.mx/es/inicio/",
+      "proof_note": "No general signature or signed proof-of-delivery rule is asserted; review the selected Redpack service and actual record.",
+      "source_url": "https://www.redpack.com.mx/es/preguntas-frecuentes/"
+    },
+    {
+      "id": "99minutos_mx",
+      "name": "99minutos",
+      "markets": ["MX"],
+      "tracking_format": "Company help examples include 99MEX plus digits or MX99 plus digits; the source says formats are general examples, not a validator.",
+      "tracking_url": "https://tracking.99minutos.com/",
+      "proof_note": "Company support says a delivery photo may be available for a shipment marked delivered; this is not a signature claim and depends on the recorded delivery.",
+      "source_url": "https://www.99minutos.com/dudas-sobre-tu-pedido/"
+    },
+    {
+      "id": "ivoy_mx",
+      "name": "iVoy",
+      "markets": ["MX"],
+      "tracking_format": "No universal guide-number pattern was verified; the carrier's business page describes tracking through its app/account.",
+      "tracking_url": "https://ivoy-customer.atlassian.net/servicedesk/customer/portal/6",
+      "proof_note": "No universal signature or proof-of-delivery rule was verified; check the shipment's selected service and recorded events.",
+      "source_url": "https://registro.ivoy.mx/prueba-ivoy"
+    }
+  ]
+}

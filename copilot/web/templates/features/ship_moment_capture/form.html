@@ -1,0 +1,28 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs, button %}
+{% block title %}Shipment-time evidence - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('Tracking at the sale', '/fulfilment/' ~ capture_id), ('Shipment-time evidence', None)]) }}{% endblock %}
+{% block content %}
+<h1>Save shipment-time evidence</h1>
+<p>Seller-entered information saved on this device for transaction <code>{{ capture_id }}</code>. Proofie does not read the photos or contact the carrier.</p>
+<p class="field-hint" data-state="packaging-retention-reminder">Keep the outer packaging, shipping label and drop-off receipt until the dispute is closed. Some carrier or insurance claims may require physical inspection; check the purchased service terms.</p>
+{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+{% if record %}<section class="panel"><h2>Saved record</h2><p>{{ record.carrier }} · {{ record.captured_at|when }} (seller-entered; not independently verified)</p><ul>{% for kind, filename in record.files.items() %}<li>{{ kind|title }} photo: {{ filename }}{% if case_documents %} <a href="/fulfilment/{{ capture_id }}/moment/{{ kind }}{% if dispute_id %}?from_dispute={{ dispute_id }}{% if from_package %}&amp;from_package={{ from_package }}{% endif %}{% elif from_package %}?from_package={{ from_package }}{% endif %}">View saved original</a>{% endif %}</li>{% endfor %}</ul></section>{% endif %}
+{% if offer %}<section class="panel" data-state="register-tracking" data-offer-state="{{ offer.state }}"><h2>Register this tracking with PayPal</h2>
+{% if offer.state == "registered" %}<p>A tracking file for this transaction exists ({{ tracking_file_label(offer.file_status) }}). <a href="{{ offer.file_href }}">Open the tracking file</a>.</p>
+{% elif offer.state == "no_number" %}<p>Add the tracking number from the label above to be able to register it with PayPal.</p>
+{% else %}<p>Proofie can register tracking <code>{{ offer.tracking_number }}</code> with {% if offer.state == "ready" %}carrier <strong>{{ offer.carrier_label }}</strong> (PayPal code <code>{{ offer.code }}</code>){% else %}the carrier name <strong>{{ offer.carrier_text }}</strong> (not in PayPal's list, sent as OTHER with that name){% endif %}. The button below prepares the request from this record and shows it to you. Nothing is sent to PayPal until you review the exact request there and approve it.</p>
+<form method="post" action="/fulfilment/{{ capture_id }}/preview"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">{% for name, value in offer.fields.items() %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}<button class="btn btn-primary" type="submit">Review what will be sent</button></form>
+<p class="field-hint">Prefer to change something first? <a href="{{ offer.href }}">Open the tracking form</a>.</p>{% endif %}</section>{% endif %}
+{% if dispute_id %}<section class="panel" data-state="shipment-case-evidence"><h2>Available to the same case</h2><p>The photo bytes remain unchanged and are copied into case document storage with their SHA-256. Image contents are not extracted or authenticated. Documents are not attached or sent automatically.</p>{% if case_documents %}<ul>{% for doc in case_documents %}<li>{{ doc.filename }} (case document ID {{ doc.id }})</li>{% endfor %}</ul>{% else %}<p>No shipment photos are linked to this case yet.</p>{% endif %}{% if package_url %}<p><a href="{{ package_url }}">Review or attach these case documents in the same package</a></p>{% else %}<p>No package exists yet. The case documents remain available for a later package.</p>{% endif %}</section>{% endif %}
+<form method="post" enctype="multipart/form-data">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<input type="hidden" name="from_dispute" value="{{ dispute_id }}">
+{% if from_package %}<input type="hidden" name="from_package" value="{{ from_package }}">{% endif %}
+<label for="ship-carrier">Carrier name</label><input id="ship-carrier" name="carrier" required maxlength="80" value="{{ record.carrier if record else '' }}">
+<label for="ship-tracking">Tracking number from the label (optional)</label><input id="ship-tracking" name="tracking_number" maxlength="64" autocomplete="off" value="{{ record.tracking_number if record and record.tracking_number else '' }}">
+<label for="ship-label">Label photo (JPEG or PNG, up to 5 MB)</label><input id="ship-label" name="label" type="file" accept="image/jpeg,image/png">
+<label for="ship-parcel">Packed parcel photo (JPEG or PNG, up to 5 MB)</label><input id="ship-parcel" name="parcel" type="file" accept="image/jpeg,image/png">
+{{ button("Save shipment record") }}</form>
+<p><a href="/fulfilment/{{ capture_id }}{% if dispute_id %}?from_dispute={{ dispute_id }}{% if from_package %}&amp;from_package={{ from_package }}{% endif %}{% elif from_package %}?from_package={{ from_package }}{% endif %}">Return to tracking preparation</a></p>
+{% endblock %}

@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "no_tracking_heldout3",
+ "type": "no_tracking",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0015",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 1500,
+  "amount_display": "15.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000015"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1015\nOrder date: 2026-09-24 09:00\nTotal paid: 15.00 USD\nPayPal capture id: EV2CAPTURE0000015",
+  "doc_note": "Seller's packing note\nPacked on 2026-09-25 and dropped in a public mailbox the same day.\nStamps: 2 first-class stamps"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_note": "packing_note.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "tracking",
+    "any_of": [
+     "tracking",
+     "guía",
+     "guia",
+     "waybill"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "Mailed with stamps; no tracking exists."
+}

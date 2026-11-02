@@ -1,0 +1,8 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs, button %}
+{% block title %}Read-only package review - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('Read-only package review', None)]) }}{% endblock %}
+{% block content %}<h1>Read-only package review</h1><p>{{ snapshot.read_only_notice }} This is a local snapshot and does not grant account access.</p><p>Case {{ snapshot.dispute_id }} · package v{{ snapshot.version }}.</p>
+<h2>Statements</h2><ol>{% for claim in snapshot.claims %}<li>{{ claim.text }} <small>({{ claim.basis }})</small></li>{% else %}<li>No statements are in this package.</li>{% endfor %}</ol>
+<h2>Attachments</h2><ul>{% for filename in snapshot.attachments %}<li>{{ filename }}</li>{% else %}<li>None</li>{% endfor %}</ul>
+<form method="post" action="/second-opinion/{{ token }}/note"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><label for="reviewer-note">One note for the seller (180 characters maximum)</label><input id="reviewer-note" name="reviewer_note" maxlength="180" required><p>This note is stored separately. It cannot change the package or approve/send it.</p>{{ button("Leave note") }}</form>{% endblock %}

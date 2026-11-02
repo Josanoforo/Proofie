@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "irrelevant_docs_heldout2",
+ "type": "irrelevant_docs",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0024",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 29000,
+  "amount_display": "290.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000024"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1024\nFecha del pedido: 2026-10-02 09:40\nTotal pagado: 290.00 MXN\nID de captura PayPal: EV2CAPTURE0000024",
+  "doc_policy": "Política de devoluciones\nAceptamos devoluciones dentro de 30 días con el ticket de compra."
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_policy": "politica_devoluciones.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "tracking",
+    "any_of": [
+     "tracking",
+     "guía",
+     "guia",
+     "waybill"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "A returns policy."
+}

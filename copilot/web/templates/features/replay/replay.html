@@ -1,0 +1,96 @@
+{% extends "_base.html" %}
+{% block title %}Legacy synthetic replay · Proofie{% endblock %}
+{% block content %}
+{% if replay.kind == "data_only" %}
+<h1>DR4 data-only recut</h1>
+<p class="notice" data-state="replay-label"><strong>Synthetic local data-only evidence; not running now. This is not a model replay.</strong></p>
+<section data-state="replay-readiness" aria-labelledby="replay-readiness-title">
+<h2 id="replay-readiness-title">Candidate and admission</h2>
+<p>Evidence date: {{ replay.evidence_date }}; RC4.3 code candidate: <code>{{ replay.source_commit }}</code>; recut candidate SHA-256: <code>{{ replay.candidate_sha256 }}</code>. The date is date-only; no execution time or model provenance is asserted.</p>
+<p>Privacy: identifiers and document bodies are omitted from this allowlist-only recut. The source ZIP itself has no verified redaction review.</p>
+<p data-state="replay-admission"><strong>Final W3-4 admission: OFF — no eligible dispute is evidenced in this recut.</strong> {{ replay.admission.reason }}</p>
+<p data-state="replay-dispute-status">Eligible Sandbox dispute: {{ replay.dispute_status.eligible_sandbox_dispute|upper }}. No-click preparation: <code>{{ replay.dispute_status.no_click_preparation }}</code>. Human step, not performed: {{ replay.dispute_status.human_step }}</p>
+</section>
+<section data-state="replay-stages" aria-labelledby="replay-stages-title">
+<h2 id="replay-stages-title">Observed local stages and unrun stages</h2>
+<ol>
+{% for stage in replay.stages %}
+<li data-state="replay-stage" data-stage="{{ stage.stage_id }}" data-status="{{ stage.status }}"><strong>{{ stage.stage_id }} — <code>{{ stage.activity }}</code>: {{ stage.status|upper }}</strong>. RC4.3 candidate <code>{{ stage.candidate_code_commit }}</code>. {{ stage.reason }} Evidence receipt(s): {% for ref in stage.receipt_refs %}<code>{{ ref }}</code>{% if not loop.last %}, {% endif %}{% endfor %}.</li>
+{% endfor %}
+</ol>
+</section>
+<section data-state="replay-artifacts" aria-labelledby="replay-artifacts-title">
+<h2 id="replay-artifacts-title">Allowlisted source and supporting artifacts</h2>
+<ul>{% for source in replay.sources %}<li><code>{{ source.basename }}</code> SHA-256 <code>{{ source.sha256 }}</code></li>{% endfor %}</ul>
+<ul>{% for artifact in replay.supporting_artifacts %}<li><code>{{ artifact.kind }}</code>: <code>{{ artifact.basename }}</code> SHA-256 <code>{{ artifact.sha256 }}</code></li>{% endfor %}</ul>
+<p>Observed claim scope: <code>{{ replay.claim_scope.observed }}</code>; delivery status: {{ replay.claim_scope.delivery_status }}. Runtime scope: {{ replay.run_observations.synthetic_fixture_gets }} synthetic fixture GETs, {{ replay.run_observations.fake_writes }} fake writes, {{ replay.run_observations.actual_external_hosts }} external hosts, {{ replay.run_observations.active_feature_flags }} active feature flags.</p>
+<p>Offline verifier: {{ replay.verification_result.checked }} checked, {{ replay.verification_result.ok }} OK, {{ replay.verification_result.fail }} FAIL; native exit {{ replay.verification_result.native_exit }}. Coverage: <code>{{ replay.coverage_status }}</code>.</p>
+<p>This static view performs no model call, send, PayPal read-back, or write. The legacy model replay remains separate and keeps its unverified provenance label.</p>
+</section>
+{% else %}
+<h1>Legacy synthetic replay</h1>
+
+<p class="notice" data-state="replay-label"><strong>Legacy synthetic replay fixture; not running now. Model metadata: {{ replay.model or 'unavailable' }}.</strong></p>
+
+<section data-state="replay-readiness" aria-labelledby="replay-readiness-title">
+<h2 id="replay-readiness-title">Recording metadata and readiness</h2>
+<ul>
+<li>Candidate fixture SHA-256: {% if replay.candidate_sha256 %}<code>{{ replay.candidate_sha256 }}</code>{% else %}unavailable{% endif %}. This identifies the loaded file; it does not verify provenance.</li>
+<li>Fixture <code>recorded_at</code> metadata (legacy, not independently verified): {{ replay.recording_date or 'unavailable' }}.</li>
+<li>Provenance readiness: {{ replay.provenance_readiness }}. No verified freeze record is linked to this fixture.</li>
+<li>Privacy review readiness: {{ replay.privacy_readiness }}. This fixture has no verified privacy-review metadata.</li>
+<li>Oct 29–30 provenance freeze: future gate; no freeze candidate is established here.</li>
+</ul>
+</section>
+
+<section data-state="replay-scope" aria-labelledby="replay-scope-title">
+<h2 id="replay-scope-title">What this page is</h2>
+<p>This page displays a legacy synthetic fixture for demo case <span translate="no">{{ replay.case }}</span>. Its provenance and recorded time are unverified; it does not establish that a model run occurred. Nothing runs now, nothing is saved, and this page cannot add content to a package or send anything to PayPal.</p>
+<p>The statements are the model's proposal. In the app a person reviews every statement, and code checks the answer before it is shown.</p>
+</section>
+
+<section data-state="replay-input" aria-labelledby="replay-input-title">
+<h2 id="replay-input-title">What the model read</h2>
+<ul>
+<li>{{ replay.documents|length + 1 }} sources, all synthetic: PayPal's dispute record{% for name in replay.documents %}, <span translate="no">{{ name }}</span>{% endfor %}.</li>
+</ul>
+</section>
+
+<section data-state="replay-claims" aria-labelledby="replay-claims-title">
+<h2 id="replay-claims-title">Statements the model proposed</h2>
+{% if replay.claims %}
+<ul>
+{% for claim in replay.claims %}
+<li data-state="replay-claim" data-basis="{{ claim.basis }}"><span data-state="replay-claim-text">{{ claim.text }}</span><br>
+<span class="field-hint">Basis: {{ claim.basis_words }}. Sources: {{ claim.sources|join(", ") }}.</span></li>
+{% endfor %}
+</ul>
+{% else %}<p>The model proposed no statements.</p>{% endif %}
+{% if replay.missing %}<p>Missing evidence the model listed: {{ replay.missing|join("; ") }}.</p>{% endif %}
+{% if replay.conflicts %}<p>Conflicts the model reported: {{ replay.conflicts|join("; ") }}.</p>{% endif %}
+</section>
+
+<section data-state="replay-next-step" aria-labelledby="replay-next-title">
+<h2 id="replay-next-title">Next step the model recommended</h2>
+<p>{{ replay.recommended }}.</p>
+{% if replay.note %}<p class="field-hint">Reviewer note the model drafted: {{ replay.note }}</p>{% endif %}
+</section>
+
+<section data-state="replay-checks" aria-labelledby="replay-checks-title">
+<h2 id="replay-checks-title">Checked by code</h2>
+<ul>
+{% for check in replay.checks %}
+<li data-state="replay-check" data-ok="{{ 'yes' if check.ok else 'no' }}">{{ 'Passed' if check.ok else 'Failed' }}: {{ check.words }}.{% for line in check.detail %} <span class="field-hint">{{ line }}</span>{% endfor %}</li>
+{% endfor %}
+</ul>
+{% if replay.validation_ok %}
+<p>All checks passed in this recording.</p>
+{% else %}
+<p data-state="replay-failed">This recording failed {{ replay.failed|length }} of {{ replay.checks|length }} checks. When an answer fails a check, the app keeps none of its statements and the seller adds the details by hand. Dates, numbers and identifiers in the text must come from a source, never from the model.</p>
+{% endif %}
+</section>
+
+<details data-state="replay-raw"><summary>The model's raw answer (technical)</summary><pre>{{ replay.raw }}</pre></details>
+{% endif %}
+
+{% endblock %}

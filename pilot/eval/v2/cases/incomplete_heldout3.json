@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "incomplete_heldout3",
+ "type": "incomplete",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0010",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 41000,
+  "amount_display": "410.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000010"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1010\nFecha del pedido: 2026-09-26 12:00\nTotal pagado: 410.00 MXN\nID de captura PayPal: EV2CAPTURE0000010",
+  "doc_guia": "Paquetería: Redpack\nGuía: RP77001010\nEstatus: Recolectado\nFecha de recolección: 2026-09-27"
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_guia": "redpack_guia.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "delivery_confirmation",
+    "any_of": [
+     "deliver",
+     "entrega",
+     "signed",
+     "firma"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "Redpack picked it up; nothing after that."
+}

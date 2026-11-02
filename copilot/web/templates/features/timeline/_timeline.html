@@ -1,0 +1,10 @@
+<section class="panel" data-state="paypal-timeline" aria-labelledby="paypal-timeline-title">
+<h2 id="paypal-timeline-title">PayPal's timeline</h2>
+<p class="field-hint" data-state="paypal-timeline-asof">As PayPal's record reads at {{ checked_at|when }}.</p>
+<p data-state="paypal-timeline-note">PayPal's dispute record has no log of status changes, so this list shows only the dated items PayPal gives. It does not show when the status changed.</p>
+{% if paypal_timeline %}<ol data-state="paypal-timeline-list">
+{% for e in paypal_timeline %}{% set t = (e.at|when) or "Not available" %}<li data-kind="{{ e.kind }}" data-origin="{{ e.origin }}">{% if e.origin == "verified_event" %}{{ e.text }} at {{ t }} (verified){% else %}{{ t }} — {{ e.text }}{% endif %}{% if e.after_read %} (dated after this read){% endif %}{% for line in e.detail %}<span class="field-hint">{{ line }}</span>{% endfor %}</li>
+{% endfor %}</ol>
+{% if paypal_timeline|selectattr("origin", "equalto", "verified_event")|list %}<p class="field-hint" data-state="paypal-timeline-notices">Rows marked verified are notices PayPal sent to Proofie, checked with PayPal. The status in them is what Proofie read from PayPal afterwards, never the notice's own.</p>{% endif %}
+{% else %}<p data-state="paypal-timeline-empty">PayPal's record lists no dated items for this dispute.</p>{% endif %}
+</section>

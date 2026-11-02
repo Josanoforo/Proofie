@@ -1,0 +1,52 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "illegible_dev2",
+ "type": "illegible",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0027",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 51500,
+  "amount_display": "515.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000027"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1027\nFecha del pedido: 2026-10-01 10:00\nTotal pagado: 515.00 MXN\nID de captura PayPal: EV2CAPTURE0000027",
+  "doc_scan": "Paquet███a: █████\nGu█a: ████████\nEstatus: ███████"
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_scan": "foto_guia.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "legible_tracking",
+    "any_of": [
+     "legib",
+     "readab",
+     "unread",
+     "could not be read",
+     "tracking",
+     "guía",
+     "guia"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "A photo of a guía whose text did not survive the extraction."
+}

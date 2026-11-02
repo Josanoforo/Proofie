@@ -1,0 +1,13 @@
+{% if selected_preparation_token and selected_preparation_csrf and selected_preparation_cases %}
+<section data-state="selected-preparation" aria-labelledby="selected-preparation-heading">
+<h3 id="selected-preparation-heading">Prepare selected cases</h3>
+<p>Choose up to three cases from this inbox observation. Preparation is local; review each result before deciding what to do.</p>
+{% if selected_preparation_scope and selected_preparation_scope.shown < selected_preparation_scope.total %}<p data-state="selected-preparation-scope">Showing the first {{ selected_preparation_scope.shown }} of {{ selected_preparation_scope.total }} cases available in this inbox observation. Only the cases shown can be selected.</p>{% endif %}
+<form method="post" action="/features/explainable_queue/prepare-selected">
+<input type="hidden" name="csrf_token" value="{{ selected_preparation_csrf }}">
+<input type="hidden" name="observation_token" value="{{ selected_preparation_token }}">
+{% for case in selected_preparation_cases %}<label><input type="checkbox" name="case_ids" value="{{ case.case_id }}"> {{ case.case_id }}</label>{% endfor %}
+<button type="submit" class="btn-secondary">Prepare selected cases</button>
+</form>
+</section>
+{% endif %}

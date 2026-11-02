@@ -1,0 +1,9 @@
+{#- rc4.3 lane PK (W1-1a, package half): what PayPal's record listed when Proofie read the dispute back after the send
+    (lane RX's SendRecord.readback: evidence_type, documents_present, paypal_date, read_at). Included by package_review.html
+    only when the record carries a read-back; the wording matches the sent page (result.html). -#}
+{%- set rb = record.readback -%}
+<div class="readback-record" data-state="paypal-record"><p><strong>What PayPal's record lists</strong></p>
+  <p>Evidence type: {{ readback_label }}.{% if rb.paypal_date %} PayPal dates it {{ rb.paypal_date|when }}.{% endif %}</p>
+  {% if rb.documents_present %}<p>Documents PayPal lists with it:</p><ul>{% for name in rb.documents_present %}<li>{{ name }}</li>{% endfor %}</ul>
+  {% else %}<p>PayPal lists no document with it.</p>{% endif %}
+  {% if rb.read_at %}<p><small>Proofie read this from PayPal at {{ rb.read_at|when }}.</small></p>{% endif %}</div>

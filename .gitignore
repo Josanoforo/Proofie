@@ -1,0 +1,23 @@
+﻿.env
+.env.*
+!.env.example
+.venv/
+.venv-ref/
+node_modules/
+__pycache__/
+data/
+
+reference/
+.claude/worktrees/
+
+# Runtime evidence: sandbox call logs are private and never published
+/evidence/
+
+# Recorded real PayPal responses (D-2026-10-05-11): private, never tracked or published; the tests use pilot/fixtures/synthetic
+/pilot/fixtures/recorded/
+
+# Session scratch outputs (acceptance runs of the CLIs; kept on disk as evidence, never tracked; scan_staged refuses them too)
+/scratch-*/
+
+# Ollama pull logs (about 1 MB each, on the owner's cleanup list)
+/internal/verif/llm1/pull-*.log

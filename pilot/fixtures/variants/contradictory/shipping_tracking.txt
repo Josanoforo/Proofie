@@ -1,0 +1,14 @@
+DEMO DATA - synthetic document for a hackathon demo, deliberately CONTRADICTORY with the other documents
+(used to test whether the assistant reports conflicts). Not a real shipment or carrier record.
+
+CARRIER TRACKING SUMMARY
+Carrier: FedEx
+Tracking number: DEMOFX9900654321
+Reference: store order TS-DEMO-1001
+Service: FedEx Ground
+
+Events (America/Mexico_City):
+2026-10-03 11:05  Delivered. Signed for by: [DEMO RECIPIENT]
+2026-10-09 10:30  Picked up at sender (Test Store (DEMO))
+
+Delivery address (as printed on the label): Avenida Otra 55, Col. Prueba, 64000 Monterrey, MX

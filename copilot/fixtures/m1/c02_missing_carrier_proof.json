@@ -1,0 +1,65 @@
+{
+  "_synthetic": "SYNTHETIC / DEMO DATA - fictitious people, addresses and tracking numbers; none resolve with a real carrier.",
+  "case": "c02_missing_carrier_proof",
+  "description": "No documents and no tracker in PayPal.",
+  "today": "2026-10-04",
+  "dispute_norm": {
+    "dispute_id": "PP-D-DEMO-0001",
+    "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+    "status": "WAITING_FOR_SELLER_RESPONSE",
+    "stage": "INQUIRY",
+    "amount_cents": 450000,
+    "currency": "MXN",
+    "seller_transaction_ids": [
+      "DEMOTXN0000000001"
+    ],
+    "create_time": "2026-09-25T16:00:00Z",
+    "evidence_requested_from_seller": [
+      "PROOF_OF_FULFILLMENT"
+    ],
+    "evidence_submitted_by_seller": []
+  },
+  "paypal": {
+    "transactions": {
+      "transaction_details": [
+        {
+          "transaction_info": {
+            "transaction_id": "DEMOTXN0000000001",
+            "transaction_initiation_date": "2026-09-10T15:00:00+0000",
+            "transaction_amount": {
+              "currency_code": "MXN",
+              "value": "4500.00"
+            }
+          },
+          "shipping_info": {
+            "name": "Ana Demo Ficticia",
+            "address": {
+              "line1": "Calle Falsa 123, Col. Demo",
+              "city": "Ciudad de Mexico",
+              "state": "CDMX",
+              "country_code": "MX",
+              "postal_code": "06600"
+            }
+          }
+        }
+      ],
+      "total_items": 1
+    },
+    "trackers": {
+      "trackers": []
+    }
+  },
+  "seller_statement": null,
+  "docs": [],
+  "expected": {
+    "tracking_number": "missing",
+    "carrier": "missing",
+    "delivery_status": "missing",
+    "delivery_date": "missing",
+    "destination": "missing",
+    "full_address": "not_applicable",
+    "document_integrity": "not_applicable",
+    "signature": "not_applicable"
+  },
+  "expected_risk": []
+}

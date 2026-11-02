@@ -1,0 +1,22 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs %}
+{% block title %}Accounting line - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('Accounting line', None)]) }}{% endblock %}
+{% block content %}<h1>Accounting line</h1><p>Amounts returned by PayPal stay separate from fee estimates. Blank applied-fee cells mean PayPal did not return an applied fee in the current dispute read.</p>
+{% if capture_options is defined and capture_options %}<section class="panel" data-state="capture-choice"><h2>Choose the sale reference for this case</h2><p>PayPal returned more than one sale reference. Select the one to summarize; Proofie will not choose one automatically.</p><form method="get"><label for="capture-id">Sale reference</label><select id="capture-id" name="capture_id" required><option value="">Choose a sale</option>{% for capture in capture_options %}<option value="{{ capture }}">{{ capture }}</option>{% endfor %}</select><button class="btn btn-primary">Open summary</button></form></section>
+{% else %}
+{% if line.sale_amount_source is defined %}<section data-state="closure-summary"><h2>Recorded closure values</h2><dl>
+<dt>Case</dt><dd>{{ line.dispute_id }}</dd><dt>Sale reference</dt><dd>{{ line.capture_id }}</dd>
+<dt>{% if line.sale_amount_basis.startswith('Disputed principal') %}Disputed amount{% else %}Transaction amount{% endif %}</dt><dd>{% if display.sale_amount %}{{ display.sale_amount }}{% else %}Unknown{% endif %} · {% if line.sale_amount_source == 'paypal_transaction_search' %}Transaction Search{% elif line.sale_amount_source == 'paypal_dispute' %}PayPal dispute read{% else %}source unknown{% endif %}</dd>
+<dt>Currency source</dt><dd>{% if line.sale_currency_source == 'paypal_transaction_search' %}Transaction Search{% elif line.sale_currency_source == 'paypal_dispute' %}PayPal dispute read{% else %}Unknown{% endif %}</dd>
+<dt>Transaction date</dt><dd>{{ line.sale_date or 'Unknown' }} · {% if line.sale_date_source == 'paypal_transaction_search' %}Transaction Search{% else %}source unknown{% endif %}</dd>
+<dt>Refund returned</dt><dd>{% if display.refund_amount %}{{ display.refund_amount }}{% else %}Unknown{% endif %} · {{ line.paypal_refund_source or 'source unknown' }}</dd>
+<dt>Applied dispute fee</dt><dd>Unknown · {{ line.applied_fee_status }}</dd>
+<dt>Fee estimate</dt><dd>{% if display.fee_estimate %}{{ display.fee_estimate }}{% else %}Unknown{% endif %} · {{ line.fee_estimate_status }}</dd>
+<dt>Local ledger records</dt><dd>{{ line.ledger_record_count }} for this case only</dd></dl></section>
+{% else %}<table><thead><tr>{% for key in line %}<th>{{ key|field_word }}</th>{% endfor %}</tr></thead><tbody><tr>{% for value in line.values() %}<td>{{ value }}</td>{% endfor %}</tr></tbody></table>{% endif %}
+<p>Outcome: {{ outcome.label or 'not returned' }} (source: fresh PayPal dispute read). Existing local ledger records counted: {{ ledger.records|length }}; {{ ledger.limitations|length }} ledger limitations retained by the ledger view.</p>
+{% if limitations %}<ul>{% for item in limitations %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}
+{% if csv_data_uri %}<p><a data-state="same-response-csv" href="{{ csv_data_uri }}" download="accounting-{{ line.dispute_id }}-{{ line.capture_id }}.csv">Download this summary as CSV</a></p><p>The downloaded CSV contains the values displayed here.</p>{% else %}<p><a href="{{ download }}">Download one-row CSV</a></p>{% endif %}
+{% if line.sale_amount_basis is defined %}<details data-state="accounting-sources"><summary>Sources and scope</summary><ul><li>Sale amount: {{ line.sale_amount_basis }}{% if line.sale_amount_source %} ({{ line.sale_amount_source }}){% else %}; source unavailable{% endif %}.</li><li>Sale date source: {{ line.sale_date_source or 'not returned' }}.</li><li>Outcome code: {{ line.outcome_code or 'not returned' }} ({{ line.outcome_source }}); this records the case outcome, not its cause or net transfer.</li><li>Applied dispute fee is unknown when blank; any account-cliff amount is a separate estimate.</li><li>Ledger count is local records for this case, not a complete transaction history.</li></ul></details>{% endif %}
+<p>This is a reconciliation aid, not a statement or accounting advice.</p>{% endif %}{% endblock %}

@@ -1,0 +1,11 @@
+SYNTHETIC / DEMO DATA - fictitious. Not a real carrier document.
+
+ESTAFETA-STYLE PUBLIC TRACKING CAPTURE (template)
+Guia: DEMO-EST-000005
+Estatus: En tránsito
+Fecha de envio: 2026-09-11
+Fecha de entrega: NULL
+Nombre de quien recibe: NULL
+Firma de recibido: [Firma]  (link, empty)
+Codigo postal destino: 06600
+Captura: 2026-09-30

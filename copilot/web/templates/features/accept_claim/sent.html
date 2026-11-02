@@ -1,0 +1,17 @@
+{% extends "_base.html" %}
+{% from "_components.html" import link_button, breadcrumbs %}
+{% set done = sent.status == 'sent_confirmed' %}
+{% set review = sent.status == 'sent_refunded_in_review' %}
+{% set refused = sent.status in ('failed', 'refused_422') %}
+{% block title %}Accept the claim: result: {{ dispute_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('Resolution options and buyer messages', hub), ('Accept the claim: result', None)]) }}{% endblock %}
+{% block content %}
+<h1>{% if done %}PayPal shows the claim accepted{% elif review %}PayPal shows the buyer refunded; the case is under PayPal's review{% elif refused %}PayPal did not accept this{% else %}Sent to PayPal; not confirmed yet{% endif %}</h1>
+<section id="sent" data-state="accept-claim-sent" data-status="{{ sent.status }}">
+{% if done %}<p data-state="sent-evidence">Confirmed by reading the dispute back from PayPal{% if sent.readback.get('checked_at') %} at {{ sent.readback.get('checked_at') }}{% endif %}: the case is closed and the buyer is refunded.</p>
+{% elif review %}<p data-state="sent-evidence">Read back from PayPal{% if sent.readback.get('checked_at') %} at {{ sent.readback.get('checked_at') }}{% endif %}: the disputed transaction is {{ (sent.readback.get('transaction_status') or 'REFUNDED')|lower }}, the dispute is {{ {'UNDER_REVIEW': 'under review', 'OPEN': 'open', 'WAITING_FOR_SELLER_RESPONSE': 'waiting for the seller', 'WAITING_FOR_BUYER_RESPONSE': 'waiting for the buyer'}.get(sent.readback.get('status'), 'not closed yet') }}, and the accept option is gone. Reload this page to read it again; nothing is sent when you do.</p>
+{% elif refused %}<p data-state="sent-evidence">{{ sent.text }}</p>
+{% else %}<p data-state="sent-evidence">The request was sent. PayPal's record does not show the case closed yet. Reload this page to read it again; nothing is sent when you do.</p>{% endif %}
+</section>
+<p>{{ link_button(hub, 'Back to resolution options', kind='secondary') }}</p>
+{% endblock %}

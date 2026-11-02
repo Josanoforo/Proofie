@@ -1,0 +1,4 @@
+{% set link_dispute_id = sale_readiness_dispute|default(norm.dispute_id if norm is defined else '', true) %}
+{% set link_package_id = sale_readiness_package_id|default(latest_package.id if latest_package is defined and latest_package else '', true) %}
+<p class="field-hint" data-state="shipment-moment-entry"><a href="/fulfilment/{{ capture_id }}/moment{% if link_dispute_id %}?from_dispute={{ link_dispute_id }}{% if link_package_id %}&amp;from_package={{ link_package_id }}{% endif %}{% elif link_package_id %}?from_package={{ link_package_id }}{% endif %}">Save label or parcel photos and carrier now</a>. Seller-entered only; Proofie does not send or read the images.</p>
+{% if feature_enabled("carrier_directory") %}{% include "features/ship_moment_capture/_carrier_entry.html" %}{% endif %}

@@ -1,0 +1,2 @@
+{% if not first_dispute_guide_seen() %}<aside class="notice" data-state="first-guide-once"><strong>New to disputes?</strong> Read this case's short guide to the stages and dates.</aside>{% endif %}
+<p data-state="first-guide-entry"><a href="/disputes/{{ norm.dispute_id }}/first-guide">{% if first_dispute_guide_seen() %}Reopen the first-dispute guide{% else %}Open the first-dispute guide{% endif %}</a></p>

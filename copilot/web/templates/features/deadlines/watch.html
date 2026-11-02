@@ -1,0 +1,23 @@
+{% extends "_base.html" %}
+{% from "_components.html" import banner, tag, checked_bar, mono_id, breadcrumbs %}
+{% block title %}PayPal due dates - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('PayPal due dates', None)]) }}{% endblock %}
+{% block content %}
+<h1>PayPal due dates</h1>
+<p data-state="deadline-threshold">Disputes waiting for you, soonest due date first. Proofie marks cases with less than {{ warning_days }} days left. Dates come from PayPal; Proofie does not estimate them.</p>
+{% if read_error %}{% call banner("info", "deadline-read-deferred", "PayPal was not read") %}<p>{{ read_error }}</p>{% endcall %}
+<p class="checked-at"><a href="/deadlines">Refresh from PayPal</a></p>
+{% else %}
+{{ checked_bar(checked_at, "/deadlines", "Refresh from PayPal") }}
+{% with banner_state = "deadline-due-soon", refresh_url = "/deadlines" %}{% include "features/deadlines/_banner.html" %}{% endwith %}
+{% if rows %}<table class="stack" data-table="deadline-watch">
+<caption class="visually-hidden">Disputes waiting for you come first, soonest due date first.</caption>
+<thead><tr><th scope="col">Dispute</th><th scope="col">Respond by</th><th scope="col">Time left</th></tr></thead><tbody>
+{% for row in rows %}<tr data-dispute="{{ row.norm.dispute_id }}" data-warning="{{ 'true' if row.warning else 'false' }}"><td data-label="Dispute"><a href="/disputes/{{ row.norm.dispute_id }}">{{ mono_id(row.norm.dispute_id) }}</a></td>
+{%- if row.due %}<td data-label="Respond by">{{ row.due.iso|when }}</td><td data-label="Time left">{% if row.urgency in ("soon", "passed") %}{{ tag("due", row.due.remaining) }}{% else %}{{ row.due.remaining }}{% endif %}</td>
+{%- elif row.waiting %}<td data-label="Respond by">No verified deadline available</td><td data-label="Time left">—</td>
+{%- else %}<td data-label="Respond by">No response due from you</td><td data-label="Time left">—</td>{% endif %}</tr>{% endfor %}
+</tbody></table>{% else %}<p>No disputes were returned by this PayPal read.</p>{% endif %}
+<p class="checked-at">{{ pages }} {{ 'page' if pages == 1 else 'pages' }} read.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs %}
+{% block title %}Buyer call script - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('Call script', None)]) }}{% endblock %}
+{% block content %}
+<h1>Buyer call script</h1><p>{{ script.source_label }}. Choose the language the buyer uses; Proofie does not detect it.</p>
+<form method="get"><label for="script-language">Buyer language</label><select id="script-language" name="lang"><option value="en"{% if script.locale == 'en' %} selected{% endif %}>English</option><option value="es"{% if script.locale == 'es' %} selected{% endif %}>Español</option></select><button class="btn btn-primary" type="submit">Update language</button></form>
+<dl><dt>PayPal case status</dt><dd>{{ script.paypal_status }}</dd><dt>PayPal stage</dt><dd>{{ script.paypal_stage }}</dd></dl>
+<section class="panel"><h2>Say</h2><p>{{ script.sections.opening }}</p><h2>Ask</h2><p>{{ script.sections.ask }}</p><h2>Do not promise</h2><p>{{ script.sections.avoid }}</p><h2>Close</h2><p>{{ script.sections.close }}</p></section>
+<p>This is a script to review and use yourself. It does not place a call or send a message.</p><p><a href="/disputes/{{ dispute_id }}">Return to case</a></p>
+{% endblock %}

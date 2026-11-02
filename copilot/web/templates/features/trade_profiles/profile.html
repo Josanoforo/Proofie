@@ -1,0 +1,8 @@
+{% extends "_base.html" %}
+{% block title %}Seller preparation profile - Proofie{% endblock %}
+{% block content %}<div class="page"><h1>Preparation profile</h1>
+<p>Choose one seller profile. Its fixed local checklist appears during shipment preparation and on the package insert. These are seller reminders, not PayPal requirements.</p>
+{% if current %}<p data-state="selected-profile">Current profile: {{ current.label }}</p>{% endif %}
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><label for="profile">What do you sell?</label><select id="profile" name="profile" required>{% for key, item in profiles.items() %}<option value="{{ key }}"{% if current and current.key == key %} selected{% endif %}>{{ item.label }}</option>{% endfor %}</select><button class="btn btn-primary">Save profile</button></form>
+{% if current %}<ul>{% for check in current.checks %}<li>{{ check }}</li>{% endfor %}</ul>{% endif %}
+</div>{% endblock %}

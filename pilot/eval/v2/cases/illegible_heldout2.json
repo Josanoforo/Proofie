@@ -1,0 +1,52 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "illegible_heldout2",
+ "type": "illegible",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0029",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 8800,
+  "amount_display": "88.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000029"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1029\nOrder date: 2026-09-27 15:00\nTotal paid: 88.00 USD\nPayPal capture id: EV2CAPTURE0000029",
+  "doc_scan": "UPS\nTracking No.: 1Z ??? ??? ?? ????\nDelivered ?? ??/??"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_scan": "ups_photo.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "legible_tracking",
+    "any_of": [
+     "legib",
+     "readab",
+     "unread",
+     "could not be read",
+     "tracking",
+     "guía",
+     "guia"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "The carrier name survives, the number and the date do not."
+}

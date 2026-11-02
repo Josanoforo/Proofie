@@ -1,0 +1,78 @@
+{
+  "schema": "proofie-season-prep/1",
+  "version": "2026-10-25",
+  "countries": {
+    "MX": [
+      {
+        "id": "buen_fin_2026",
+        "label": "El Buen Fin 2026",
+        "start": "2026-11-13",
+        "end": "2026-11-17",
+        "source_name": "El Buen Fin 2026 FAQ",
+        "source_url": "https://www.elbuenfin.org/preguntas-frecuentes",
+        "source_checked": "2026-10-25",
+        "source_note": "Official 2026 event dates; not a carrier delivery promise.",
+        "preparation": [
+          "Choose the carrier service before promising a delivery date.",
+          "Save the shipping label, package condition, and purchase receipt with the shipment record.",
+          "Check the selected service for signature or proof-of-delivery options; availability is service-specific."
+        ],
+        "shipping_cutoffs": []
+      },
+      {
+        "id": "school_cycle_2026_27",
+        "label": "School cycle 2026–2027",
+        "start": "2026-08-31",
+        "end": "2027-07-09",
+        "source_name": "SEP 2026–2027 basic education calendar",
+        "source_url": "https://educacionbasica.sep.gob.mx/publica-sep-calendario-escolar-2026-2027-para-educacion-basica-y-normal/",
+        "source_checked": "2026-10-25",
+        "source_note": "School calendar only; dates are not shipping deadlines or a delivery-volume forecast.",
+        "preparation": [
+          "Keep listing, buyer, and shipment references together before dispatch.",
+          "Save the label, package condition, and receipt when the shipment is prepared.",
+          "Confirm the delivery estimate with the specific carrier service selected by the seller."
+        ],
+        "shipping_cutoffs": []
+      },
+      {
+        "id": "holiday_2026",
+        "label": "Year-end holiday preparation 2026",
+        "start": "2026-12-01",
+        "end": "2026-12-25",
+        "source_name": "Calendar planning window",
+        "source_url": "",
+        "source_checked": "2026-10-25",
+        "source_note": "Planning window only; no Mexico-wide carrier cutoff or congestion delay is asserted.",
+        "preparation": [
+          "Avoid promising a delivery day from the holiday date alone.",
+          "Check the selected service's published commitment and retain the receipt and package evidence.",
+          "Record tracking and the carrier service used in the shipment file."
+        ],
+        "shipping_cutoffs": []
+      }
+    ],
+    "US": [
+      {
+        "id": "holiday_2026",
+        "label": "Christmas shipping preparation 2026",
+        "start": "2026-12-17",
+        "end": "2026-12-25",
+        "source_name": "USPS 2026 holiday shipping dates",
+        "source_url": "https://www.usps.com/holidayshippingdates/",
+        "source_checked": "2026-10-25",
+        "source_note": "USPS recommended send-by dates for expected delivery before Dec. 25, contiguous U.S. only; actual delivery varies by origin, destination, acceptance time, and conditions. These are not other-carrier or all-service cutoffs.",
+        "preparation": [
+          "Compare the selected service with its own published holiday date before setting buyer expectations.",
+          "Save the label, package condition, and purchase receipt with the shipment record.",
+          "Use a signature or proof-of-delivery option only when confirmed for the purchased service."
+        ],
+        "shipping_cutoffs": [
+          {"service": "USPS Ground Advantage and First-Class Mail", "date": "2026-12-17"},
+          {"service": "USPS Priority Mail", "date": "2026-12-18"},
+          {"service": "USPS Priority Mail Express", "date": "2026-12-19"}
+        ]
+      }
+    ]
+  }
+}

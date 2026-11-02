@@ -1,0 +1,212 @@
+{% if feature_enabled("offline_market_mode") %}<section class="panel" data-feature="offline-market-mode" data-state="checking" id="offline-market-mode" data-dispute-id="{{ dispute_id }}" data-package-id="{{ package.id if package else '' }}" data-package-version="{{ package.version if package else '' }}">
+  <h2>Connection status</h2><p data-offline-message aria-live="polite">Browser connection status is being checked.</p>
+  <p>Offline you can read, capture and prepare locally. Approval requires a fresh PayPal read and a new human action after reconnecting. Sending remains a separate manual action. Reconnecting never sends or retries.</p>
+  <p>Editable text and captured photos are saved only in this browser for this case/package. Local photos are not attached to the package, ledger, or provider. Review and attach them manually after reconnecting. Photos are limited to 5 MB each; browser storage space and camera permission vary by device. If camera capture is unavailable, choose an image file.</p>
+  <fieldset data-offline-photos>
+    <legend>Capture shipment photos for this package</legend>
+    <label for="offline-label-photo">Shipping label photo (JPEG or PNG)</label>
+    <input id="offline-label-photo" type="file" accept="image/jpeg,image/png" capture="environment" data-offline-photo="label">
+    <label for="offline-parcel-photo">Packed parcel photo (JPEG or PNG)</label>
+    <input id="offline-parcel-photo" type="file" accept="image/jpeg,image/png" capture="environment" data-offline-photo="parcel">
+    <p data-photo-status aria-live="polite">Photos stay in this browser until you review and attach them manually.</p>
+    <ul data-photo-downloads aria-label="Locally saved photos for manual upload"></ul>
+    <p><a href="/disputes/{{ dispute_id }}/workspace/prepare#documents">After reconnecting, download a reviewed photo above, then choose it in the dispute's document upload</a>. Nothing here adds a file to the package.</p>
+  </fieldset>
+  <button class="btn btn-secondary" type="button" data-prepare-approval>Prepare this package locally</button>
+  <p data-approval-preparation aria-live="polite">Local preparation is not approval and does not authorize sending.</p>
+</section>
+<style>
+#offline-market-mode fieldset { min-width: 0; max-width: 100%; box-sizing: border-box; }
+#offline-market-mode input[type="file"] { max-width: 100%; box-sizing: border-box; }
+</style>
+{% endif %}
+{% if feature_enabled("declared_limits") %}<p><a href="/declared-limits">What Proofie does not do</a></p>{% endif %}
+{% if feature_enabled("presentation_mode") %}<p><a href="/presentation-mode?case_id={{ dispute_id }}&amp;package_id={{ package.id if package else 0 }}">Presentation guide</a></p>{% endif %}
+{% if feature_enabled("offline_market_mode") %}
+<script>
+(() => {
+  const initialize = () => {
+  const panel = document.getElementById("offline-market-mode");
+  if (!panel) return;
+  const message = panel.querySelector("[data-offline-message]");
+  const prepareButton = panel.querySelector("[data-prepare-approval]");
+  const preparation = panel.querySelector("[data-approval-preparation]");
+  const photoStatus = panel.querySelector("[data-photo-status]");
+  const photoDownloads = panel.querySelector("[data-photo-downloads]");
+  const storageKey = `proofie:offline-approval-preparation:${panel.dataset.disputeId}:${panel.dataset.packageId}`;
+  const draftKey = `proofie:offline-editable-draft:${panel.dataset.disputeId}:${panel.dataset.packageId}`;
+  const photoDbName = `proofie:offline-photos:${panel.dataset.disputeId}:${panel.dataset.packageId}`;
+  const photoStore = "photos";
+  const openPhotoDb = () => new Promise((resolve, reject) => {
+    if (!window.indexedDB) return reject(new Error("Browser photo storage is unavailable"));
+    const request = indexedDB.open(photoDbName, 1);
+    request.onupgradeneeded = () => request.result.createObjectStore(photoStore, { keyPath: "kind" });
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("Could not open browser photo storage"));
+  });
+  const storePhoto = async (kind, file) => {
+    const db = await openPhotoDb();
+    try {
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(photoStore, "readwrite");
+        tx.objectStore(photoStore).put({ kind, name: file.name, type: file.type,
+          lastModified: file.lastModified, blob: file });
+        tx.oncomplete = resolve; tx.onerror = () => reject(tx.error || new Error("Photo storage failed"));
+        tx.onabort = () => reject(tx.error || new Error("Photo storage was aborted"));
+      });
+    } finally { db.close(); }
+  };
+  const exposeManualDownload = (kind, file) => {
+    const previous = photoDownloads.querySelector(`[data-photo-kind="${kind}"]`);
+    if (previous) { URL.revokeObjectURL(previous.href); previous.remove(); }
+    const link = document.createElement("a");
+    link.dataset.photoKind = kind;
+    link.href = URL.createObjectURL(file);
+    link.download = file.name;
+    link.textContent = `Download ${kind} photo for manual upload (${file.name})`;
+    const item = document.createElement("li"); item.append(link); photoDownloads.append(item);
+  };
+  const restorePhotos = async () => {
+    try {
+      const db = await openPhotoDb();
+      const rows = await new Promise((resolve, reject) => {
+        const tx = db.transaction(photoStore, "readonly");
+        const request = tx.objectStore(photoStore).getAll();
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => reject(request.error || new Error("Photo restore failed"));
+      });
+      db.close();
+      rows.forEach((row) => {
+        const input = document.querySelector(`[data-offline-photo="${row.kind}"]`);
+        if (!input || !row.blob) return;
+        const file = new File([row.blob], row.name, { type: row.type, lastModified: row.lastModified });
+        const transfer = new DataTransfer(); transfer.items.add(file); input.files = transfer.files;
+        exposeManualDownload(row.kind, file);
+      });
+      if (rows.length) photoStatus.textContent = `${rows.length} local photo(s) restored from this browser. Review and attach manually; nothing was uploaded.`;
+    } catch (_) { photoStatus.textContent = "Local photos could not be restored. Check browser storage and permission; nothing was uploaded."; }
+  };
+  document.querySelectorAll("[data-offline-photo]").forEach((input) => input.addEventListener("change", async () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    if (!/^image\/(jpeg|png)$/.test(file.type) || file.size > 5 * 1024 * 1024) {
+      input.value = ""; photoStatus.textContent = "Choose a JPEG or PNG image up to 5 MB. Nothing was saved."; return;
+    }
+    try {
+      await storePhoto(input.dataset.offlinePhoto, file);
+      exposeManualDownload(input.dataset.offlinePhoto, file);
+      photoStatus.textContent = `${file.name} saved in this browser for review. It is not attached or uploaded.`;
+    } catch (_) { photoStatus.textContent = "This browser could not store the photo (space or permission may be limited). Nothing was uploaded."; }
+  }));
+  restorePhotos().then(() => update());
+  const editableControls = () => Array.from(document.querySelectorAll("textarea, input:not([type=hidden]):not([type=file]):not([type=submit]):not([type=button]), select"))
+    .filter((control) => control.name && !/csrf|approval|approve|phrase|sufficiency/i.test(control.name)
+      && !control.closest(".approve-form") && !control.closest('form[data-sends]'));
+  const draftValues = () => editableControls().map((control, index) => ({
+    name: control.name, index, type: control.type || control.tagName.toLowerCase(),
+    value: control.type === "checkbox" || control.type === "radio" ? control.checked : control.value
+  }));
+  const saveDraft = () => {
+    try {
+      window.localStorage.setItem(draftKey, JSON.stringify({
+        state: "editable-draft-local-only", dispute: panel.dataset.disputeId,
+        package: panel.dataset.packageId, version: panel.dataset.packageVersion, controls: draftValues()
+      }));
+    } catch (_) { preparation.textContent = "This browser could not save the local text draft. Nothing was approved or sent."; }
+  };
+  const restoreDraft = () => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(draftKey) || "null");
+      if (!saved || saved.state !== "editable-draft-local-only" || saved.dispute !== panel.dataset.disputeId
+        || saved.package !== panel.dataset.packageId || saved.version !== panel.dataset.packageVersion) return;
+      const controls = editableControls();
+      saved.controls.forEach((entry) => {
+        const control = controls[entry.index];
+        if (!control || control.name !== entry.name) return;
+        if (control.type === "checkbox" || control.type === "radio") control.checked = Boolean(entry.value);
+        else control.value = String(entry.value);
+      });
+      preparation.textContent = "Local editable text draft restored in this browser. Review a fresh case read and make a new human approval choice after reconnecting.";
+    } catch (_) { preparation.textContent = "The local text draft could not be restored. Nothing was approved or sent."; }
+  };
+  editableControls().forEach((control) => {
+    control.addEventListener("input", saveDraft);
+    control.addEventListener("change", saveDraft);
+  });
+  restoreDraft();
+  const content = () => {
+    const statements = Array.from(document.querySelectorAll(".claims .claim-card")).map((card) => ({
+      id: card.dataset.claim, basis: card.dataset.basis,
+      text: card.querySelector('textarea[name="text"]')?.value ?? "",
+      source: card.querySelector("[data-source]")?.innerText || "",
+      documents: Array.from(card.querySelectorAll(".claim-source-detail")).map((row) => row.innerText)
+    }));
+    const sendList = document.querySelector('ul[data-state="will-send"]');
+    const controls = draftValues();
+    const selectedFiles = Array.from(document.querySelectorAll('input[type="file"]'))
+      .flatMap((input) => Array.from(input.files || []).map((file) => [input.name, file.name, file.size, file.type, file.lastModified]));
+    return JSON.stringify({
+      dispute: panel.dataset.disputeId,
+      package: panel.dataset.packageId,
+      version: panel.dataset.packageVersion,
+      statements,
+      sendList: sendList ? sendList.innerText : "",
+      controls,
+      selectedFiles
+    });
+  };
+  const digest = async (value) => {
+    if (!window.crypto || !window.crypto.subtle) throw new Error("Local content fingerprint unavailable");
+    const bytes = new TextEncoder().encode(value);
+    const hash = await window.crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(hash), (part) => part.toString(16).padStart(2, "0")).join("");
+  };
+  const readPreparation = () => {
+    try { return JSON.parse(window.localStorage.getItem(storageKey) || "null"); }
+    catch (_) { return null; }
+  };
+  prepareButton.addEventListener("click", async () => {
+    try {
+      saveDraft();
+      const fingerprint = await digest(content());
+      window.localStorage.setItem(storageKey, JSON.stringify({ state: "prepared-local-only", fingerprint }));
+      preparation.textContent = "Text draft and package fingerprint saved only in this browser. This is not approval. Reconnect, review the fresh PayPal case read, and approve with a new human action if you still choose. Photos are not saved.";
+    } catch (_) {
+      preparation.textContent = "Local preparation could not be saved in this browser. Nothing was approved or sent.";
+    }
+  });
+  const update = () => {
+    const online = navigator.onLine;
+    panel.hidden = false;
+    panel.dataset.state = online ? "online" : "offline";
+    prepareButton.hidden = online;
+    message.textContent = online ? "Online. Review the case after its fresh PayPal read; approval still requires a new human action." : "Offline: reading and preparation stay local; effective approval and PayPal writes need a connection.";
+    const saved = readPreparation();
+    if (saved && saved.state === "prepared-local-only") {
+      digest(content()).then((current) => {
+        preparation.textContent = current === saved.fingerprint
+          ? "Local preparation matches the displayed package. It is not approval; use the existing action after a fresh PayPal read and a new human click."
+          : "The displayed package changed. The local preparation is stale; nothing was approved or sent.";
+      }).catch(() => { preparation.textContent = "Local preparation could not be checked. Nothing was approved or sent."; });
+    }
+    document.querySelectorAll("form.approve-form, form[data-sends]").forEach((form) => {
+      if (!online && !form.dataset.offlineGuarded) {
+        form.addEventListener("submit", (event) => {
+          if (!navigator.onLine) {
+            event.preventDefault();
+            message.textContent = "Still offline. Nothing was sent or approved. Reconnect, review, then press the action yourself.";
+          }
+        });
+        form.dataset.offlineGuarded = "true";
+      }
+    });
+  };
+  update();
+  window.addEventListener("online", update);
+  window.addEventListener("offline", update);
+  };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initialize, { once: true });
+  else initialize();
+})();
+</script>
+{% endif %}

@@ -1,0 +1,35 @@
+{% if feature_enabled('local_autopilot') and assistance_context %}
+<section class="panel" data-state="case-assistance">
+  <h2>Preparation and possible next action</h2>{% if feature_enabled('local_preparation') %}{% include "features/local_autopilot/_preparation.html" %}{% endif %}{% if feature_enabled('gap_resolution') and gap_context is defined %}{% include "features/local_autopilot/_gap_resolution.html" %}{% endif %}{% if feature_enabled('case_reentry') and case_reentry_view is defined %}{% include "features/case_reentry/_checkpoint.html" %}{% endif %}
+  <p>{% if feature_enabled('local_preparation') %}Preparation{% else %}Automatic preparation{% endif %}: {{ assistance_context.preparation }}. {% if assistance_context.package_id %}<a href="/disputes/{{ norm.dispute_id }}/packages/{{ assistance_context.package_id }}">Review the prepared package</a>.{% elif feature_enabled('local_preparation') %}<a href="#local-preparation">Review local preparation</a>.{% else %}<a href="/disputes">Check the inbox</a>.{% endif %}</p>
+  <p>{% if assistance_context.recommendation == 'message' %}Suggested next step: review a message.{% elif assistance_context.recommendation == 'offer' %}Suggested next step: review an offer.{% else %}No action is suggested yet. {{ assistance_context.reason }}{% endif %} This is guidance, not approval or sending.</p>
+  {% if assistance_context.attention_plan %}
+  <p data-state="attention-next">Next: {{ assistance_context.attention_plan.tasks[0].text }}</p>
+  <details id="attention-plan" data-state="attention-plan"{% if request.query_params.get('attention_model') %} open{% endif %}><summary>Show the case attention plan and sources</summary>
+    <ol>{% for task in assistance_context.attention_plan.tasks %}<li>{{ task.text }} {% if task.href == 'documents' %}<a href="/disputes/{{ norm.dispute_id }}/workspace/prepare#documents">Review documents</a>{% elif task.href == 'inbox' %}<a href="/disputes">Open inbox</a>{% elif task.href == 'local_preparation' %}<a href="#local-preparation">Review local preparation</a>{% else %}<a href="#local-autopilot">Open practice</a>{% endif %}</li>{% endfor %}</ol>
+    <p>{{ assistance_context.attention_plan.invalidators }} Changes do not erase your saved decisions.</p>
+    <ul>{% for source in assistance_context.attention_plan.sources %}<li>{{ source.source }} ({{ source.id }}; SHA-256: {{ source.sha256 or 'unavailable' }})</li>{% else %}<li>No readable case source recorded.</li>{% endfor %}</ul>
+    {% if assistance_context.attention_plan.model_hint %}<p>{{ assistance_context.attention_plan.model_hint.label }} {{ assistance_context.attention_plan.model_hint.source_ids|join(', ') }}</p>{% endif %}
+    {% if request.query_params.get('attention_model') in ('busy', 'unavailable') %}<p role="status">Model assistance is unavailable; the recorded-data plan remains available.</p>{% endif %}
+    {% if feature_enabled('attention_model') %}<form method="post" action="/disputes/{{ norm.dispute_id }}/local-autopilot/model-review"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="fingerprint" value="{{ assistance_context.attention_plan.fingerprint }}"><button type="submit" class="btn-secondary">Optionally review sources with the local model</button></form><p>Optional interpretation requires your review and does not approve or send.</p>{% endif %}
+    {% if assistance_context.recommendation and feature_enabled('negotiation_drafts') and feature_enabled('resolution') %}
+    <details><summary>Prepare a draft from this plan</summary>
+      <form method="post" action="/disputes/{{ norm.dispute_id }}/local-autopilot/plan-draft">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="fingerprint" value="{{ assistance_context.attention_plan.fingerprint }}">
+        <input type="hidden" name="kind" value="{{ 'partial_offer' if assistance_context.recommendation == 'offer' else 'followup' }}">
+        <label for="plan-recipient">Buyer or contact label</label><input id="plan-recipient" name="recipient" required>
+        {% if assistance_context.recommendation == 'offer' %}<label for="plan-amount">Proposed amount ({{ norm.currency }})</label><input id="plan-amount" name="amount" inputmode="decimal" required>{% endif %}
+        <label for="plan-conditions">Conditions for review</label><textarea id="plan-conditions" name="conditions"></textarea>
+        <button type="submit" class="btn-secondary">Prepare local draft</button>
+      </form>
+    </details>{% endif %}
+  </details>
+  {% endif %}
+  <details><summary>Why this suggestion and which sources?</summary>
+    {% if assistance_context.recommendation %}<p>{{ assistance_context.reason }}</p>{% endif %}
+    <p>Based on {{ assistance_context.facts|length }} readable seller-supplied document(s); their authenticity is not verified. {% if assistance_context.facts %}<a href="/disputes/{{ norm.dispute_id }}/workspace/prepare#documents">Review the case's source documents</a>.{% endif %}</p>
+    <p>Recorded disputed amount: {{ assistance_context.amount_display or 'unavailable for this currency' }}.</p>
+  </details>
+  {% include "case/_local_autopilot.html" %}
+</section>
+{% endif %}

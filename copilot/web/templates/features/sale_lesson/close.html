@@ -1,0 +1,15 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs, button %}
+{% block title %}Seller lesson - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('Seller lesson', None)]) }}{% endblock %}
+{% block content %}
+<h1>Carry a seller lesson into the next sale</h1>
+<p>PayPal's recorded outcome: <strong>{{ view.label or 'not available' }}</strong> ({{ view.outcome_code or 'no outcome code' }}). This is separate from your lesson; Proofie does not infer why the case closed.</p>
+{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+{% if record %}<section class="panel"><h2>Saved seller lesson</h2><p>{{ record.seller_lesson }}</p><p>Sale type: {{ record.sale_type }} · recorded {{ record.created_at }} UTC</p></section>{% endif %}
+{% if (not record and not error) or (error and feature_enabled("closure_summary")) %}<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="capture_id" value="{{ capture_id }}"><input type="hidden" name="outcome_code" value="{{ view.outcome_code }}">
+<label for="sale-type">Sale type this note applies to</label><select id="sale-type" name="sale_type" required{% if form_disabled %} disabled{% endif %}><option value="">Choose type</option>{% for key,label in kind_labels %}<option value="{{ key }}"{% if sale_type_value == key %} selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+<label for="seller-lesson">Your one-line view of what may have contributed and what to prepare differently</label><input id="seller-lesson" name="lesson" maxlength="180" value="{{ lesson_value }}" required{% if form_disabled %} disabled{% endif %}><p>This is your own view, not a cause confirmed by PayPal. Write what you want to prepare differently.</p>
+{% if not form_disabled %}{{ button("Save seller lesson") }}{% endif %}</form>{% endif %}
+<p><a href="/disputes/{{ dispute_id }}">Return to case</a></p>
+{% endblock %}

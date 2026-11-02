@@ -1,0 +1,11 @@
+<section class="panel" data-state="adversarial-review">
+<h2>Review differences in sources</h2>
+<p>These are literal readings from current case records, not proof of what happened or a decision. A person must review each statement; seller and model interpretations remain attributed.</p>
+{% for row in adversarial_review.rows %}<article data-review-state="{{ row.assessment }}"><h3>Statement</h3><p>{{ row.claim }}</p><p>Basis: {{ row.basis }} · {{ row.assessment }}</p>
+{% for source in row.sources %}<p>Case source {{ source.id }}: {{ source.state }}</p>{% endfor %}
+{% if row.support %}<h4>Literal reading in the statement</h4>{% for source in row.support %}<p>{{ source.name }} ({{ source.id }}) · {{ source.field }}: {{ source.value }} · SHA-256 {{ source.sha256 }} · <a href="/disputes/{{ dispute_id }}/workspace/prepare#documents">Open case records</a></p>{% endfor %}{% endif %}
+{% if row.opposing %}<h4>Different reading from the same checklist conflict</h4>{% for source in row.opposing %}<p>{{ source.name }} ({{ source.id }}) · {{ source.field }}: {{ source.value }} · SHA-256 {{ source.sha256 }} · <a href="/disputes/{{ dispute_id }}/workspace/prepare#documents">Open case records</a></p>{% endfor %}{% endif %}
+{% if not row.support %}<p>No supported literal pair was established; check the cited sources and corroborate the statement.</p>{% endif %}</article>{% else %}<p>No statements are stored in this package.</p>{% endfor %}
+<h3>Changes since the previous stored package</h3>
+{% if adversarial_review.previous_version %}<p>Compared with package v{{ adversarial_review.previous_version }}. Source readings above are current; old source contents are not reconstructed.</p><ul>{% for change in adversarial_review.changes %}<li>{{ change.kind }}{% if change.before %}: previously “{{ change.before }}”{% endif %}{% if change.after %}; now “{{ change.after }}”{% endif %}{% if change.sources_changed %}; cited sources changed{% endif %}. Review impact before approval.</li>{% else %}<li>No stored statement text, basis or source-reference change was found.</li>{% endfor %}</ul>{% else %}<p>No earlier stored package is available for comparison.</p>{% endif %}
+</section>

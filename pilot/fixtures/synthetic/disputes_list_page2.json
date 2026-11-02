@@ -1,0 +1,46 @@
+{
+  "_source": "DEMO DATA - hand-made synthetic fixture with the same JSON shape as the real PayPal sandbox response it replaces in the tests; every identifier is invented.",
+  "body": {
+    "items": [
+      {
+        "dispute_id": "PP-R-DEMO-SECONDPAGE",
+        "create_time": "2026-09-01T10:00:00.000Z",
+        "update_time": "2026-09-01T10:00:00.000Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "DEMOBUYERTX0002",
+            "buyer": {
+              "payer_id": "[redacted]"
+            },
+            "seller": {
+              "merchant_id": "[redacted]"
+            }
+          }
+        ],
+        "reason": "UNAUTHORISED",
+        "status": "OPEN",
+        "dispute_state": "OPEN_INQUIRIES",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "10.00"
+        },
+        "dispute_life_cycle_stage": "INQUIRY",
+        "dispute_channel": "INTERNAL",
+        "links": [
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-DEMO-SECONDPAGE",
+            "rel": "self",
+            "method": "GET"
+          }
+        ]
+      }
+    ],
+    "links": [
+      {
+        "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes?next_page_token=SYNTHETIC-TOKEN-1&page_size=1",
+        "rel": "self",
+        "method": "GET"
+      }
+    ]
+  }
+}

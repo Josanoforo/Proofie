@@ -1,0 +1,35 @@
+{% set package_target = ("/disputes/" ~ dispute_id ~ "/packages/" ~ current_package.id) if current_package else "/disputes/" ~ dispute_id ~ "/workspace/prepare#package" %}
+<nav class="case-primary-nav" aria-label="Case views" data-state="case-primary-nav">
+  <a href="/disputes/{{ dispute_id }}"{% if current_case_view == "overview" %} aria-current="page"{% endif %}>Overview</a>
+  <a href="/disputes/{{ dispute_id }}/workspace/review"{% if current_case_view == "review" %} aria-current="page"{% endif %}>Review claims</a>
+  <a href="{{ package_target }}"{% if current_case_view == "package" %} aria-current="page"{% endif %}>{% if current_package %}Evidence package{% else %}Prepare package{% endif %}</a>
+</nav>
+<details class="case-more-nav" data-state="case-more-nav">
+  <summary>Other case links</summary>
+  <nav class="case-nav" aria-label="Main navigation"><ul>
+    <li><a href="/disputes" aria-label="All disputes" title="All disputes">All disputes</a></li>
+    {% if feature_enabled('fulfilment') %}<li><a href="/fulfilment" aria-label="Tracking at the sale" title="Tracking at the sale">Tracking at the sale</a></li>{% endif %}
+    {% if feature_enabled('judge_walkthrough') %}<li><a href="/features/judge_walkthrough?case_id={{ dispute_id }}" aria-label="Local integrated walkthrough" title="Local integrated walkthrough">Local integrated walkthrough</a></li>{% endif %}
+    {% if feature_enabled('local_demo_hub') %}<li><a href="/features/local_demo_hub?case_id={{ dispute_id }}" aria-label="Case-flow evidence hub" title="Case-flow evidence hub">Case-flow evidence hub</a></li>{% endif %}
+  </ul></nav>
+  {% if nav is defined and nav %}
+  <nav class="case-nav" aria-label="Other case tasks" data-state="case-nav">
+  {% for group, items in nav %}
+    {% set other_group = namespace(has_items=false) %}{% for item in items %}{% if item.key not in ("overview", "review") %}{% set other_group.has_items = true %}{% endif %}{% endfor %}
+    {% if other_group.has_items %}<div class="case-nav-grouping"><p class="case-nav-group">{{ group }}</p><ul>
+    {% for item in items if item.key not in ("overview", "review") %}
+      {% set short_state = item.state.split()[:3]|join(' ') if item.key in ('prepare','review','approve','send') else '' %}
+      <li><a href="{{ item.href }}"{% if item.current %} aria-current="page"{% endif %} data-nav="{{ item.key }}" aria-label="{{ item.label }}: {{ item.state }}" title="{{ item.state }}">{% if item.n %}<span class="case-nav-no" aria-hidden="true">{% if item.done %}&#10003;{% else %}{{ item.n }}{% endif %}</span>{% endif %}<span class="case-nav-name">{{ item.label }}</span>{% if short_state %}<span class="case-nav-state">{{ short_state }}</span>{% endif %}</a></li>
+    {% endfor %}</ul></div>{% endif %}
+  {% endfor %}
+  </nav>
+  {% else %}
+  <nav class="case-nav" aria-label="Other case tasks" data-state="case-nav"><ul>
+    <li><a href="/disputes/{{ dispute_id }}/workspace/prepare"><span class="case-nav-name">Prepare</span></a></li>
+    <li><a href="/disputes/{{ dispute_id }}/workspace/approve"><span class="case-nav-name">Approve package</span></a></li>
+    <li><a href="/disputes/{{ dispute_id }}/workspace/send"><span class="case-nav-name">Send and check</span></a></li>
+    <li><a href="/disputes/{{ dispute_id }}/workspace/records"><span class="case-nav-name">Case records</span></a></li>
+    <li><a href="/disputes/{{ dispute_id }}/workspace/other"><span class="case-nav-name">Other responses</span></a></li>
+  </ul></nav>
+  {% endif %}
+</details>

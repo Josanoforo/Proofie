@@ -1,0 +1,72 @@
+{% extends "_base.html" %}
+{% from "_components.html" import tag, breadcrumbs, link_button, post_button, mono_id %}
+{% from "features/fulfilment/_notices.html" import already_notice %}
+{% set headlines = {'registered': 'Tracking registered in PayPal', 'registered_unconfirmed': 'Send attempted - not confirmed by PayPal', 'unknown': 'Send attempted - not confirmed by PayPal', 'failed': 'PayPal did not accept the tracking', 'saved_without_registration': 'Tracking file saved in Proofie'} %}
+{% block title %}Tracking file: {{ capture_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('Tracking at the sale', '/fulfilment'), ('Sale ' ~ capture_id, '/fulfilment/' ~ capture_id), ('Tracking file', None)]) }}{% endblock %}
+{% block content %}
+{% set number = tracker.tracking_number %}
+<h1>{{ headlines.get(status, 'Tracking file') }}</h1>
+{{ already_notice(notice, capture_id) }}
+<p>{{ tag(tracking_view.kind, tracking_view.label) }}</p>
+<p class="field-hint" data-state="saved-copy">Saved copy from {{ file.created_at|when }}. Proofie did not ask PayPal again to show this page.</p>
+<section class="panel" data-state="file-status" data-status="{{ status }}" aria-label="Outcome">
+{% if status == "registered" %}
+<p>PayPal lists tracking {{ mono_id(number) }} for sale {{ mono_id(capture_id) }}: registered and confirmed by reading it back.</p>
+<p>This is a record of the tracking number. It does not prove the package was delivered.</p>
+{% elif status in ("registered_unconfirmed", "unknown") %}
+<p>Proofie asked PayPal and did not get a confirmation. Proofie will not send it again on its own.</p>
+{% if status == "registered_unconfirmed" %}<p>PayPal answered OK; not listed yet. Reading the trackers back did not list tracking {{ mono_id(number) }}.</p>{% endif %}
+{% if limitation_text %}<p class="fulfilment-limitations" data-state="limitation">{{ limitation_text }}</p>{% endif %}
+{% if recheck and recheck.outcome == "not_listed" and recheck.released %}<p data-state="recheck" data-released="yes">PayPal answered and does not list tracking {{ number }} for this sale {{ recheck.minutes_after_send }} minutes after it was sent. You can prepare it again; nothing is sent automatically. <span class="field-hint">Read {{ recheck.read_at|when }}.</span></p>
+{% elif recheck and recheck.outcome == "not_listed" %}<p data-state="recheck">PayPal answered and does not list tracking {{ number }} for this sale yet. Proofie will not send it again; check again later. <span class="field-hint">Read {{ recheck.read_at|when }}.</span></p>
+{% elif recheck and recheck.outcome == "read_failed" %}<p data-state="recheck">Proofie could not read PayPal at {{ recheck.read_at|when }}. Nothing was sent.</p>{% endif %}
+<div class="actions actions--forward">
+{{ post_button('/fulfilment/' ~ capture_id ~ '/check', 'Check PayPal again', csrf_token, kind='primary', sending='Checking PayPal...', fields=[('file_id', file.id)] + ([('from_dispute', from_dispute)] if from_dispute else [])) }}
+{% if recheck and recheck.released %}{{ link_button('/fulfilment/' ~ capture_id, 'Prepare the tracking again', kind='secondary') }}{% endif %}
+</div>
+<p class="action-note">Reads the tracking from PayPal. Sends nothing.</p>
+{% elif status == "failed" %}
+<p data-state="refusal-reason">PayPal did not accept the tracking. {{ post_result.reason|reason_words }} Nothing was registered.</p>
+<div class="actions actions--forward">{{ link_button('/fulfilment/' ~ capture_id, 'Prepare the tracking again', kind='primary') }}</div>
+{% else %}
+<p>Proofie saved the file without registering the tracking with PayPal.</p>
+<div class="actions actions--forward">{{ link_button('/fulfilment', 'See all tracking files', kind='primary') }}</div>
+{% endif %}
+</section>
+<section data-state="what-next" aria-labelledby="what-next-title">
+<h2 id="what-next-title">What happens next</h2>
+<p>{% if status == "registered" %}The tracking is registered. This does not answer the dispute: {% if from_dispute %}<a href="/disputes/{{ from_dispute }}">open the dispute</a>{% else %}open the dispute{% endif %} to respond.{% elif status in ("registered_unconfirmed", "unknown") %}Press Check PayPal again to see whether PayPal now lists it. Proofie will not send it again on its own.{% elif status == "failed" %}Nothing was registered. Correct the details and prepare the tracking again. Proofie sends nothing until you approve it.{% else %}Nothing was sent to PayPal. The file stays in Proofie; you can see all tracking files from the list.{% endif %}</p>
+</section>
+{% if readback %}
+<h2>As PayPal returned it</h2>
+<table data-state="readback">
+  <caption class="visually-hidden">Read-back of the tracking</caption>
+  <tr><th scope="row">Tracking number</th><td>{{ readback.tracking_number }}</td></tr>
+  <tr><th scope="row">Status</th><td data-value="{{ readback.status }}">{{ status_labels.get(readback.status, 'Not available') }}</td></tr>
+  <tr><th scope="row">Carrier</th><td>{{ carrier_display_name(readback.carrier) or 'Not returned by PayPal' }}{% if readback.carrier %} (PayPal code {{ readback.carrier }}){% endif %}</td></tr>
+  <tr><th scope="row">Ship date</th><td>{{ readback.shipment_date[:10]|datewords if readback.shipment_date else "Not returned by PayPal" }}</td></tr>
+</table>
+<p>{% if readback.read_at %}Status as PayPal shows it, read by Proofie at {{ readback.read_at|when }}.{% else %}Status as PayPal showed it when Proofie read the trackers back.{% endif %}</p>
+<div class="actions actions--forward">{{ link_button('/delivery-facts/' ~ capture_id, 'View shipment facts', kind='primary') }}</div>
+{% endif %}
+<details data-state="checks-details"><summary>Checks at the sale (information only)</summary>
+<p>Address comparison: <span data-state="address-comparison">{{ tag('bad' if check_data.address_comparison.result == 'mismatch' else 'ok' if check_data.address_comparison.result == 'match' else 'warn', {'match':'Matches','mismatch':'Does not match','cannot_compare':'Cannot compare','not_declared':'No address entered','no_paypal_address':'PayPal returned no address'}.get(check_data.address_comparison.result,'Not available')) }}</span>{% if check_data.address_comparison.basis %} ({{ check_data.address_comparison.basis }}){% endif %}</p>
+<table class="fulfilment-checks" data-state="checks">
+  <caption class="visually-hidden">Checks at the sale</caption>
+  <thead><tr><th scope="col">Check</th><th scope="col">State</th><th scope="col">Detail</th></tr></thead>
+  <tbody>
+  {% for c in checks %}<tr data-check="{{ c.id }}"><td>{{ c.label }}</td><td>{{ tag('na' if c.neutral else {'verified':'ok','missing':'bad','conflict':'bad','present_unverifiable':'warn','not_applicable':'na'}.get(c.state,'todo'), c.state_label) }}</td><td>{{ c.message }}</td></tr>{% endfor %}
+  </tbody>
+</table>
+<h2>Cannot be checked until a dispute exists</h2>
+<ul data-state="not-evaluable">{% for n in check_data.not_evaluable %}<li data-check="{{ n.id }}">{{ {'case_request': "PayPal's evidence request"}.get(n.id) or (n.id|field_word) }}: {{ n.reason }}</li>{% endfor %}</ul>
+{% if check_data.limitations %}
+<ul class="fulfilment-limitations">{% for l in check_data.limitations %}<li>{{ l.message }}</li>{% endfor %}</ul>
+{% endif %}
+</details>
+<details><summary>Technical details</summary>{% if status == "failed" %}<p data-state="refusal-technical">PayPal answered:{% if post_result.http_status %} HTTP status {{ post_result.http_status }}{% endif %}{% if post_result.reason %}; {{ post_result.reason }}{% endif %}.</p>{% endif %}<p>PayPal's Seller Protection code: <span data-state="eligibility">{{ check_data.protection_eligibility or "not returned" }}</span></p>
+<p>Fingerprint of this file (sha256): <code data-state="file-sha256">{{ file.file_sha256 }}</code></p>
+<p>Fingerprint of the approved request (sha256): <code>{{ file.request_sha256 }}</code></p>
+{% if readback %}<pre>{{ readback|tojson(indent=2) }}</pre>{% endif %}</details>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "_base.html" %}
+{% block content %}
+<div class="page">
+  <h1>Proofie case-flow and evidence index</h1>
+  <p>Version {{ version }}. The ten fronts are independently available behind their own flags and connect through the existing inbox, case, resolution, fulfilment, outcome, and package screens where applicable. The hub indexes those real records; it does not create another case workflow or assert provider authenticity.</p>
+  {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+  <section class="panel" data-state="hub-for-judges">
+    <h2>For judges</h2>
+    <p><strong>Next step:</strong> {% if judge_as_buyer_enabled %}<a href="/features/judge_as_buyer">open the case as the sandbox buyer</a>{% else %}<a href="/disputes">open All disputes</a>{% endif %}, then review the case as the seller. Nothing is sent to PayPal until you approve it.</p>
+    <p>Check your setup: run <code>python tools/judge_check.py</code>; it reads the local app and prints one line per step (see "Check your setup" in <code>docs/JUDGE-RUN.md</code>).</p>
+    <p>The setup script (<code>tools/sandbox_seed.py</code>) creates two sales by the same sandbox buyer in your own PayPal Sandbox account, one with a DEMO tracker; you open the dispute as that buyer in seven steps on the Judge as buyer page, and the inbox marks the seeded sale. Proofie does not sign in, open a dispute or send anything on the buyer's behalf.</p>
+    <p>At send, the hash of the approved package is written into the evidence line, and the dispute is read back from PayPal by GET before the send shows as confirmed.</p>
+  </section>
+  {% if case %}
+  <section class="panel" data-state="hub-current-case">
+    <h2>Current Proofie case</h2>
+    <p>{{ case.source }} · case <span translate="no">{{ case.case_id }}</span></p>
+    <p><a href="{{ case.case_url }}">Return to this case</a>{% if case.package_url %} · <a href="{{ case.package_url }}">Open its latest package review</a>{% endif %}</p>
+    <h3>Saved package records</h3><table><thead><tr><th>Package ID</th><th>Version</th><th>Source</th><th>Validation record</th></tr></thead><tbody>
+    {% for package in case.packages %}<tr><td>{{ package.id }}</td><td>{{ package.version }}</td><td>{{ package.source }}</td><td>{{ "passed local validation flag" if package.validation_ok else "not validated" }}</td></tr>{% else %}<tr><td colspan="4">No package records exist for this case.</td></tr>{% endfor %}</tbody></table>
+    <h3>Saved document records</h3><table><thead><tr><th>Document ID</th><th>Filename</th><th>Recorded SHA-256</th><th>Hash status</th></tr></thead><tbody>
+    {% for doc in case.documents %}<tr><td>{{ doc.id }}</td><td>{{ doc.filename }}</td><td><code>{{ doc.sha256 or "UNKNOWN" }}</code></td><td>{{ doc.digest_status }}</td></tr>{% else %}<tr><td colspan="4">No document records exist for this case.</td></tr>{% endfor %}</tbody></table>
+    <h3>Local outputs recorded for this case</h3><table><thead><tr><th>Artifact</th><th>Status</th><th>Reference</th><th>Meaning</th></tr></thead><tbody>
+    {% for row in case_outputs %}<tr><td>{{ row.kind }}</td><td>{{ row.status }}</td><td><code>{{ row.reference }}</code></td><td>{{ row.detail }}</td></tr>{% else %}<tr><td colspan="4">No local simulation or MCP note is recorded for this case.</td></tr>{% endfor %}</tbody></table>
+    <p>Recorded DB digests are identifiers; this hub does not reread original bytes. Source authenticity is not verified here.</p>
+  </section>
+  {% else %}<p>Open the hub from a case page to see its actual package, document, simulation, and local-note references. Start at <a href="/disputes">All disputes</a>.</p>{% endif %}
+  <h2>Case-aware destinations</h2>
+  <ul>{% for item in pages %}<li>{% if item.enabled and item.href %}<a href="{{ item.href }}">{{ item.title }}</a>{% else %}<strong>{{ item.title }} (disabled)</strong>{% endif %} — {{ item.description }} <small>{% if item.enabled and item.href %}enabled locally{% else %}Requires {% if item.missing_flags %}{{ item.missing_flags | join(' + ') }}{% else %}a case with a saved package{% endif %}=true in this process for its destination{% endif %}</small></li>{% endfor %}{% if judge_as_buyer_enabled %}<li><a href="/features/judge_as_buyer">Judge as buyer</a> — Buyer-side guide for reviewing the case from the other side <small>enabled locally</small></li>{% endif %}</ul>
+  <h2>Claims and evidence status</h2>
+  <table><thead><tr><th>Claim</th><th>Source artifact</th><th>Source SHA-256</th><th>Dossier SHA-256</th><th>Focused integration receipt</th><th>Status</th></tr></thead><tbody>
+  {% for row in claims %}<tr><td>{{ row.claim }}</td><td>{{ row.artifact }}{% if row.dossier %} · {{ row.dossier.split('/')[-2:] | join('/') }}{% endif %}</td><td><code>{{ row.sha256 or 'unavailable' }}</code></td><td><code>{{ row.dossier_sha256 or 'unavailable' }}</code></td><td>{{ row.acceptance_log.split('/')[-1] if row.acceptance_log else row.artifact }}</td><td>{{ row.run_status }}</td></tr>{% endfor %}
+  </tbody></table>
+  <h2>Local demonstration path</h2><ol>{% for step in storyboard %}<li>{{ step }}</li>{% endfor %}</ol>
+  <p>Historical CUT72 R04 is fixed to its cited source SHA and was not rerun. Human rehearsals Q1/Q2 remain NOTRUN. Local hashes and records do not establish external authenticity.</p>
+</div>
+{% endblock %}

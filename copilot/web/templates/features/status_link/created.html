@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+{% block title %}Buyer status link created - Proofie{% endblock %}
+{% block content %}
+<div class="page" data-state="status-link-created">
+<h1>Link created</h1>
+<p>Share it yourself (message, e-mail, chat). Proofie has not sent it to anyone.</p>
+<label for="status-link-url">Buyer link</label>
+<textarea id="status-link-url" rows="3" readonly>{{ link }}</textarea>
+<p>It works until {{ view.expires }}. Anyone holding the link can read the page, so send it only to the buyer.</p>
+{% if not on_public_base %}<p role="note">This address is the one you are on now. If it is not reachable from outside, the buyer cannot open it: the operator sets the public address for links, or you use the hosted copy.</p>{% endif %}
+<p><a href="/status-link">Create another</a></p>
+</div>
+{% endblock %}

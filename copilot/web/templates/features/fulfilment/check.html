@@ -1,0 +1,53 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs, button, link_button, exact_content, mono_id %}
+{% from "features/fulfilment/_notices.html" import already_notice %}
+{% block title %}Review the tracking: {{ capture_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('Tracking at the sale', '/fulfilment'), ('Sale ' ~ capture_id, '/fulfilment/' ~ capture_id), ('Review the tracking', None)]) }}{% endblock %}
+{% block content %}
+<h1>Review the tracking before it is sent</h1>
+<section id="preview" class="panel" aria-labelledby="preview-title">
+<h2 id="preview-title">Not sent yet.</h2>
+{% if register_enabled %}
+<p>This is the prepared request, exactly as Proofie will send it to the PayPal sandbox to add this tracking number to the sale.</p>
+{% else %}
+<p class="notice" data-state="register-off">Registration with PayPal is switched off in this installation: approving only saves the file and the checks, nothing is sent.</p>
+{% endif %}
+{% set change = '/fulfilment/' ~ capture_id ~ '?from=' ~ token %}
+<dl data-state="tracking-summary">
+  <dt>To</dt><dd>PayPal, for sale {{ mono_id(capture_id) }}</dd>
+  <dt>Carrier</dt><dd>{{ carrier.text }} <a href="{{ change }}#field-carrier">Change<span class="visually-hidden"> the carrier</span></a>
+    {% if carrier.aggregator %}<br><span data-state="aggregator-note">This looks like a shipping platform, not a carrier. Use the carrier that delivers the parcel when you can.</span>{% endif %}</dd>
+  <dt>Tracking number</dt><dd>{% call exact_content() %}{{ tracker.tracking_number }}{% endcall %}
+    {% if sent_as %}<span data-state="sent-as">Sent as: {{ mono_id(sent_as) }}. Spaces were removed.</span>{% endif %}
+    <a href="{{ change }}#field-tracking_number">Change<span class="visually-hidden"> the tracking number</span></a></dd>
+  <dt>Shipment status</dt><dd>{{ status_label }} <a href="{{ change }}#field-status">Change<span class="visually-hidden"> the shipment status</span></a></dd>
+  <dt>Address you shipped to</dt><dd>{% if declared %}{% for k in ('line1', 'city', 'state', 'postal_code', 'country_code') %}{% if declared.get(k) %}{{ declared[k] }}{% if not loop.last %}, {% endif %}{% endif %}{% endfor %}{% else %}Not given{% endif %} <a href="{{ change }}#declared-address">Change<span class="visually-hidden"> the address</span></a></dd>
+</dl>
+<p>Proofie does not ask PayPal to email the buyer about this tracking.</p>
+{% if ups_advisory %}<p class="notice" data-state="ups-advisory">UPS numbers usually start with 1Z and have 18 characters. Check the label. A matching format does not prove the shipment exists.</p>{% endif %}
+{% if delivered_warning %}<p class="notice" data-state="delivered-warning">You are telling PayPal the parcel was delivered. Proofie cannot check this; PayPal shows what you send.</p>{% endif %}
+{% if notes.trackers_read_failed_at %}<p class="notice" data-state="trackers-read-failed">Proofie could not check PayPal's trackers at {{ notes.trackers_read_failed_at|when }}.</p>{% endif %}
+</section>
+{% if feature_enabled("package_insert") %}{% include "features/package_insert/_entry.html" %}{% endif %}
+{% if feature_enabled("trade_profiles") %}<p data-state="trade-profile-link"><a href="/trade-profile">Set a seller preparation profile</a>. Its reminders can appear on your package insert.</p>{% endif %}
+{% if feature_enabled("lessons_exchange") %}<p data-state="lessons-exchange-link"><a href="/lessons-exchange">Import or share seller preparation reminders</a>. Imported categories stay on this device and are shown in the package preparation form.</p>{% endif %}
+{% if feature_enabled("ship_notice") %}{% include "features/ship_notice/_entry.html" %}{% endif %}
+{{ already_notice(notice, capture_id) }}
+{% if not notice %}
+<form method="post" action="/fulfilment/{{ capture_id }}/register" data-state="confirm-form" data-sends novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="token" value="{{ token }}">
+  <input type="hidden" name="request_sha256" value="{{ sha256 }}">
+  {% if register_enabled %}<p>Adding the tracking is the send: there is no separate step.</p>
+  <p data-state="cannot-undo">Adding the tracking cannot be undone from Proofie. Proofie refuses to add the same tracking twice.</p>{% endif %}
+  <div class="actions actions--forward">{{ button('Add tracking in PayPal' if register_enabled else 'Save the tracking file', large=True, sending='Sending to PayPal...' if register_enabled else None) }}
+  {{ link_button(change ~ '#field-carrier', 'Change the details', kind='link') }}</div>
+</form>
+{% else %}
+<p>{{ link_button(change ~ '#field-carrier', 'Change the details', kind='secondary') }}</p>
+{% endif %}
+<details><summary>Technical details</summary>
+<p>Transaction ID: <code>{{ capture_id }}</code></p>
+<pre data-state="request-body">{{ body_text }}</pre>
+<p>sha256 of this request: <code data-state="request-sha256">{{ sha256 }}</code></p></details>
+{% endblock %}

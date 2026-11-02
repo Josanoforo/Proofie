@@ -1,0 +1,50 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "unsupported_claim_heldout3",
+ "type": "unsupported_claim",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0040",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2900,
+  "amount_display": "29.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000040"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1040\nOrder date: 2026-09-25 13:00\nTotal paid: 29.00 USD\nPayPal capture id: EV2CAPTURE0000040",
+  "doc_review": "Customer review (5 stars): Great seller, fast and friendly!"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_review": "review.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "carrier_proof",
+    "any_of": [
+     "tracking",
+     "carrier",
+     "proof",
+     "deliver",
+     "ship"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "A review does not say this order arrived."
+}

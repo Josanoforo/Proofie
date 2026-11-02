@@ -1,0 +1,16 @@
+{% extends "_base.html" %}
+{% block title %}Seller lesson exchange - Proofie{% endblock %}
+{% block content %}<div class="page"><h1>Share a generic preparation reminder</h1>
+<p>Exports contain only seller-selected categories. Case IDs, sale IDs, free-text lesson notes, outcomes, names, and exact amounts are not included. A reported topic is not verified causality or PayPal policy.</p>
+{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+<h2>Export from a seller lesson</h2><p>{{ lesson_count }} local seller lesson record(s) available. The selected categories below are an anonymized reminder authored by you; no lesson text is copied.</p>
+<form method="post" action="/lessons-exchange/export"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<label for="country">Seller account country</label><input id="country" value="{{ country }}" readonly>
+<label for="amount-band">Approximate amount band (seller selected)</label><select id="amount-band" name="amount_band">{% for v, label in [('unknown','Unknown'),('under_25','Under 25'),('25_to_100','25 to 100'),('100_to_500','100 to 500'),('over_500','Over 500')] %}<option value="{{ v }}">{{ label }}</option>{% endfor %}</select>
+<label for="trade-profile">Trade profile</label><select id="trade-profile" name="trade_profile" required><option value="">Choose</option>{% for key, item in profiles.items() %}<option value="{{ key }}">{{ item.label }}</option>{% endfor %}</select>
+<label for="reported-topic">Reported topic (seller selected)</label><select id="reported-topic" name="reported_topic" required>{% for v in ['delivery','tracking','packaging','item_detail','other'] %}<option value="{{ v }}">{{ field_word('topic_' ~ v) }}</option>{% endfor %}</select>
+<label for="reminder">Preparation reminder</label><select id="reminder" name="preparation_reminder" required>{% for key, label in [('check_delivery_window','Check delivery window'),('save_tracking_receipt','Save tracking receipt'),('photograph_package','Photograph package'),('record_item_details','Record item details'),('keep_receipt','Keep receipt')] %}<option value="{{ key }}">{{ label }}</option>{% endfor %}</select>
+<button class="btn btn-primary">Download case-free JSON</button></form>
+<h2>Import a seller reminder</h2><form method="post" action="/lessons-exchange/import" enctype="multipart/form-data"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><label for="reminder-file">UTF-8 JSON file (8 KiB maximum)</label><input id="reminder-file" type="file" name="reminder_file" accept="application/json,.json" required><button class="btn btn-secondary">Import to this device</button></form>
+{% if imported %}<h2>Imported local preparation reminders</h2><ul>{% for item in imported %}<li data-state="imported-reminder">{{ item.country|field_word }} · {{ item.amount_band|field_word }} · {{ item.trade_profile|field_word }} · {{ field_word('topic_' ~ item.reported_topic) }} · {{ item.preparation_reminder|field_word }} <span>Seller-selected, not verified; not PayPal policy.</span></li>{% endfor %}</ul>{% endif %}
+</div>{% endblock %}

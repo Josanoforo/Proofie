@@ -1,0 +1,10 @@
+{
+ "contradictory_heldout": "0f940ad8e0a4bd90988c6246cf7bd2d9d28e5f53cc6f942a6566ba34d2947695",
+ "illegible_heldout": "49e0d5744664d242305c3f431a8cc4e0d7cf9c76fdd6e0edc3c82b4aaac515b6",
+ "incomplete_heldout": "7b621aa083d92f9aec33a553a07b9377c2d1d4dc5a2c7852f480b33774b6dcc5",
+ "injection_heldout": "4ce83a63d1087ccbcf3b968b055c8e29ea7b28b85d866bc074737d15dc0b44c2",
+ "irrelevant_docs_heldout": "006a91620b34c7efa644441b019fe878a7cc2a27cc2368645086e8df19c9a09f",
+ "no_tracking_heldout": "0869fe9e1cb9a736bbdabf295774df6d01bf89a5e1f27b9b98e12bf138e4496a",
+ "sufficient_coherent_heldout": "349ab2dd7ab3afe3e2ee1478e91367acd7ddb0d16a12f0986d45708014e34740",
+ "unsupported_claim_heldout": "e18e903d2a27fc72cbea86cc6743b1a90e643c6e52324e03184ab360bc66e164"
+}

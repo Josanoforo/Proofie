@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs %}
+{% block title %}Carrier directory - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('Tracking at the sale', '/fulfilment'), ('Carrier directory', None)]) }}{% endblock %}
+{% block content %}
+<h1>Carrier directory</h1>
+<p>Offline reference links and number formats. These are not live tracking results. Proof or signature options depend on the selected service and shipment.</p>
+<form method="get"><label for="carrier-search">Carrier or market</label><input id="carrier-search" name="q" value="{{ query }}"><button class="btn btn-primary" type="submit">Filter</button></form>
+<table><thead><tr><th>Carrier</th><th>Market</th><th>Number format</th><th>Tracking</th><th>Proof or signature note</th><th>Source</th></tr></thead><tbody>
+{% for item in carriers %}<tr><th scope="row">{{ item.name }}</th><td>{{ item.markets|join(", ") }}</td><td>{{ item.tracking_format }}</td><td><a href="{{ item.tracking_url }}" rel="noreferrer">Open carrier tracking</a></td><td>{{ item.proof_note }}</td><td><a href="{{ item.source_url }}" rel="noreferrer">Official source</a></td></tr>{% else %}<tr><td colspan="6">No directory entries match.</td></tr>{% endfor %}
+</tbody></table>
+<p>Proofie does not contact carriers or verify the carrier's current tracking data.</p>
+{% endblock %}

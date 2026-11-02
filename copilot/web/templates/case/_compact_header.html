@@ -1,0 +1,13 @@
+{% from "_components.html" import tag %}
+<div class="b-case-bar">
+  <div class="b-case-title">
+    <p class="b-case-name">{{ compact_case.reason|capitalize }}{% if compact_case.norm.amount_display %}: {{ compact_case.norm.amount_display }} {{ compact_case.norm.currency or '' }}{% endif %}</p>
+    <span class="h1-id" translate="no">Dispute {{ dispute_id }}</span>
+  </div>
+  <div class="case-strip" aria-label="The case at a glance">
+    <div class="case-line"><div><span class="b-label">Case status</span>{{ tag(compact_case.status.kind, compact_case.status.label) }}</div>
+      <div data-safety="due-date"><span class="b-label">Respond by</span>{% if compact_case.due %}{{ compact_case.due.text|replace('Respond by ', '') }}{% else %}No verified deadline available{% endif %}</div></div>
+    <a href="/disputes/{{ dispute_id }}">Case overview and facts</a>
+  </div>
+  <div class="case-navigation">{% include "_case_primary_nav.html" %}</div>
+</div>

@@ -1,0 +1,17 @@
+DEMO DATA - synthetic document for a hackathon demo. Not a real transaction, store or customer.
+
+ORDER CONFIRMATION
+Store: Test Store (DEMO)
+Store order number: TS-DEMO-1001
+Order date: 2026-10-04 18:04 (America/Mexico_City)
+
+Item: DEMO DATA - pilot item
+Quantity: 1
+Total paid: 25.00 USD
+Payment method: PayPal
+PayPal order id: 8RX26735CU316042V
+PayPal capture id: DEMOTXN0000000001
+
+Ship to: [DEMO CUSTOMER], Calle Ejemplo 100, Col. Demo, 06000 Ciudad de Mexico, MX
+Shipping service: Estafeta Terrestre
+Estimated dispatch: next business day after the order date

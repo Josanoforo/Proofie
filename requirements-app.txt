@@ -1,0 +1,14 @@
+fastapi==0.142.2
+uvicorn[standard]==0.54.0
+jinja2==3.1.6
+python-multipart==0.0.32
+mcp==2.3.0
+httpx==0.28.1
+python-dotenv==1.2.4
+tzdata==2026.5
+pypdfium2==5.14.0
+pillow==12.3.0
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+referencing==0.37.0
+rpds-py==2026.9.1

@@ -1,0 +1,17 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs %}
+{% block title %}Seasonal preparation - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('Tracking at the sale', '/fulfilment'), ('Sale ' ~ capture_id, '/fulfilment/' ~ capture_id), ('Seasonal preparation', None)]) }}{% endblock %}
+{% block content %}<div class="page" data-state="season-prep" data-country="{{ country }}">
+<h1>Prepare for seasonal sales</h1><p>For sale <span translate="no">{{ capture_id }}</span> · market {{ country }} · local data version {{ version }}.</p>
+<p>Season dates are planning references. They do not predict a carrier delay, guarantee arrival, or change a PayPal deadline. Confirm dates for the service actually purchased.</p>
+{% if not available %}<p data-state="season-data-unavailable">No seasonal data is bundled for this country.</p>{% endif %}
+{% for season in seasons %}<section class="panel" data-season="{{ season.id }}" data-season-state="{{ season.state }}">
+<h2>{{ season.label }} · {{ season.state|title }}</h2><p>{{ season.start }} to {{ season.end }}</p>
+<p>{{ season.source_note }}{% if season.source_url %} <a href="{{ season.source_url }}">{{ season.source_name }}</a> (checked {{ season.source_checked }}){% else %} {{ season.source_name }} (checked {{ season.source_checked }}){% endif %}</p>
+<h3>Preparation checklist</h3><ul>{% for item in season.preparation %}<li>{{ item }}</li>{% endfor %}</ul>
+{% if season.shipping_cutoffs %}<h3>Service-specific recommended send-by dates</h3><ul>{% for cutoff in season.shipping_cutoffs %}<li>{{ cutoff.service }}: {{ cutoff.date }}</li>{% endfor %}</ul><p>These are recommendations for the stated service and area, not a delivery guarantee.</p>{% endif %}
+</section>{% else %}{% if available %}<p data-state="no-upcoming-season">No active or upcoming date is bundled within the next 90 days.</p>{% endif %}{% endfor %}
+<section class="panel" data-state="carrier-service-notes"><h2>Check the purchased carrier service</h2><p>Signature and proof-of-delivery availability depends on the service and its terms. These notes are not a promise for your shipment.</p><ul>{% for carrier in carriers %}<li>{{ carrier.name }} — {{ carrier.proof_note }} <a href="{{ carrier.source_url }}">Carrier source</a></li>{% endfor %}</ul></section>
+<p data-state="season-prep-back"><a href="/fulfilment/{{ capture_id }}">Return to this sale's shipment preparation</a>{% if feature_enabled("ship_moment_capture") %}; save the label and package condition there when available{% endif %}.</p>
+</div>{% endblock %}

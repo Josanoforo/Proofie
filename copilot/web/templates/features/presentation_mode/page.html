@@ -1,0 +1,43 @@
+{% extends "_base.html" %}{% block title %}Presentation guide - Proofie{% endblock %}{% block content %}
+<h1>Four real moments, then one simulation</h1>
+<p>Use the arrow keys to move through this case's four live destinations and the separate simulation step. Press Enter to open the current step. The guide creates no data and makes no provider calls.</p>
+{% if proposal_error %}<p role="alert">{{ proposal_error }} <a href="/disputes">Return to disputes</a>.</p>{% endif %}
+{% if proposal %}<section class="panel" data-state="presentation-review-proposal"><h2>Review this case and package</h2>
+<p>Case {{ proposal.case_id }} · package {{ proposal.package_id }} · version {{ proposal.version }} · {{ proposal.claim_count }} statements.</p>
+<p>{{ proposal.next_action }} {% if not proposal.latest %}This is not the latest package; open the current case first.{% endif %}</p>
+<p>Approval recorded: {{ 'yes' if proposal.approval_recorded else 'no' }}. {{ proposal.limitation }}</p>
+<ul>{% for source in proposal.sources %}<li>{{ source.id }} — {{ source.name }}: {{ source.status }}{% if source.sha256 %} · SHA-256 <code>{{ source.sha256 }}</code>{% endif %}</li>{% else %}<li>No source references recorded.</li>{% endfor %}</ul>
+<p>Attachments:</p><ul>{% for attachment in proposal.attachments %}<li>{{ attachment.name }}: {{ attachment.status }}</li>{% else %}<li>None recorded.</li>{% endfor %}</ul>
+<p>Review snapshot: <code data-state="review-snapshot">{{ proposal.snapshot }}</code>. Share this token with the local assistant only when you choose to compare it.</p>
+<p><a href="{{ proposal.review_url }}">Open this package for review</a></p>
+{% if comparison %}<p role="status" data-state="snapshot-comparison">{{ comparison.status }}: {{ comparison.reason if comparison.reason is defined else comparison.next_action }} <a href="{{ comparison.review_url }}">Continue safely</a>.</p>{% endif %}
+</section>{% endif %}
+<p data-state="evaluation-status">{{ eval_status }}</p>
+<nav aria-label="Presentation steps"><button class="btn btn-secondary" type="button" data-step-back aria-label="Previous moment">Previous</button><span data-step-count>1 of 5</span><button class="btn btn-secondary" type="button" data-step-next aria-label="Next moment">Next</button></nav>
+<ol id="presentation-steps">{% for step in steps %}<li data-presentation-step data-kind="{{ step.kind }}"{% if not loop.first %} hidden{% endif %}><strong>{{ step.title }}</strong> — {% if step.available is defined and not step.available %}This optional flow is disabled in this configuration.{% else %}<a href="{{ step.href }}" data-step-link>Open the current app flow</a>. <small>{{ step.subtitle }}</small>{% endif %}</li>{% endfor %}</ol>
+<p><a href="/disputes">Return to disputes</a></p>
+<script>
+(() => {
+  const steps = Array.from(document.querySelectorAll("[data-presentation-step]"));
+  if (steps.length !== 5) return;
+  let current = 0;
+  const count = document.querySelector("[data-step-count]");
+  const show = (index) => {
+    current = Math.max(0, Math.min(steps.length - 1, index));
+    steps.forEach((step, i) => { step.hidden = i !== current; });
+    count.textContent = `${current + 1} of ${steps.length}`;
+  };
+  document.querySelector("[data-step-back]").addEventListener("click", () => show(current - 1));
+  document.querySelector("[data-step-next]").addEventListener("click", () => show(current + 1));
+  document.addEventListener("keydown", (event) => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.key === "ArrowRight") { event.preventDefault(); show(current + 1); }
+    if (event.key === "ArrowLeft") { event.preventDefault(); show(current - 1); }
+    if (event.key === "Enter" && !event.target.closest("a,button,input,select,textarea")) {
+      const link = steps[current].querySelector("[data-step-link]");
+      if (link) window.location.assign(link.href);
+    }
+  });
+})();
+</script>
+{% endblock %}

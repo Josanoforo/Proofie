@@ -1,0 +1,46 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "contradictory_heldout1",
+ "type": "contradictory",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0018",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 98000,
+  "amount_display": "980.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000018"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1018\nFecha del pedido: 2026-09-29 09:00\nTotal pagado: 980.00 MXN\nID de captura PayPal: EV2CAPTURE0000018\nEnvío a: Av. Reforma 222, Código postal: 06600, Ciudad de México",
+  "doc_guia": "Paquetería: Redpack\nGuía: RP77001018\nEstatus: Entregado\nFecha de entrega: 2026-10-02\nCódigo postal: 64000"
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_guia": "redpack_guia.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [],
+  "conflicts": [
+   {
+    "id": "address",
+    "any_of": [
+     "postal",
+     "address",
+     "dirección",
+     "código",
+     "06600",
+     "64000"
+    ]
+   }
+  ],
+  "forbidden": [],
+  "must_cite_tracking": null
+ },
+ "notes": "The delivery postal code differs from the order's shipping address."
+}

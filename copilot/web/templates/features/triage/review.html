@@ -1,0 +1,28 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs, link_button %}
+{% block title %}What the evidence supports: {{ dispute_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('What the evidence supports', None)]) }}{% endblock %}
+{% block content %}{% set rc3_reviewing = feature_enabled("outcome") and verdict.norm.stage == "CHARGEBACK" and verdict.norm.status == "UNDER_REVIEW" %}{% if feature_enabled("outcome") %}{% with rc3_norm = verdict.norm %}{% include "features/outcome/_review_notice.html" %}{% endwith %}{% endif %}
+<section id="triage" data-state="{{ verdict.state }}">
+<h1>What the evidence supports <span class="h1-id" translate="no">Dispute {{ dispute_id }}</span></h1>
+<p>{{ verdict.scope|dates_in_words }}</p>{% if not rc3_reviewing %}<p>{{ verdict.text|dates_in_words }}</p><p data-state="recommendation">{{ verdict.recommendation }}</p>
+{%- if verdict.state == "cannot_meet_rule" and feature_enabled("resolution") and not verdict.buyer_closed %}
+<p class="actions">{{ link_button("/disputes/" ~ dispute_id ~ "/resolution", "Resolution options and buyer messages", kind="secondary", large=True) }}</p>{% endif %}{% endif %}
+<p>This is a rule check on your documents, not a prediction of how PayPal will decide. You decide what to send; this page sends nothing.</p>
+<h2>What is missing or cannot be verified</h2>
+<ul>{% for check in verdict.missing %}<li data-state="{{ check.state }}">{{ safe_text(check.label_for_seller) }}: {% if rc3_reviewing and check.action != "none" %}{{ REVIEWING_NEUTRAL_TEXT }}{% else %}{{ safe_text(check.seller_message)|dates_in_words }}{% endif %} <small>{{ check.basis_ref|dates_in_words|mark_spanish }}</small>{% if feature_enabled("clauses") %}{% with clauses = verdict.clauses %}{% include "features/clauses/_clause.html" %}{% endwith %}{% endif %}{% if not rc3_reviewing %} {{ link_button("/disputes/" ~ dispute_id ~ "/workspace/prepare#documents", "Add proof", kind="secondary", hidden="for " ~ safe_text(check.label_for_seller)) }}{% endif %}</li>{% else %}<li>No missing requirement in these implemented checks.</li>{% endfor %}</ul>
+<h2>PayPal's request in this case</h2>
+<ul>{% for check in verdict.requests %}<li>{{ safe_text(check.seller_message)|dates_in_words }}</li>{% else %}<li>No request was returned.</li>{% endfor %}</ul>
+<p>PayPal's request and the delivery rule are separate: meeting one does not meet the other.</p>
+<h2>Quality cautions from Proofie</h2>
+<ul>{% for check in verdict.cautions %}<li>{{ safe_text(check.label_for_seller) }}: {% if rc3_reviewing and check.action != "none" %}{{ REVIEWING_NEUTRAL_TEXT }}{% else %}{{ safe_text(check.seller_message)|dates_in_words }}{% endif %}</li>{% else %}<li>No quality caution flagged.</li>{% endfor %}</ul>
+<h2>What Proofie could not read</h2>
+<ul>{% for limitation in limitations %}<li>{{ safe_text(limitation.message)|dates_in_words }}</li>{% else %}<li>No context limitation recorded.</li>{% endfor %}</ul>
+{% if not rc3_reviewing %}<p>Missing context is not a refusal to send; add proof or enter the shipment details yourself.</p>{% endif %}
+<h2>Costs to consider</h2>
+{% if economics %}<ul data-state="economics">{% for line in safe_text(economics.text).split(' · ') %}<li>{{ line|dates_in_words }}</li>{% endfor %}</ul>{% else %}<p>Economics not computed: the amount or currency could not be read.</p>{% endif %}
+<details><summary>Technical details</summary><p>Seller Protection for {{ {'MX': 'Mexico', 'US': 'the United States'}.get(rules.country, rules.country) }}, effective {{ rules.effective_date }}. <span data-rule-set="{{ rules.rule_set_id }}"></span> <a href="{{ rules.source_url }}">Published policy</a></p>
+<ul>{% for check in checks %}<li>{{ check.id }}: {{ check.state }}; {{ check.basis }}; {{ check.basis_ref|mark_spanish }}{% if feature_enabled("clauses") %}{% with clauses = verdict.clauses %}{% include "features/clauses/_clause.html" %}{% endwith %}{% endif %}</li>{% endfor %}</ul></details>
+{% if feature_enabled('ledger') %}<p>{{ link_button("/disputes/" ~ dispute_id ~ "/ledger", "What this app recorded", kind="link") }}</p>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "_base.html" %}
+{% from "_components.html" import link_button %}
+{% block title %}Case started - Proofie{% endblock %}
+{% block content %}
+<h1>Case started</h1>
+<p role="status" data-state="waiting">{{ note }}</p>
+<p class="actions">{{ link_button('/judge/cases/' ~ dispute_id ~ '/check', 'Check again') }}</p>
+<p><a href="/judge">Back to the cases</a></p>
+{% endblock %}

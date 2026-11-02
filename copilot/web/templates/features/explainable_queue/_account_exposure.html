@@ -1,0 +1,26 @@
+{% if account_exposure %}
+<section class="panel" data-state="account-dispute-exposure">
+  <h2>Known principal in open disputes</h2>
+  <p>{{ account_exposure.active_case_count }} known-open cases among {{ account_exposure.population_count }} distinct dispute rows returned · as of {{ account_exposure.as_of }}.</p>
+  <p>{{ account_exposure.principal_label }}</p>
+  {% if account_exposure.principal_by_currency %}
+  <ul>{% for row in account_exposure.principal_by_currency %}<li>{{ row.amount_text }} across {{ row.case_count }} case{{ '' if row.case_count == 1 else 's' }}</li>{% endfor %}</ul>
+  {% else %}<p>No complete open-dispute principal amounts were returned.</p>{% endif %}
+  <details data-state="account-exposure-sources"><summary>Period, sources and data coverage</summary>
+    <p>Historical count window: {{ account_exposure.period_label }}.</p>
+    <p>Sales denominator: {% if account_exposure.sales_count is none %}{{ account_exposure.sales_denominator_label }}{% else %}{{ account_exposure.sales_count }} {{ account_exposure.sales_denominator_label }}{% endif %}. Window disputes: {% if account_exposure.window_dispute_count is none %}not available because the dispute read is incomplete{% else %}{{ account_exposure.window_dispute_count }} disputes{% endif %}. These counts have different units; no ratio is calculated here.</p>
+    <p>Dispute creation dates: {{ account_exposure.dated_dispute_count }} readable; {{ account_exposure.undated_dispute_count }} missing or unreadable. Current amount coverage: {{ account_exposure.known_amount_case_count }} known, {{ account_exposure.incomplete_amount_count }} open case{{ '' if account_exposure.incomplete_amount_count == 1 else 's' }} with missing or invalid amount/currency; {{ account_exposure.unclassified_status_count }} unclassified status.</p>
+    <p>{{ account_exposure.duplicate_rows }} duplicate row{{ '' if account_exposure.duplicate_rows == 1 else 's' }} and {{ account_exposure.unidentified_rows }} row{{ '' if account_exposure.unidentified_rows == 1 else 's' }} without a case ID excluded. Dispute listing: {{ 'complete' if account_exposure.dispute_listing_complete else 'incomplete' }}; sales read: {{ 'complete' if account_exposure.sales_read_complete else 'incomplete' }}. {{ account_exposure.coverage_label }}.</p>
+    <p><small>Dispute source: {{ account_exposure.source_disputes }} Sales source: {{ account_exposure.source_sales }} {{ account_exposure.scope }}</small></p>
+    {% set movements = account_exposure.completed_sales %}
+    <h3>Recorded completed-sale amounts</h3>
+    <p>{{ movements.coverage_label }} Period: {{ movements.period_label }}. Source: {{ movements.source }}</p>
+    {% if movements.by_currency %}
+    <ul>{% for currency_row in movements.by_currency %}<li>{{ currency_row.amount_text }} across {{ currency_row.transaction_count }} completed sale{{ '' if currency_row.transaction_count == 1 else 's' }}.
+      <ul>{% for day in currency_row.by_date %}<li>{{ day.amount_text }} on {{ day.date_utc }} UTC ({{ day.transaction_count }} transaction{{ '' if day.transaction_count == 1 else 's' }}).</li>{% endfor %}</ul>
+    </li>{% endfor %}</ul>
+    {% else %}{% if movements.fetch_complete %}<p>No T0006/S completed-sale amounts appeared in this complete search window.</p>{% else %}<p>No complete T0006/S transaction amounts were returned; this is unavailable/partial, not zero.</p>{% endif %}{% endif %}
+    <p>{{ movements.included_transaction_count }} rows included; {{ movements.duplicate_transaction_rows }} duplicate rows excluded; {{ movements.incomplete_transaction_rows }} incomplete or unreadable rows; {{ movements.non_completed_t0006_rows }} T0006 rows not completed under the existing Proofie rule; {{ movements.unclassified_event_rows }} other event codes not classified. {{ movements.scope }}</p>
+  </details>
+</section>
+{% endif %}

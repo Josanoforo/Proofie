@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "no_tracking_dev1",
+ "type": "no_tracking",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0011",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2200,
+  "amount_display": "22.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000011"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1011\nOrder date: 2026-09-28 17:00\nTotal paid: 22.00 USD\nPayPal capture id: EV2CAPTURE0000011",
+  "doc_receipt": "Post office retail receipt\nUSPS Ground Advantage postage: 6.40 USD\nDate: 2026-09-29\nNo tracking purchased"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_receipt": "postage_receipt.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "tracking",
+    "any_of": [
+     "tracking",
+     "guía",
+     "guia",
+     "waybill"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "Postage was paid without tracking."
+}

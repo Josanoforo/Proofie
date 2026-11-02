@@ -1,0 +1,6 @@
+{#- rc4.3 lane PK (W1-3): the clause behind a check, shown while COPILOT_FEATURE_CLAUSES is on. `clauses` maps a check id
+    to clause_for(...) (copilot/features/clauses/service.py); the calling loop names the check `c` (package page) or
+    `check` (triage page). PayPal's words are quoted verbatim with their source; nothing here is a verdict. -#}
+{%- set _clause = clauses.get((c if c is defined else check).id) if clauses else none -%}
+{%- if _clause and _clause.kind == "published" %}<details class="clause" data-clause="published"><summary>PayPal's words</summary><blockquote lang="{{ _clause.quote_lang }}"><p>{{ _clause.quote }}</p></blockquote><p><small>Source: {{ _clause.citation_text|mark_spanish }}{% if _clause.url %} · <a href="{{ _clause.url }}" rel="noopener">Read the full terms on PayPal</a>{% endif %}</small></p></details>
+{%- elif _clause %} <small class="clause" data-clause="{{ _clause.kind }}">{{ _clause.text }}</small>{% endif %}

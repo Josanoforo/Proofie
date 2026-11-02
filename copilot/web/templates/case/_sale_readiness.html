@@ -1,0 +1,15 @@
+{% from "_components.html" import tip %}
+{% set package_context_id = sale_readiness_package_id|default(latest_package.id if latest_package else '', true) %}
+{% if feature_enabled("sale_readiness") and capture %}
+<section class="panel" id="sale-readiness" data-state="case-sale-readiness">
+<h2>Is the sale ready?</h2>
+{% if sale_readiness_error %}<p role="alert">The sale checklist could not be loaded. Refresh the case before trying again.</p>
+{% elif sale_readiness_words %}
+<p>Sale <span translate="no">{{ capture }}</span>. {% call tip("Where this comes from") %}This uses the documents on this case and the shipping details you saved. {{ sale_readiness_words.source }}{% endcall %}</p>
+{% if sale_readiness_words.status %}<p>{{ sale_readiness_words.status }}{% if sale_readiness_words.price %} Price you recorded: {{ sale_readiness_words.price }}.{% endif %}</p>{% endif %}
+{% if sale_readiness_words.missing %}<h3>What is still missing</h3><ul>{% for item in sale_readiness_words.missing %}<li>{{ item }}</li>{% endfor %}</ul>{% else %}<p>Nothing is missing from the sale record.</p>{% endif %}
+<p>{% if feature_enabled("fulfilment") %}<a href="/fulfilment/{{ capture }}?from_dispute={{ norm.dispute_id }}{% if package_context_id %}&amp;from_package={{ package_context_id }}{% endif %}#sale-readiness">Continue to the sale checklist</a>{% else %}The sale checklist is switched off in this setup.{% endif %}{% if feature_enabled("ship_moment_capture") %} · <a href="/fulfilment/{{ capture }}/moment?from_dispute={{ norm.dispute_id }}{% if package_context_id %}&amp;from_package={{ package_context_id }}{% endif %}">Save/view label and parcel originals</a>{% endif %}{% if feature_enabled("buyer_note") %} · <a href="/fulfilment/{{ capture }}/buyer-note?locale=en{% if package_context_id %}&amp;from_package={{ package_context_id }}{% endif %}">Prepare a copy-only buyer note from the saved shipment</a>{% endif %}{% if package_context_id %} · <a href="/disputes/{{ norm.dispute_id }}/packages/{{ package_context_id }}">Review the same case package</a>{% endif %}</p>
+{% if feature_enabled("buyer_note") and feature_enabled("fulfilment") %}<p data-state="delivery-incident-entry"><a href="/fulfilment/{{ capture }}/delivery-incident?from_dispute={{ norm.dispute_id }}&amp;incident=delivered_not_received&amp;locale=en{% if package_context_id %}&amp;from_package={{ package_context_id }}{% endif %}">Review a delivery issue with the saved shipment</a>. Choose delivered but not received, delay, or possibly missing; saved facts and seller-entered originals are reused. Any case/photo relationship still requires the matching readiness record.</p>{% endif %}
+{% endif %}
+</section>
+{% endif %}

@@ -1,0 +1,4 @@
+{% set no_response = do_nothing_path(state.norm.amount_cents, state.norm.currency, economics.fee_cents, state.norm.seller_response_due_date) %}
+<section class="panel" data-state="do-nothing-path" aria-labelledby="do-nothing-title"><h3 id="do-nothing-title">If you do not respond</h3>
+<p>Amount at stake: {{ no_response.amount_at_stake }}. {% if no_response.fee_estimate %}{{ no_response.fee_label }}: {{ no_response.fee_estimate }}.{% else %}{{ no_response.fee_label }}.{% endif %}</p>
+<p>{{ no_response.timing }} {{ no_response.limit }}</p></section>

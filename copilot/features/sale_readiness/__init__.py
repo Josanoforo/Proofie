@@ -1,0 +1,1 @@
+"""Offline sale readiness checklist."""

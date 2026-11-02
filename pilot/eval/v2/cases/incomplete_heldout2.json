@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "incomplete_heldout2",
+ "type": "incomplete",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0009",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 3300,
+  "amount_display": "33.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000009"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1009\nOrder date: 2026-10-05 08:45\nTotal paid: 33.00 USD\nPayPal capture id: EV2CAPTURE0000009",
+  "doc_label": "UPS label receipt\nTracking No.: 1ZEV20000000009\nStatus: Label created, not yet in the UPS system\nCreated: 2026-10-05"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_label": "ups_label.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "delivery_confirmation",
+    "any_of": [
+     "deliver",
+     "entrega",
+     "signed",
+     "firma"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "A label was created; the parcel was never scanned or delivered."
+}

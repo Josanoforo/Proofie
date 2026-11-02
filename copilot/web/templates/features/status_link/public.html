@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="{{ view.locale }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:,">
+<title>{{ 'Información sobre tu envío' if view.locale == 'es' else 'About your shipment' }}</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<main id="main"><div class="page" data-state="status-link-public">
+{% include "features/status_link/_view.html" %}
+</div></main>
+<footer class="site-footer">Independent project. Not affiliated with or endorsed by PayPal.</footer>
+</body>
+</html>

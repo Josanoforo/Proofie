@@ -1,0 +1,34 @@
+{# The body of the check page. What PayPal will receive, once, as stored on the server under the check token.
+   The only send control is the form at the end: its fields are the token, the action and the approval fingerprint, never the
+   text. Context: check (stored record), token, body, body_text, norm (optional), origin_labels, csrf_token, refusal. #}
+{% from "_components.html" import button, link_button, exact_content %}
+{% set is_offer = check.action == 'offer' %}
+<section id="preview" data-state="preview">
+<p>Not sent yet. This is the exact {{ 'offer' if is_offer else 'text' }} PayPal will show the buyer.</p>
+<p><strong>To:</strong> The buyer, through PayPal</p>
+{% if is_offer %}
+<p><strong>Offer:</strong> You offer {{ body.offer_amount.value }} {{ body.offer_amount.currency_code }}{% if disputed_text %} (of {{ disputed_text }} disputed){% endif %}.</p>
+{% if check.origin == 'paypal_record' %}<p data-state="offer-proposed-label">Proposed from PayPal's record: the buyer's requested amount; you can change it.</p>{% endif %}
+<p><strong>Note to the buyer:</strong></p>
+{% call exact_content() %}{{ body.note }}{% endcall %}
+{% else %}
+<p><strong>Message:</strong></p>
+{% call exact_content() %}{{ body.message }}{% endcall %}
+<p><strong>Where this text came from:</strong> {{ origin_labels.get(check.origin, origin_labels['seller']) }}</p>
+{% endif %}
+<p>{{ link_button('/disputes/' ~ dispute_id ~ '/resolution?from=' ~ token ~ ('#offer-amount' if is_offer else '#message-text'), 'Change the offer' if is_offer else 'Change the message', kind='link') }}</p>
+</section>
+<form method="post" action="/disputes/{{ dispute_id }}/resolution/register" data-sends data-state="confirm-form" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="token" value="{{ token }}">
+  <input type="hidden" name="action" value="{{ check.action }}">
+  <input type="hidden" name="approval_sha256" value="{{ check.request_sha256 }}">
+  {% if hosted_demo() %}<p>This demo shares one PayPal sandbox account: what you send is visible to everyone who opens it.</p>{% endif %}
+  {% if not is_offer and feature_enabled('resolution_status_message') %}<p data-state="message-removes-offer">Sending a message removes the offer option on this dispute if PayPal still offers one (Proofie has seen PayPal do this).</p>{% endif %}
+  <p data-state="cannot-undo">Sending cannot be undone from Proofie. Proofie refuses a repeat send of the same {{ 'offer' if is_offer else 'message' }}.</p>
+  {{ button('Send offer to PayPal' if is_offer else 'Send message to buyer', sending='Sending to PayPal…', id='field-send') }}
+  <p>{{ 'Send offer to PayPal' if is_offer else 'Send message to buyer' }} sends it: there is no separate send step.</p>
+  <p>Proofie will not send it again on its own.</p>
+</form>
+<details><summary>Technical details</summary>{% if outcome is defined and outcome and outcome.technical %}<p data-state="refusal-technical">PayPal answered: {{ outcome.technical }}.</p>{% endif %}<pre data-state="request-body">{{ body_text }}</pre>
+<p>Fingerprint of this request (sha256). The record keeps it, so you can match what you approved with what was sent: <code data-state="request-sha256">{{ check.request_sha256 }}</code></p></details>

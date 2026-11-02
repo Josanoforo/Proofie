@@ -1,0 +1,61 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs, limitation_text %}
+{% block title %}Account and dispute fees - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Account and dispute fees', None)]) }}{% endblock %}
+{% block content %}
+<h1>Account and dispute fees</h1>
+<p class="account-cliff" data-state="account-cliff-line">{{ line }}</p>
+<p data-state="fee-schedule-limitation">{{ schedule_limitation }}</p>
+<table class="account-cliff-summary">
+  <caption>Where this account stands, from PayPal's records</caption>
+  <tr><th scope="row">Counted period <span class="field-hint">Dates in UTC, as PayPal counts them.</span></th><td>{{ summary.window_start.isoformat()[:10]|datewords }} to {{ summary.window_end.isoformat()[:10]|datewords }}</td></tr>
+  <tr><th scope="row">Completed sales</th><td>{{ sales }}</td></tr>
+  <tr><th scope="row">Disputes created in the window</th><td>{{ disputes }}</td></tr>
+  <tr><th scope="row">Dispute rate</th><td>{{ rate }}</td></tr>
+  <tr><th scope="row">Threshold status</th><td>{{ status }}</td></tr>
+  <tr><th scope="row">Fee now</th><td>{{ fee_now }}</td></tr>
+  <tr><th scope="row">Fee if high volume</th><td>{{ fee_if_high }}</td></tr>
+  <tr><th scope="row">Computed at</th><td>{{ computed_at|when }}</td></tr>
+</table>
+<p>These are the account counts read from PayPal for this window. The same formula is used for the fee comparison.</p>
+<details><summary>Technical details</summary><p>Completed sales are PayPal transactions of type T0006, status S. The counting window uses UTC dates.</p></details>
+{% if cliff_path %}
+<h2>Path to the cliff</h2>
+<div class="account-cliff-path" data-state="cliff-path" data-path-state="{{ cliff_path.state }}">
+  <p>{{ cliff_headline|dates_in_words }}</p>
+  <table class="account-cliff-summary">
+    <caption>The next window, worked out by code from PayPal's records</caption>
+    {% for label, value in cliff_rows %}<tr><th scope="row">{{ label }}</th><td>{{ value|dates_in_words }}</td></tr>
+    {% endfor %}
+  </table>
+  <ul>{% for n in cliff_notes %}<li>{{ n|dates_in_words }}</li>{% endfor %}</ul>
+  {% if cliff_path.limitations %}<ul class="account-cliff-limitations">{% for lim in cliff_path.limitations %}<li>{{ limitation_text(lim) }}</li>{% endfor %}</ul>{% endif %}
+</div>
+{% endif %}
+{% if feature_enabled("explainable_queue") %}{% if account_exposure_error %}<p role="status">Dispute exposure is unavailable; the account counts above are unaffected.</p>{% else %}{% include "features/explainable_queue/_account_exposure.html" %}{% endif %}{% endif %}
+<h2>Constants and sources</h2>
+<table class="account-cliff-constants stack">
+  <caption>The numbers Proofie uses, each with its source</caption>
+  <thead><tr><th scope="col">Constant</th><th scope="col" class="amount">Value</th><th scope="col">Source</th></tr></thead>
+  <tbody>
+  {% for c in constants %}
+  <tr data-constant="{{ loop.index }}"><td data-label="Constant">{{ c.name|dates_in_words }}</td><td data-label="Value"{% if c.value is number %} class="amount"{% endif %}>{{ c.display|dates_in_words }}</td><td data-label="Source">{{ c.source|dates_in_words }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<h2>Network context</h2>
+<div class="account-cliff-network" data-state="network-context">
+  <ul>
+  {% for f in network_facts %}
+    <li data-network="{{ loop.index }}"><strong>{{ f.name }}.</strong> {{ f.display|dates_in_words }} <span class="source">Source: {{ f.source|dates_in_words }}; read {{ f.read_date|datewords }}.</span></li>
+  {% endfor %}
+  </ul>
+  <p>{{ won_sentence|dates_in_words }}</p>
+</div>
+{% if summary.limitations %}
+<h2>Limitations</h2>
+<ul class="account-cliff-limitations">
+  {% for lim in summary.limitations %}<li>{{ limitation_text(lim) }}</li>{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

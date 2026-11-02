@@ -1,0 +1,8 @@
+# Allow-list of binary files that may be committed under evidence/ (tools/scan_staged.py).
+# Maintained by the owner only: a session never adds a line. Format: <sha256 hex, 64 chars>  <free label>.
+# A line is a decision that this exact file may live in the repository. Remove a line when the file leaves the tree.
+# Seed (2026-10-05): the 3 binaries already tracked under evidence/manual/ (buyer-side sandbox pages), so nothing
+# existing breaks. Their move out of the repository is a separate decision.
+e2bbc5a2689375da583c20f34c7e9b058e1af50135e34855bc0f78d0947c8eb1  evidence/manual png (buyer case submitted)
+fa51d6731a52d9d274115112724fc21c3d23dd28589ddabadaaf6a86f63cfd03  evidence/manual jpg (buyer resolution centre draft)
+270c551f119d92d03b3cda35694aacb7e9f24bc8913ea40e93a050ba70ad9290  evidence/manual pdf (buyer transaction details)

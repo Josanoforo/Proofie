@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-label="Proofie social preview">
+  <title>Proofie: sourced evidence for small sellers</title>
+  <rect width="1280" height="640" fill="#0b2f6b"/>
+  <rect y="624" width="1280" height="16" fill="#e8590c"/>
+  <g transform="translate(120 150) scale(4)">
+    <path d="M14 6h24l12 12v40H14z" fill="#ffffff" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M38 6v12h12z" fill="#c9d7f0"/>
+    <path d="M23 39l8 8 14-17" fill="none" stroke="#e8590c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="420" y="290" fill="#ffffff" font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif" font-size="120" font-weight="700">Proofie</text>
+  <text x="424" y="360" fill="#c9d7f0" font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif" font-size="32">Sourced evidence for a small seller's PayPal dispute.</text>
+  <text x="424" y="410" fill="#c9d7f0" font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif" font-size="32">You review. You approve. Sandbox only.</text>
+  <text x="120" y="570" fill="#c9d7f0" font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif" font-size="26">Independent project. Not affiliated with or endorsed by PayPal.</text>
+</svg>

@@ -1,0 +1,13 @@
+<section data-state="appeal-preview">
+<h3>Review the appeal</h3>
+<p>This is exactly what Proofie will send to PayPal. Nothing is sent until you approve it below. PayPal accepts an appeal only with new information.</p>
+<pre data-state="request-body">{{ body_text }}</pre>
+<ul data-state="appeal-attachments">{% for a in preview.attachments %}<li>{{ a.filename }}</li>{% else %}<li>No attachments.</li>{% endfor %}</ul>
+<p>Approval fingerprint (the request and the sha256 of each attachment): <code data-state="request-sha256">{{ preview.sha256 }}</code></p>
+<form method="post" action="/disputes/{{ dispute_id }}/outcome/appeal/register" data-state="confirm-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="package_id" value="{{ package_id }}">
+  <input type="hidden" name="approval_sha256" value="{{ preview.sha256 }}">
+  <button type="submit">Approve and send the appeal to PayPal</button>
+</form>
+</section>

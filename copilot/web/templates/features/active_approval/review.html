@@ -1,0 +1,191 @@
+{% extends "_base.html" %}
+{% from "_components.html" import button, link_button, breadcrumbs, exact_content, tag, mono_id, field_error, banner %}
+{% from "_form_fields.html" import required_note %}
+{% block title %}{% if review_error %}Error: {% endif %}{{ page_title }}: {{ dispute_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('Evidence package v' ~ review.package.version, '/disputes/' ~ dispute_id ~ '/packages/' ~ package_id), ('Review each statement and approve', None)]) }}{% endblock %}
+{% block content %}
+{% set package_url = '/disputes/' ~ dispute_id ~ '/packages/' ~ package_id %}
+{% set editable = state in ('idle', 'typed-required', 'cleared') %}
+<section id="approval" data-state="{{ state }}">
+{% if review_error %}<section class="error-summary" role="alert" tabindex="-1" autofocus><h2><span aria-hidden="true">✕</span> There is a problem</h2><p><a href="#{{ error_field }}">{{ review_error }}</a></p></section>{% endif %}
+{% set current_case_view = "package" %}{% set current_package = review.package %}
+{% if compact_case %}{% include "case/_compact_header.html" %}{% else %}<div class="case-navigation">{% include "_case_primary_nav.html" %}</div>{% endif %}
+<div class="approval-workspace" data-state="approval-workspace">
+<div class="approval-main">
+<p><a href="{{ package_url }}">Package contents</a></p>
+<h1 id="approval-header">{% if state in ('approved', 'sent') %}{{ heading }}{% else %}Human approval review{% endif %}</h1>
+{% if context_limitations %}
+{% call banner("info", "paypal-limitations", "What PayPal did not return") %}
+  <ul>{% for limitation in context_limitations %}<li>{{ limitation }}</li>{% endfor %}</ul>
+  <p>These checks stay "Present, but Proofie cannot verify" until you add the missing detail yourself. <a href="{{ package_url }}#shipment-details">Type the details</a></p>
+  {% if review.request_input and summary.tracking %}<p class="field-hint">The package has tracking {{ mono_id(safe_text(summary.tracking)) }}{% if summary.carrier %} ({{ safe_text(summary.carrier) }}){% endif %}; that does not mean it is registered in PayPal.</p>{% endif %}
+  <p>These limits describe the latest PayPal read. They do not change what is approved, sent, or confirmed.</p>
+{% endcall %}
+{% endif %}
+<p class="step-note">{{ step_caption(3) }}</p>
+<p><a class="btn-link" href="{{ package_url }}#statements">Change statements on the package page</a></p>
+
+{% if state in ('approved', 'sent') %}
+<section class="panel" id="approval-done" data-state="{{ 'approval-used' if state == 'sent' else 'approved-panel' }}">
+{% if state == 'sent' %}<p id="approval-used">Approval used for the send at {{ sent_at|when }}.</p>
+{% else %}<p id="approval-receipt">You approved this package on {{ review.approval.approved_at|when }}.</p>
+{% if send_record.state == 'none' %}<p>Nothing has been sent to PayPal yet.</p>{% endif %}{% endif %}
+{% if state == 'sent' %}<div class="actions actions--forward">{{ link_button('/disputes/' ~ dispute_id, "View the dispute and PayPal's answer") }}</div>
+{% elif sendable and review.can_provide_evidence %}<p data-state="send-final">Sending to PayPal cannot be undone; Proofie sends it once.</p>
+<div class="actions actions--forward">{{ link_button(package_url ~ '#next-step', 'Continue to send evidence') }}</div>
+{% elif sendable %}<div class="actions actions--forward">{{ link_button(package_url, 'Back to the package') }}</div>
+{% else %}<h2>Cannot send yet</h2>
+<ul class="fix-list">{% for item in send_fixes %}<li>{{ item.text }} {% if loop.first %}{{ link_button(item.href, item.link) }}{% else %}<a href="{{ item.href }}">{{ item.link }}</a>{% endif %}</li>{% endfor %}</ul>{% endif %}
+</section>
+{% endif %}
+
+{% if state == 'blocked' and earlier_approval %}
+<section class="error-summary reapproval-callout" id="approval-block-reasons" data-state="blocked-panel" data-reapproval="blocked" role="group" aria-labelledby="reapproval-title">
+<h2 id="reapproval-title">{{ tag('bad', 'Approval blocked') }}</h2>
+<p>Your approval of package v{{ review.package.version }}, given {{ earlier_approval.approved_at|when }}, was cleared when you edited the package.</p>
+<p>What the sources show:</p>
+<ul class="fix-list">{% for item in blocked_items %}<li class="approval-blocked">{{ item.text }} <a href="{{ item.href }}">{{ item.link }}</a></li>{% endfor %}</ul>
+{% if has_delivery_block %}<p class="field-hint">{{ DELIVERY_WORDS_HINT_HTML }}</p>{% endif %}
+<p>Approving the edited text is blocked. What to do: remove or fix the statement, then review again.</p>
+</section>
+{% elif state == 'blocked' %}
+<section class="panel" id="approval-block-reasons" data-state="blocked-panel">
+<h2>Cannot approve yet</h2>
+<ul class="fix-list">{% for item in blocked_items %}<li class="approval-blocked">{{ item.text }} {% if loop.first %}{{ link_button(item.href, item.link) }}{% else %}<a href="{{ item.href }}">{{ item.link }}</a>{% endif %}</li>{% endfor %}</ul>
+{% if has_delivery_block %}<p class="field-hint">{{ DELIVERY_WORDS_HINT_HTML }}</p>{% endif %}
+</section>
+{% endif %}
+
+<div class="approval-review-flow">
+<section id="send-summary">
+{% if state == 'sent' and sent_view %}<h2>What was sent</h2>
+{# A version PayPal holds is shown from the attempt (what PayPal received), never from the package now #}
+{% if sent_view.recorded %}<p class="send-label"><strong>Exact text PayPal received</strong></p>
+{% call exact_content(sent=true) %}{{ sent_view.notes }}{% endcall %}
+<dl class="send-rows">
+<dt>Tracking number</dt><dd>{{ mono_id(safe_text(sent_view.tracking)) }}</dd>
+<dt>Carrier</dt><dd>{{ mono_id(safe_text(sent_view.carrier or 'Not set')) }}</dd>
+<dt>Files ({{ sent_view.files|length }})</dt><dd>{% if sent_view.files %}<ul>{% for name in sent_view.files %}<li>{{ mono_id(safe_text(name)) }}</li>{% endfor %}</ul>{% else %}Files: none.{% endif %}</dd>
+</dl>
+{% else %}<p>Proofie did not keep the exact text of this send. Files: {% if sent_view.files %}{{ sent_view.files|join(", ") }}{% else %}none{% endif %}.</p>{% endif %}
+{% else %}<h2>What will be sent</h2>
+{% if review.request_input %}<p class="send-label"><strong>Exact text PayPal receives</strong></p>
+{% call exact_content() %}{{ summary.notes }}{% endcall %}
+<dl class="send-rows">
+<dt>To</dt><dd>PayPal, only when you press Send evidence to PayPal on the package page</dd>
+<dt>Tracking number</dt><dd>{{ mono_id(safe_text(summary.tracking)) }}</dd>
+<dt>Carrier</dt><dd>{{ mono_id(safe_text(summary.carrier)) }}</dd>
+<dt>Files ({{ summary.files|length }})</dt><dd>{% if summary.files %}<ul>{% for f in summary.files %}<li>{{ mono_id(safe_text(f.filename)) }}{% if f.excluded %} (left out of the checks, but still sent){% endif %}</li>{% endfor %}</ul>{% else %}Files: none. PayPal receives the text only. <a href="{{ package_url }}#attachments">Attach a document</a>{% endif %}</dd>
+</dl>
+{% if summary.was_cut %}<p class="field-hint" id="notes-cut">PayPal receives only the first 2,000 characters.</p>{% endif %}
+{% else %}<p>No sendable request yet: add tracking before sending and approve again.</p>{% endif %}
+{% endif %}
+</section>
+
+
+{% if editable %}<p{% if one_control %} data-state="read-count"{% endif %}>{{ review.claims|length }} {{ 'statement' if review.claims|length == 1 else 'statements' }} to {{ 'read' if one_control else 'confirm' }}</p>{% endif %}
+{% if review.cleared %}<p>Approval cleared because the content or its sources changed.</p>{% endif %}
+{% if review.cleared and review.view_changes %}<section id="approval-changes" aria-labelledby="approval-changes-title">
+<h2 id="approval-changes-title">What changed since you approved</h2>
+<ul>{% for change in review.view_changes %}<li><p>Statement {{ change.claim_id }}: {{ safe_text(change.statement) }}</p>
+{% if change.statement_changed %}<p>The statement text changed since approval.</p>{% endif %}
+{% for file in change.files %}<p>File {{ safe_text(file.filename) }} ({{ safe_text(file.field) }}): its stored hash differs from the approved version.</p>{% endfor %}
+</li>{% endfor %}</ul></section>{% endif %}
+
+{% if editable and earlier_approval %}<section class="reapproval-callout reapproval-callout--info" id="reapproval-fixed" data-reapproval="fixed" role="group" aria-labelledby="reapproval-fixed-title">
+<h2 id="reapproval-fixed-title">{{ tag('info', 'Review again') }}</h2>
+<p>The package was edited after you approved it, and no statement now claims delivery that its sources do not show.</p>
+<p>Your earlier approval of package v{{ review.package.version }} ({{ earlier_approval.approved_at|when }}) is not restored. A new review against the sources is required before you can approve.</p>
+</section>{% endif %}
+
+{% if editable %}<form method="post" novalidate>
+{{ required_note((0 if one_control else review.claims|length) + (1 if review.reasons else 0) + (1 if review.flags else 0), true) }}
+<p>{% if one_control %}Read every statement and its source below, then approve once.{% else %}Each statement needs your own confirmation.{% endif %}</p>
+{% if one_control %}<input type="hidden" name="read_statements" value="{{ review.claims|length }}">{% endif %}
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<input type="hidden" name="review_sha256" value="{{ review.review_sha256 }}">
+{% if review_error and error_field not in ('approval-phrase', 'approval-override') %}{{ field_error('claim-list-error', review_error) }}{% endif %}
+{% endif %}
+<ol id="claim-list">
+{% for c in review.claims %}{% set blocked_card = c.claim_id in blocked_claim_ids %}
+<li class="claim-card" id="statement-{{ loop.index }}" data-state="{{ 'confirmed' if review.approval or state == 'sent' else 'blocked' if c.verdict == 'conflict' or blocked_card else 'pending' }}" data-verdict="{{ 'blocked' if blocked_card else c.verdict }}" data-claim-basis="{{ c.claim_basis }}" data-basis="{{ c.bases|join(' ') }}">
+<p class="claim-sentence">{{ safe_text(c.text) }}</p>
+{% if review.spanish is defined and review.spanish is not none %}{% set es_row = review.spanish.get(c.claim_id) %}{% if es_row %}<p class="claim-sentence-es" data-es-state="{{ es_row.es_state }}">Spanish version, covered by this approval and not sent to PayPal: {% if es_row.es %}<span lang="es">{{ safe_text(es_row.es) }}</span>{% if es_row.es_state == 'ai' %} {{ tag('warn', 'Written by the AI model: check every word') }}{% endif %}{% else %}none yet. <a href="{{ package_url }}#es-claim-{{ c.claim_id }}">Write it on the package page</a>{% endif %}</p>{% endif %}{% endif %}
+{% if c.claim_basis == "seller_statement" and not c.sources %}<p class="claim-basis" data-basis="{{ c.bases|join(' ') }}">Your own statement. No document is cited.</p>
+{% else %}{% set basis_labels = namespace(words=[]) %}{% for basis in [c.claim_basis] + (c.bases|list) %}{% set word = {'case_request': "PayPal's request", 'published_policy': 'published policy', 'app_quality_rule': "Proofie's own quality rule", 'seller_statement': 'your statement', 'buyer_statement': "the buyer's statement", 'model_interpretation': 'assistant reading', 'none': 'Not available'}.get(basis, 'Not available') %}{% if word not in basis_labels.words %}{% set basis_labels.words = basis_labels.words + [word] %}{% endif %}{% endfor %}<p class="claim-basis" data-basis="{{ c.bases|join(' ') }}">Why it is in the file: {{ basis_labels.words|join('; ') }}</p>
+<p class="claim-verdict">{{ tag({'verified':'ok','unverifiable':'warn','seller_statement':'info','conflict':'bad'}.get(c.verdict,'todo'), {'verified': 'Matches the source', 'unverifiable': 'Cannot be verified', 'seller_statement': 'Your own statement', 'conflict': 'Does not match the source'}.get(c.verdict, 'Not available')) }}</p>
+{% if conflict_value_pairs.get(c.key) %}<dl class="claim-conflict-values" aria-label="Conflicting document values">
+{% for source in conflict_value_pairs[c.key] %}<dt>Document {{ 'A' if loop.index == 1 else 'B' }}</dt><dd>{{ safe_text(source.filename) }} — {{ safe_text(source.field) }}: {{ safe_text(source.value) }}</dd>{% endfor %}
+</dl>{% endif %}
+{% endif %}
+{% for s in c.sources %}<dl class="claim-source">
+<dt>Document</dt><dd class="claim-source-doc" data-source-id="{{ safe_text(s.artifact_id) }}">{{ safe_text(document_names[s.artifact_id]) }}</dd>
+<dt>Field read</dt><dd class="claim-source-field" data-field="{{ safe_text(s.field) }}">{{ safe_text(s.field|field_word) }}</dd>
+<dt>Value read</dt><dd class="claim-source-value">{{ safe_text(s.value) if s.value is not none else 'No extracted value' }}{% if s.field == 'extracted_text' %}<span class="field-hint">Document text; not a saved shipment-status field.</span>{% endif %}</dd>
+<dt>Source record</dt><dd><details><summary>Technical details</summary><p>Artifact: {{ safe_text(s.artifact_id) }}; field: {{ safe_text(s.field) }}</p><p>Document fingerprint (SHA-256): <span class="claim-source-hash">{{ s.sha256 or 'No artifact available' }}</span></p></details></dd>
+</dl>{% endfor %}
+{% if editable and one_control and c.verdict == 'unverifiable' %}<p class="claim-own" data-state="claim-own">No document backs this statement. It goes to PayPal as your own statement.</p>{% endif %}
+{% if editable and not one_control %}
+{% set unticked = tick_each and ('seller_statement' if c.verdict == 'unverifiable' else 'confirmed') != decisions.get(c.key) %}
+{% if unticked %}{{ field_error('error-claim-' ~ c.key, 'Tick statement ' ~ loop.index ~ ' to confirm you checked it.') }}{% endif %}
+{% if c.verdict == 'unverifiable' %}<div class="claim-choices">
+<label for="claim-{{ c.key }}"><input class="claim-confirm" type="checkbox" id="claim-{{ c.key }}" name="claim-{{ c.key }}" value="seller_statement" {% if decisions.get(c.key) == 'seller_statement' %}checked{% endif %} required{% if unticked %} aria-invalid="true" aria-describedby="error-claim-{{ c.key }}"{% endif %}> I confirm statement {{ loop.index }} is true and says what I mean. <strong class="field-mark">Required</strong></label>
+<a href="{{ package_url }}#claim-{{ c.claim_id }}">Edit this statement before approving</a>
+</div>{% else %}
+<label for="claim-{{ c.key }}"><input class="claim-confirm" type="checkbox" id="claim-{{ c.key }}" name="claim-{{ c.key }}" value="confirmed" {% if decisions.get(c.key) == 'confirmed' %}checked{% endif %} required{% if unticked %} aria-invalid="true" aria-describedby="error-claim-{{ c.key }}"{% endif %}> {% if c.verdict == 'seller_statement' %}I checked statement {{ loop.index }} and send it as my own statement.{% else %}I compared statement {{ loop.index }} with the source above.{% endif %} <strong class="field-mark">Required</strong></label>
+{% endif %}
+{% endif %}
+{% if c.verdict == 'conflict' %}<p class="claim-conflict-note"><a href="{{ package_url }}#checks">Review the difference</a>. Tracking and destination conflicts must be fixed; a date difference needs an explanatory note.</p>{% endif %}
+</li>{% endfor %}
+</ol>
+<div id="approval-counters">
+<span id="counter-confirmed">{% if one_control and not (review.approval or state == 'sent') %}{{ review.claims|length }} {{ 'statement' if review.claims|length == 1 else 'statements' }} shown above.{% else %}{{ confirmed_count }} of {{ review.claims|length }} {{ 'statement' if review.claims|length == 1 else 'statements' }} checked.{% endif %}</span>
+{%- set own_count = review.claims|selectattr('verdict', 'equalto', 'seller_statement')|list|length %}
+{%- set cannot_count = review.claims|selectattr('verdict', 'equalto', 'unverifiable')|list|length %}
+{%- set conflict_count = review.claims|selectattr('verdict', 'equalto', 'conflict')|list|length %}
+<span id="counter-unverifiable">{% if own_count %}{{ own_count }} {{ 'has' if own_count == 1 else 'have' }} no document, so Proofie cannot verify {{ 'it' if own_count == 1 else 'them' }}.{% endif %}{% if own_count and cannot_count %} {% endif %}{% if cannot_count %}{{ cannot_count }} cannot be verified.{% endif %}</span>
+<span id="counter-conflicts">{% if conflict_count %}{{ conflict_count }} do not match.{% endif %}</span>
+</div>
+{% if editable %}
+{% if review.reasons %}<section id="typed-confirm"><h2>Additional confirmation</h2>
+<p>If the amount is at or above {% for threshold in rules.THRESHOLDS %}{{ threshold.display }}{% if not loop.last %}; {% endif %}{% endfor %}, or a statement accuses the buyer of fraud, you also type the phrase below.</p>
+<p class="field-hint">Proofie's own extra check for large amounts and fraud words. It is not a PayPal rule.</p>
+<details><summary>Technical details</summary><p>{{ rules.SOURCE }}</p></details>
+<div id="typed-confirm-reason">{% for reason in review.reasons %}<p>{{ reason.replace('Your wording includes a fraud caution word: ' , 'Flagged words: ') }}</p>{% else %}<p>No typed confirmation required for this review.</p>{% endfor %}</div>
+<p id="typed-confirm-phrase">{{ rules.PHRASE }}</p>
+<label for="approval-phrase">Type this phrase to confirm you reviewed every statement against its source <strong class="field-mark">Required</strong></label>
+<p id="approval-phrase-reasons">Type the phrase because: {% for reason in review.reasons %}{{ reason }}{% if not loop.last %} {% endif %}{% endfor %}</p>
+{% if review_error and error_field == 'approval-phrase' %}{{ field_error('approval-phrase-error', review_error) }}{% endif %}
+<input id="approval-phrase" name="phrase" type="text" required autocomplete="off" value="{{ entered_phrase }}" aria-describedby="approval-phrase-reasons{% if review_error and error_field == 'approval-phrase' %} approval-phrase-error{% endif %}"{% if review_error and error_field == 'approval-phrase' %} aria-invalid="true"{% endif %}>
+</section>{% endif %}
+{% if review.flags %}<label for="approval-override">Open notices: explain your decision <strong class="field-mark">Required while a notice is open</strong></label>
+<ul>{% for flag in review.flags %}<li>{{ tag('bad',safe_text(flag)) }} <a href="{{ package_url }}#checks">Review the difference</a></li>{% endfor %}</ul>
+{% if review_error and error_field == 'approval-override' %}{{ field_error('approval-override-error', review_error) }}{% endif %}<input id="approval-override" name="sufficiency_override" type="text" required value="{{ entered_override }}"{% if review_error and error_field == 'approval-override' %} aria-invalid="true" aria-describedby="approval-override-error"{% endif %}>{% endif %}{% if note_proposed %}<p class="field-hint" data-state="proposed-note">Proposed from the open notices. Edit it or replace it with your own words; it is saved as you submit it.</p>{% endif %}
+<div id="approval-control">
+<p class="action-note">Approving does not send anything. Sending is a separate step.</p>
+{% if one_control %}{{ button('Approve this package: I have read these ' ~ review.claims|length ~ (' statement' if review.claims|length == 1 else ' statements'), kind='primary') }}{% else %}{{ button('Approve this package', kind='primary') }}{% endif %}
+</div>
+</form>
+{% endif %}
+</div>
+{% if state in ('approved', 'sent') %}<p>This is exactly the text and files you approved. The content hash under Technical details identifies this version.</p><details><summary>Technical details</summary><p>Local content hash: {{ review.approval.approval_sha256 if review.approval else 'Not available' }}</p></details>{% endif %}
+<p><a href="{{ package_url }}">Package contents</a> · <a href="{{ package_url }}#what-will-be-sent">What will be sent</a>{% if feature_enabled('evidence_dossier') %} · <a href="{{ package_url }}#evidence-dossier">Evidence dossier</a>{% endif %}</p>
+</div>
+<aside class="approval-context-rail" aria-label="Package approval and send status">
+  <h2>Package state</h2>
+  {% set check_states = review.checks|map(attribute='state')|list %}
+  <dl class="approval-state-list">
+    <dt>Package</dt><dd>{{ review.package.status|default('Draft', true)|capitalize }} · v{{ review.package.version }}</dd>
+    <dt>Review</dt><dd>{% if state == 'blocked' %}Needs changes before approval{% elif state == 'cleared' %}Review again; earlier approval was cleared{% elif state == 'typed-required' %}Additional confirmation required{% elif state in ('approved', 'sent') %}Reviewed{% else %}Ready to review{% endif %}</dd>
+    <dt>Attention</dt><dd>{% if 'conflict' in check_states or 'missing' in check_states %}Needs attention{% elif 'present_unverifiable' in check_states %}Some facts cannot be verified{% else %}No outstanding check notices{% endif %}</dd>
+    <dt>Approval</dt><dd>{% if review.approval %}Recorded for this package version{% elif state == 'blocked' %}Not available yet{% else %}Not recorded{% endif %}</dd>
+    <dt>Sending</dt><dd>{% if state == 'sent' %}Sent; read-back is shown on this page{% elif send_record.state == 'none' %}Not sent yet{% else %}A send attempt is recorded; see the result on this page{% endif %}</dd>
+  </dl>
+  <p>Approving does not send anything. Sending is a separate step.</p>
+  <p><a href="{{ package_url }}">Return to package contents</a></p>
+  <p><a href="{{ package_url }}#shipment-fold">Open shipment details</a></p>
+</aside>
+</div>
+{% set b_record = send_record %}{% include "case/_package_sending_status.html" %}
+</section>
+{% endblock %}

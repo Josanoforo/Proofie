@@ -1,0 +1,12 @@
+{% from "_components.html" import tip %}
+    <section data-state="status-sending">
+      <div data-state="sent">
+      <h3>Sent from Proofie</h3>
+      {% if summary.sent %}<ul>{% for s in summary.sent %}<li data-sent="{{ s.state }}">{{ s.text }}</li>{% endfor %}</ul>
+      {% else %}<p>Nothing has been sent to PayPal from this app yet. Nothing is sent until you review, approve and send a package.</p>{% endif %}
+      {% if summary.drift %}<p class="note-neutral" data-state="drift">{{ summary.drift }}</p>{% endif %}
+      </div>
+      <div><h3>Confirmed by PayPal</h3>{% if summary.confirmed %}<ul data-state="paypal-confirmed">{% for a in summary.confirmed %}<li>Your send on {{ a.at|when }} is confirmed. {% call tip("What a confirmation covers") %}A confirmation covers only the content sent then.{% endcall %}</li>{% endfor %}</ul>
+      {% if listed %}<p data-state="evidence-listed-once">{{ once_per_dispute }}</p>{% endif %}
+      {% else %}<p data-state="paypal-confirmed-none">PayPal has not confirmed any evidence from this app for this dispute.</p>{% endif %}</div>
+    </section>

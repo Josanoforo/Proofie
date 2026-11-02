@@ -1,0 +1,16 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs, button %}
+{% block title %}Missing-package options - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('Missing-package options', None)]) }}{% endblock %}
+{% block content %}<div class="page" data-state="lost-package-paths" data-case="{{ dispute_id }}">
+<h1>Options for a package not received</h1>
+<p>This is a local guide for the current case. Proofie does not contact a carrier, insurer, or PayPal from this page. Deadlines and claim access depend on the selected carrier service and contract; use the cited source to confirm them.</p>
+{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+<form method="get" action="/disputes/{{ dispute_id }}/lost-package-paths"><input type="hidden" name="capture_id" value="{{ capture_id }}"><label for="carrier-choice">Carrier</label><select id="carrier-choice" name="carrier">{% for item in carrier_rows %}<option value="{{ item.id }}"{% if carrier.id == item.id %} selected{% endif %}>{{ item.name }}</option>{% endfor %}</select>{{ button("Show carrier-specific steps", kind="secondary") }}</form>
+<h2>{{ carrier.name }}</h2><p data-state="carrier-proof-note">{{ carrier.proof_note }}</p>
+<ol class="task-list">{% for path in paths %}<li class="task-row" data-path="{{ path.key }}"><h3>{{ path.label }}</h3><p><strong>Who starts:</strong> {{ path.who }}</p><p><strong>Published window:</strong> {{ path.deadline }}</p><p><strong>Documents:</strong></p><ul>{% for item in path.documents %}<li>{{ item }}</li>{% endfor %}</ul><p><a href="{{ path.url }}"{% if path.url.startswith('https://') %} target="_blank" rel="noopener noreferrer"{% endif %}>Open {{ path.source.name }}</a> · source checked {{ path.source.checked_on }}</p></li>{% endfor %}</ol>
+<section class="panel" data-state="record-carrier-reference"><h2>Record a carrier case/reference number</h2><p>Only enter a number the carrier gave you. It is saved as a seller-written note in this case's audit ledger; it does not start or verify a carrier claim.</p>
+<form method="post" action="/disputes/{{ dispute_id }}/lost-package-paths/reference"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="capture_id" value="{{ capture_id }}"><input type="hidden" name="carrier_id" value="{{ carrier.id }}"><label for="carrier-reference">Carrier reference</label><input id="carrier-reference" name="carrier_reference" maxlength="120" required>{{ button("Record this reference", kind="secondary") }}</form>
+{% if audit %}<h3>Seller-recorded references</h3><ul>{% for row in audit %}<li><time>{{ row.ts }}</time> · {{ row.detail.carrier_id }} · <code>{{ row.detail.carrier_case_reference }}</code> · seller-entered, not independently verified</li>{% endfor %}</ul>{% endif %}
+</section><p><a href="/disputes/{{ dispute_id }}">Return to the current PayPal case</a></p>
+</div>{% endblock %}

@@ -1,0 +1,54 @@
+{#- Other things the seller may do, folded by default. Same links, same flags and conditions as the old "Optional, any time"
+    panel and the entry partials around it; nothing here is a step of the main flow. -#}
+{% from "_components.html" import tip %}
+{%- set can_respond_more = not rc3_reviewing and not buyer_closed %}
+{%- set any_other = (can_respond_more and (feature_enabled("resolution") or feature_enabled("draft") or feature_enabled("fulfilment") or feature_enabled("triage"))) or feature_enabled("first_dispute_guide") or (feature_enabled("two_clocks") and capture) or (feature_enabled("lost_package_paths") and norm.reason == "MERCHANDISE_OR_SERVICE_NOT_RECEIVED") or (feature_enabled("call_script") and norm.stage == "INQUIRY" and not decided) %}
+{%- set lead_resolution = can_respond_more and feature_enabled("resolution") and not resolution_in_panel %}
+{%- set lead_draft = not lead_resolution and can_respond_more and feature_enabled("draft") %}
+{%- set lead_fulfilment = not lead_resolution and not lead_draft and can_respond_more and feature_enabled("fulfilment") %}
+{%- set lead_triage = not lead_resolution and not lead_draft and not lead_fulfilment and can_respond_more and feature_enabled("triage") %}
+{%- set any_more = (can_respond_more and ((feature_enabled("draft") and not lead_draft) or (feature_enabled("fulfilment") and not lead_fulfilment) or (feature_enabled("triage") and not lead_triage))) or feature_enabled("first_dispute_guide") or (feature_enabled("two_clocks") and capture) or (feature_enabled("lost_package_paths") and norm.reason == "MERCHANDISE_OR_SERVICE_NOT_RECEIVED") or (feature_enabled("call_script") and norm.stage == "INQUIRY" and not decided) %}
+<details class="panel other-responses" id="other-responses-list" data-state="other-responses-list"{% if view == "other" %} open{% endif %}><summary>Other possible responses</summary>
+<p class="field-hint" data-state="do-nothing">{{ do_nothing }}</p>
+{%- if any_other %}
+{% if lead_resolution %}
+<p class="other-leading" data-state="other-leading"><a href="/disputes/{{ norm.dispute_id }}/resolution">Resolution options and buyer messages</a>
+{% call tip("About this option") %}Offer a refund or write to the buyer. You see the exact text before anything is sent. A message does not send your evidence.{% endcall %}</p>
+{% elif lead_draft %}
+<p class="other-leading" data-state="other-leading"><a href="/disputes/{{ norm.dispute_id }}/draft">Draft a message to the buyer</a></p>
+{% elif lead_fulfilment %}
+<p class="other-leading" data-state="other-leading"><a href="{{ ('/fulfilment/' ~ capture ~ '?from_dispute=' ~ norm.dispute_id) if capture else '/fulfilment' }}">Add tracking in PayPal</a>
+{% call tip("About this option") %}Adds the tracking number to the sale in PayPal after you approve it. It does not answer the dispute or change your evidence package.{% endcall %}</p>
+{% elif lead_triage %}
+<p class="other-leading" data-state="other-leading"><a href="/disputes/{{ norm.dispute_id }}/triage">What the evidence supports</a></p>
+{% endif %}
+{% if any_more %}
+<details data-state="more-options"><summary>More options</summary>
+<ul class="optional-list" data-state="release-feature-links">
+{%- if can_respond_more and feature_enabled("draft") and not lead_draft %}
+<li><a href="/disputes/{{ norm.dispute_id }}/draft">Draft a message to the buyer</a></li>
+{%- endif %}
+{%- if can_respond_more and feature_enabled("fulfilment") and not lead_fulfilment %}
+<li><a href="{{ ('/fulfilment/' ~ capture ~ '?from_dispute=' ~ norm.dispute_id) if capture else '/fulfilment' }}">Add tracking in PayPal</a>
+{% call tip("About this option") %}Adds the tracking number to the sale in PayPal after you approve it. It does not answer the dispute or change your evidence package.{% endcall %}</li>
+{%- endif %}
+{%- if can_respond_more and feature_enabled("triage") and not lead_triage %}
+<li><a href="/disputes/{{ norm.dispute_id }}/triage">What the evidence supports</a></li>
+{%- endif %}
+{%- if feature_enabled("call_script") and norm.stage == "INQUIRY" and not decided %}
+<li><a href="/disputes/{{ norm.dispute_id }}/call-script">Prepare a buyer call script</a></li>
+{%- endif %}
+{%- if feature_enabled("two_clocks") and capture %}
+<li>{% include "features/two_clocks/_entry.html" %}</li>
+{%- endif %}
+{%- if feature_enabled("lost_package_paths") and norm.reason == "MERCHANDISE_OR_SERVICE_NOT_RECEIVED" %}
+<li>{% include "features/lost_package_paths/_entry.html" %}</li>
+{%- endif %}
+{%- if feature_enabled("first_dispute_guide") %}
+<li>{% include "features/first_dispute_guide/_entry.html" %}</li>
+{%- endif %}
+</ul>
+</details>
+{% endif %}
+{%- endif %}
+</details>

@@ -1,0 +1,6 @@
+{% if audit_timeline %}<details class="panel" data-state="timeline"><summary>Action timeline ({{ audit_timeline|length }} events)</summary>
+<ol>
+{% for event in audit_timeline %}<li>{{ event.ts|when }} — {{ action_label(event.action) }}<details><summary>Technical details</summary>Event {{ event.id }}; {{ event.actor }}; {{ event.action }}</details></li>{% endfor %}
+</ol>
+{% if feature_enabled("ledger") %}<p><a href="/disputes/{{ norm.dispute_id }}/ledger">What this app recorded</a></p>{% endif %}
+</details>{% endif %}

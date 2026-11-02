@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence package v{{ package.version }} - dispute {{ package.header.dispute_id }}</title>
+<style>
+@page { size: A4; margin: 18mm; }
+* { box-sizing: border-box; }
+body { margin: 0; color: #17212b; background: #fff; font: 11pt/1.55 Arial, sans-serif; }
+.sheet { max-width: 174mm; margin: 0 auto; padding: 8mm 0; break-after: page; page-break-after: always; overflow-wrap: anywhere; }
+.sheet:last-child { break-after: auto; page-break-after: auto; }
+h1, .sheet-title { font-size: 22pt; font-weight: bold; margin: 0.67em 0; } h2 { font-size: 16pt; }
+.label { font-weight: bold; } .hash { font: 9pt/1.4 monospace; overflow-wrap: anywhere; }
+.notice { border-left: 3px solid #526779; padding: 3mm; }
+.claim { white-space: pre-wrap; }
+.hosted-demo-note { max-width: 174mm; margin: 4mm auto 0; font-size: 9pt; color: #17212b; } .note-line { display: block; }
+.footer { margin-top: 12mm; border-top: 1px solid #526779; padding-top: 3mm; font-size: 9pt; }
+@media print { .screen-only { display: none; } }
+/* A visible focus ring that survives forced-colours mode; 44 px targets for the link and the summaries on screen. */
+a:focus-visible, summary:focus-visible { outline: 3px solid #0b4aa8; outline-offset: 2px; }
+@media (forced-colors: active) { a:focus-visible, summary:focus-visible { outline: 3px solid Highlight; } }
+summary { cursor: pointer; }
+@media screen { summary { display: list-item; min-height: 44px; padding: 10px 0; box-sizing: border-box; } .screen-only a { display: inline-block; min-height: 44px; padding: 10px 0; } }
+@media screen { body { background: #edf1f4; padding: 12mm; } .sheet { background: white; padding: 12mm; margin-bottom: 8mm; } }
+</style></head>
+<body>
+<main>
+<p class="screen-only"><a href="/disputes/{{ dispute_id }}/packages/{{ package.package_id }}">Back to the evidence package</a></p>
+{% for page in package.pages %}
+<section class="sheet">
+{% if loop.first %}<h1>Evidence package v{{ package.version }} - dispute {{ package.header.dispute_id }}</h1>
+<div class="header-block" data-state="print-header">
+<p>Version {{ package.version }} · Copy of the package as saved on this computer</p>
+<ul>
+<li>Dispute: {{ package.header.dispute_id }}</li>
+{% if package.header.tracking %}<li>{{ 'Tracking number' if held_by_paypal else 'Tracking number in this attempt' }}: {{ package.header.tracking }}{% if package.header.carrier %} ({{ package.header.carrier }}){% endif %}</li>
+{% endif %}{% if package.header.state %}<li>{{ 'Files sent' if held_by_paypal else 'Files in this attempt' }}: {% if package.header.files %}{{ package.header.files|join(", ") }}{% else %}none{% endif %}</li>
+{% endif %}</ul>
+<p data-state="print-status">{% if status_line %}{{ status_line }}{% else %}PayPal's record showed it at {{ package.header.when|when }}, when Proofie checked.{% endif %}</p>
+</div>
+<details open><summary>Technical details</summary><p>Local package record: {{ package.package_id }}</p></details>
+<div class="case-record" data-state="case-record">
+<h2>Case file record</h2>
+<ul>
+<li>Source commit: {% if source_commit %}<span class="hash">{{ source_commit }}</span>{% else %}not available on this computer{% endif %}</li>
+{% if package.case.send %}{% set send = package.case.send %}<li>Send record: request {{ send.request_id or 'without an id' }}, state {{ send.state }}, recorded {{ send.when|when }}</li>
+<li>Package hash (SHA-256 of the request Proofie sent): <span class="hash">{{ send.package_sha256 }}</span></li>
+<li>Approval fingerprint the send was checked against: <span class="hash">{{ send.approval_sha256 or 'not recorded' }}</span></li>
+{% else %}<li>No send of this package is recorded.</li>{% endif %}
+{% if package.case.approval %}<li>Approved {{ package.case.approval.approved_at|when }}; approval fingerprint <span class="hash">{{ package.case.approval.approval_sha256 }}</span></li>{% endif %}
+</ul>
+{% if readback %}<p><strong>What PayPal's record lists</strong></p>
+<p>Evidence type: {{ readback_label }}.{% if readback.paypal_date %} PayPal dates it {{ readback.paypal_date|when }}.{% endif %}</p>
+{% if readback.documents_present %}<p>Documents PayPal lists with it:</p><ul>{% for name in readback.documents_present %}<li>{{ name }}</li>{% endfor %}</ul>{% else %}<p>PayPal lists no document with it.</p>{% endif %}{% endif %}
+<p>Check the downloaded case file offline with <code>python -m copilot.verify --case-file</code> and the zip's path. A matching hash shows the content is unchanged; it does not show that what it says is true.</p>
+{% if not saved_copy %}<p class="screen-only"><a href="{{ case_url }}" download>Download the case file</a></p>{% endif %}
+</div>
+{% else %}<p class="sheet-title">Evidence package v{{ package.version }} - dispute {{ package.header.dispute_id }}</p>
+<p>Version {{ package.version }} · Copy of the package as saved on this computer</p>
+{% endif %}
+{% if loop.first and package.acknowledgements %}<h2>Review the difference — acknowledged dates</h2>
+{% for acknowledgement in package.acknowledgements %}<p><strong>{{ {'delivery_date':'Delivery date', 'dates_coherent':'Shipping and delivery dates'}.get(acknowledgement.check_id) }}</strong>: {{ acknowledgement.note }}</p>{% endfor %}{% endif %}
+{% if page.kind == "claim" %}
+<h2>Statement {{ page.claim }}{% if page.continuation %} — continued{% endif %}</h2>
+<p class="label">{{ page.basis }}</p>
+<div class="claim">{{ page.text }}</div>
+<h2>Local exhibit citations</h2>
+{% for source in page.citations %}<p>Exhibit {{ source.number }}</p><details open><summary>Technical details</summary><p class="hash">SHA256 {{ source.sha256 }}</p></details>{% endfor %}
+{% if page.missing %}<p class="notice">No local exhibit is available for at least one source. This view does not fetch PayPal data or invent a citation.</p>{% endif %}
+{% elif page.kind == "exhibit" %}
+<h2>Exhibit {{ page.number }}</h2><details open><summary>Technical details</summary><p class="hash">SHA256 {{ page.sha256 }}</p></details>
+{% if page.late %}<p class="notice" data-state="added-after-send">Added after the response was sent; not in PayPal.</p>
+{% elif page.unlisted %}<p class="notice" data-state="sent-not-listed">Sent with the response; PayPal does not list it.</p>
+{% elif page.excluded_sent %}<p class="notice" data-state="excluded-sent">{% if page.sent %}Attached to the response and sent to PayPal, but left out of the checks.{% else %}Attached to the response (it is sent with it), but left out of the checks.{% endif %}</p>{% endif %}
+<p>The saved file matches this fingerprint. A matching fingerprint shows the file is unchanged; it does not show that what it says is true.</p>
+{% else %}<p>No statements or local exhibits are stored in this package.</p>{% endif %}
+{% if loop.last and hosted_demo() %}<div class="hosted-demo-note" data-state="hosted-demo">{{ (request.app.state.hosted_demo_sentence if request is defined and request.scope is defined and "app" in request.scope and request.app.state.hosted_demo_sentence else hosted_demo_sentence)|note_lines }}</div>{% endif %}
+<div class="footer">Page {{ loop.index }} of {{ package.pages|length }} · Page numbers here are the package's own. Your browser may split pages differently when you print.</div>
+</section>
+{% endfor %}
+</main>
+</body></html>

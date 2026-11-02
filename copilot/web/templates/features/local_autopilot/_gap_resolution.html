@@ -1,0 +1,13 @@
+{% if feature_enabled('gap_resolution') and gap_context %}
+<section data-state="case-gaps" aria-labelledby="case-gaps-title"><h3 id="case-gaps-title">Resolve missing or differing details</h3>
+{% if not gap_context.ok %}<p role="status">{{ gap_context.error }} Review the case before changing anything.</p>
+{% else %}<p>{{ gap_context.gaps|length }} details need review. Existing saved values and sources remain available.</p>
+{% set status_labels = {'confirmed_by_seller': 'Saved by you', 'recorded_provider': 'From the case record', 'missing': 'Needs a value', 'suggested': 'Saved suggestion', 'conflict': 'Sources disagree'} %}
+{% set source_labels = {'manual_fields': 'Your saved case details', 'readiness': 'Saved sale terms', 'shipment_request': 'Saved shipment', 'seller_selection': 'Your language choice', 'case_observation': 'Case record'} %}
+<ul>{% for gap in gap_context.gaps %}<li>
+  <strong>{{ gap.field|field_word }}</strong>: {{ status_labels.get(gap.status, 'Review this detail') }}{% if gap.value is not none %} — {{ gap.value }}{% endif %}
+  {% if gap.conflict %}<p role="note"><strong>Saved sources disagree.</strong>{% if gap.status == 'confirmed_by_seller' and gap.source_kind == 'manual_fields' %} Your saved choice is selected.{% else %} Review the values before choosing.{% endif %}</p>{% endif %}
+  {% if gap.candidates %}<details><summary>Compare saved values</summary><ul>{% for candidate in gap.candidates %}<li>{{ candidate.value }} — {{ source_labels.get(candidate.source_kind, 'Recorded source') }} ({{ status_labels.get(candidate.status, 'Review this detail') }}){% if candidate.source_ref %} · {{ candidate.source_ref }}{% endif %}</li>{% endfor %}</ul></details>{% endif %}
+  {% if gap.href %} <a href="{{ gap.href }}">Review in the complete package form</a>{% else %} Review the recorded case or select this detail when preparing a proposal.{% endif %}
+</li>{% else %}<li>No missing or differing details in this local projection.</li>{% endfor %}</ul>{% endif %}</section>
+{% endif %}

@@ -1,0 +1,9 @@
+SYNTHETIC / DEMO DATA - fictitious. Not a real shipping receipt.
+
+AGGREGATOR RECEIPT (template, Skydropx-style)
+Guia: DEMO-SKY-000010   Servicio: ocurre (recoger en sucursal)
+Estatus: Entregado en sucursal (ocurre)
+Fecha de envio: 2026-09-11   Fecha de entrega: 2026-09-15
+Sucursal destino: Cuernavaca, Morelos, CP 62000
+Recibio: A. Demo
+Captura: 2026-09-30

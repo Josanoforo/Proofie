@@ -1,0 +1,7 @@
+{
+  "clothing": {"label": "Clothing", "checks": ["Photograph the item and size label.", "Keep the packing receipt."]},
+  "electronics": {"label": "Electronics", "checks": ["Record the serial number.", "Photograph the sealed package."]},
+  "crafts": {"label": "Crafts", "checks": ["Photograph fragile-item packaging.", "Keep the materials and packing receipt."]},
+  "auto_parts": {"label": "Auto parts", "checks": ["Record the declared compatibility.", "Photograph the part and its label."]},
+  "shelf_stable_food": {"label": "Shelf-stable food", "checks": ["Photograph the product and expiry label.", "Keep the packing receipt."]}
+}

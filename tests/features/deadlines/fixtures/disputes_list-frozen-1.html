@@ -1,0 +1,54 @@
+{% extends "_base.html" %}
+{% from "_components.html" import banner, checked_bar, tag, link_button, mono_id %}
+{% block title %}All disputes - Proofie{% endblock %}
+{# FIX2 C8: refresh by itself every 10 s, only while a draft is being prepared. No script. #}
+{% block head_extra %}{% if rows | selectattr("auto_prep") | selectattr("auto_prep.status", "equalto", "preparing") | list %}<meta http-equiv="refresh" content="10">{% endif %}{% endblock %}
+{% block content %}
+<h1>All disputes</h1>
+{#- RC4.1 P1-20: at most one attention block (the deadline banner) and the summary line sit above the table; the fee line and the files link sit below it. #}
+{%- if feature_enabled("deadlines") %}{% with refresh_url = "/disputes" %}{% include "features/deadlines/_banner.html" %}{% endwith %}{% endif %}
+{% if rows|length == 0 %}
+{{ checked_bar(checked_at, "/disputes", "Refresh from PayPal") }}
+{% call banner("info", "empty", "No disputes need your attention right now") %}
+  <p>PayPal returned no disputes for this account when it was checked at {{ checked_at|when }}. Nothing was changed.</p>
+  <details data-state="empty-guide-box"><summary>First time using Proofie?</summary>
+  <p data-state="empty-guide">New here? Proofie reads the disputes of your own PayPal sandbox account. To try it, create an "item not received" dispute by hand in the sandbox: the step-by-step guide is in the repository, <code>docs/JUDGE-RUN.md</code>, step 3. A new dispute can take a few minutes to appear here.</p></details>
+  <p class="actions">{{ link_button("/disputes", "Check PayPal again") }}</p>
+{% endcall %}
+{% else %}
+{% set preparing = rows | selectattr("auto_prep") | selectattr("auto_prep.status", "equalto", "preparing") | list %}
+<p class="inbox-summary" data-state="inbox-summary"><strong>{{ summary.text }}</strong></p>
+<p class="inbox-inaction" data-state="inbox-inaction">{{ inaction[0] }}<a href="{{ inaction[3] }}">{{ inaction[1] }}</a>{{ inaction[2] }}</p>
+{{ checked_bar(checked_at, "/disputes", "Refresh from PayPal") }}
+{%- if preparing %}
+<p class="action-note" data-state="preparing">{{ preparing|length }} {{ 'draft is' if preparing|length == 1 else 'drafts are' }} being prepared. Nothing is approved or sent automatically; the draft only appears when it is ready. <a href="/disputes">Reload to see progress</a></p>
+{%- endif %}
+<table class="stack" data-table="inbox">
+<caption>{{ sort_caption }}</caption>
+<thead><tr><th scope="col">Dispute</th><th scope="col">Status</th><th scope="col">Respond by</th><th scope="col">Amount</th><th scope="col">Next step</th></tr></thead>
+<tbody>
+{% for row in rows %}
+{%- set did = row.norm.dispute_id %}
+<tr data-dispute="{{ did }}">
+  <td data-label="Dispute"><a href="/disputes/{{ did }}">{{ mono_id(did) }}</a><br><span class="row-reason">{{ row.reason_text }}</span></td>
+  <td data-label="Status">{{ tag(row.status.kind, row.status.label) }}{% if feature_enabled("outcome") %}{% with rc3_norm = row.norm %}{% include "features/outcome/_review_notice.html" %}{% endwith %}{% endif %}</td>
+  <td data-label="Respond by">
+    {%- if row.due %}{{ row.due.iso|when }}<br>
+    {%- if row.urgency in ("soon", "passed") %}{{ tag("due", row.due.remaining) }}{% else %}<span class="row-remaining">{{ row.due.remaining }}</span>{% endif %}
+    {%- elif row.waiting %}No verified deadline available
+    {%- else %}{{ row.due_note }}{% endif %}</td>
+  <td data-label="Amount">{{ row.norm.amount_display or "—" }} {{ row.norm.currency or "" }}</td>
+  <td data-label="Next step" data-draft-state="{{ row.auto_prep.status if row.auto_prep else 'none' }}">
+    {%- if row.next_step.label %}{{ link_button(row.next_step.href, row.next_step.label, kind="primary" if row.primary else "secondary", hidden="for " ~ did) }}{% endif %}
+    {%- if row.next_step.text %}<p class="row-note">{{ row.next_step.text }}</p>{% endif %}
+    {%- for line in row.next_step.lines %}<p class="row-note">{{ line }}</p>{% endfor %}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<p class="checked-at">Everything above was read from PayPal (read-only). {{ pages }} page(s) read.</p>
+{% endif %}
+{% if account_cliff %}{% include "features/account_cliff/_line.html" %}{% endif %}
+{%- if feature_enabled("fulfilment") %}
+<p class="actions"><a href="/fulfilment">Tracking at the sale: files</a></p>{%- endif %}
+{% endblock %}

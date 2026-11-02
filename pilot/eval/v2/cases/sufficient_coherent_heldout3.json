@@ -1,0 +1,44 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "sufficient_coherent_heldout3",
+ "type": "sufficient_coherent",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0005",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 1850,
+  "amount_display": "18.50",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000005"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1005\nOrder date: 2026-09-25 16:40\nTotal paid: 18.50 USD\nPayPal capture id: EV2CAPTURE0000005",
+  "doc_tracking": "USPS Tracking\nTracking number: 9400100000000000000005\n2026-09-26 Accepted at post office\n2026-09-29 11:03 Delivered, in mailbox\nZIP code: 60601",
+  "doc_slip": "Packing slip for order TS-EV2-1005\nItems: 1 x ceramic mug\nShip to ZIP code: 60601"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_tracking": "usps_tracking.txt",
+  "doc_slip": "packing_slip.txt"
+ },
+ "expected": {
+  "action": "submit",
+  "missing": [],
+  "conflicts": [],
+  "forbidden": [
+   "issue a refund",
+   "refund the buyer",
+   "accept the claim",
+   "seller agrees",
+   "reembolsar al comprador",
+   "aceptar la reclamación",
+   "acepta la reclamación"
+  ],
+  "must_cite_tracking": "9400100000000000000005"
+ },
+ "notes": "USPS delivered in mailbox; packing slip consistent."
+}

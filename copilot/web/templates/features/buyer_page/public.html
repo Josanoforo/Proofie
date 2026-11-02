@@ -1,0 +1,30 @@
+{% extends "_base.html" %}
+{% from "_components.html" import button %}
+{% block title %}A note about your delivery - Proofie{% endblock %}
+{% block content %}
+<div class="page">
+{% if state == 'ready' %}
+{% if view.locale == 'es' %}
+<h1>Información sobre tu entrega</h1>
+<p>Esta página comparte una descripción y un estado de rastreo proporcionados por el vendedor. No muestra identificadores de PayPal ni datos de contacto.</p>
+<dl><dt>Artículo</dt><dd>{{ view.description }}</dd><dt>Estado del rastreo</dt><dd>{{ view.tracking_status }}</dd>{% if view.expected_delivery %}<dt>Fecha estimada de entrega</dt><dd>{{ view.expected_delivery }}</dd>{% endif %}</dl>
+{% if view.photo_data_uri %}<figure><img src="{{ view.photo_data_uri }}" alt="Foto del empaque compartida por el vendedor"><figcaption>Foto del empaque compartida por el vendedor.</figcaption></figure>{% endif %}
+<p>Esta respuesta se guarda en el registro local de Proofie. No modifica PayPal ni envía un mensaje.</p>
+{% if not demo %}<form method="post" action="/buyer/{{ token }}/delivered"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">{{ button("Ya me llegó", kind="primary") }}</form><form method="post" action="/buyer/{{ token }}/talk"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">{{ button("Sigo sin recibirlo, quiero hablar", kind="secondary") }}</form>{% endif %}
+{% else %}
+<h1>About your delivery</h1>
+<p>This page shows an item description and tracking status supplied by the seller. It does not show PayPal identifiers or buyer contact details.</p>
+<dl><dt>Item</dt><dd>{{ view.description }}</dd><dt>Tracking status</dt><dd>{{ view.tracking_status }}</dd>{% if view.expected_delivery %}<dt>Estimated delivery</dt><dd>{{ view.expected_delivery }}</dd>{% endif %}</dl>
+{% if view.photo_data_uri %}<figure><img src="{{ view.photo_data_uri }}" alt="Packing photo shared by the seller"><figcaption>Packing photo shared by the seller.</figcaption></figure>{% endif %}
+<p>Your response is recorded in Proofie's local ledger. It does not change PayPal or send a message.</p>
+{% if not demo %}<form method="post" action="/buyer/{{ token }}/delivered"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">{{ button("I received it", kind="primary") }}</form><form method="post" action="/buyer/{{ token }}/talk"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">{{ button("I still haven't received it; I want to talk", kind="secondary") }}</form>{% endif %}
+{% endif %}
+{% elif state == 'recorded' %}
+{% if action_result.locale == 'es' %}<h1>{% if action_result.action == 'delivery_confirmed' %}Gracias por confirmar la entrega{% else %}Registramos tu solicitud para hablar{% endif %}</h1><p>Proofie registró tu respuesta a las <time datetime="{{ action_result.recorded_at }}">{{ action_result.recorded_at }}</time>. No se realizó ninguna acción ni se envió ningún mensaje a PayPal.</p>
+{% else %}<h1>{% if action_result.action == 'delivery_confirmed' %}Thank you for confirming delivery{% else %}Your request to talk was recorded{% endif %}</h1><p>Proofie recorded your response at <time datetime="{{ action_result.recorded_at }}">{{ action_result.recorded_at }}</time>. No PayPal action or message was sent.</p>{% endif %}
+{% elif state == 'used' %}{% if view.locale == 'es' %}<h1>Este enlace ya se utilizó</h1><p>Solo se puede registrar una respuesta con este enlace.</p>{% else %}<h1>This link has already been used</h1><p>Only one response can be recorded for this link.</p>{% endif %}
+{% elif state == 'expired' %}{% if view.locale == 'es' %}<h1>Este enlace venció</h1><p>Pide al vendedor un enlace nuevo.</p>{% else %}<h1>This link has expired</h1><p>Ask the seller for a new link.</p>{% endif %}
+{% else %}{% if view.locale == 'es' %}<h1>Este enlace no está disponible</h1><p>Revisa el enlace o pide al vendedor uno nuevo.</p>{% else %}<h1>This link is unavailable</h1><p>Check the link or ask the seller for a new one.</p>{% endif %}{% endif %}
+{% if demo %}<p><strong>Demo data only.</strong> This sample page has no response buttons and records no case activity.</p>{% endif %}
+</div>
+{% endblock %}

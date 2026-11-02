@@ -1,0 +1,99 @@
+{% extends "_base.html" %}
+{% from "_stage.html" import stage_words %}
+{% from "_components.html" import banner, button, link_button, post_button, breadcrumbs, limitation_text %}
+{% block title %}Draft a message to the buyer: {{ dispute_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('Draft a message to the buyer', None)]) }}{% endblock %}
+{% block content %}
+{% set page_url = '/disputes/' ~ dispute_id ~ '/draft' %}
+<h1>Draft a message to the buyer <span class="h1-id" translate="no">Dispute {{ dispute_id }}</span></h1>
+{% if unknown_channel %}
+<section data-state="channel" data-channel="unknown">
+{% call banner('warn', 'read-failed', 'Proofie could not read this dispute from PayPal') %}
+  <p>{% for lim in view.limitations %}{{ lim.message }} {% endfor %}Proofie cannot show the facts or say whether PayPal accepts a message here. Nothing was sent.</p>
+  <p class="actions">{{ link_button(page_url, 'Reload page') }}</p>
+{% endcall %}
+</section>
+{% else %}
+<p data-state="channel" data-channel="{{ view.channel }}">{{ view.sentence }}</p>
+{% if view.limitations %}<ul class="draft-limitations" data-state="limitations">{% for lim in view.limitations %}<li>{{ limitation_text(lim) }}</li>{% endfor %}</ul>{% endif %}
+
+<section id="message" aria-labelledby="message-title">
+<h2 id="message-title">Your message to the buyer</h2>
+{% if box_has_ai %}<p class="notice" data-state="ai-warning">Read each sentence and compare it with the facts on this page. Code checked the numbers, dates, tracking number, links and a few banned words. It did not check that the sentences are true.</p>{% endif %}
+{% if start_refused %}<p class="notice" data-state="start-ai-refused">There is no current AI text to start from, so your message starts as the fixed template.</p>{% endif %}
+{% if paypal_channel %}
+<form method="post" action="/disputes/{{ dispute_id }}/resolution/preview#preview" novalidate data-state="handoff-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="action" value="message">
+  <div class="field">
+    <label for="draft-message">English text for the buyer <strong class="field-mark">Required</strong></label>
+    <p class="field-hint" id="hint-draft-message">{% if box_has_ai %}Starts as the AI text you chose. Edit it as you like; you are responsible for what you send.{% else %}Starts as the fixed template, written by code from PayPal's data. Edit it as you like; you are responsible for what you send.{% endif %}</p>
+    <textarea name="text" id="draft-message" rows="8" data-lang="en" data-state="{{ 'ai-start' if box_has_ai else 'template' }}" aria-describedby="hint-draft-message" aria-required="true">{{ box_text }}</textarea>
+  </div>
+  <div class="actions actions--forward">{{ button('Review this text on the resolution page (nothing is sent yet)', kind='primary') }}</div>
+  <p class="action-note">Nothing is sent yet. You check the exact text on the next page.</p>
+  {% if view.offer_possible %}<p class="action-note" data-state="offer-note">After a message, PayPal no longer shows the option to make an offer. <a href="/disputes/{{ dispute_id }}/resolution">Make an offer first</a></p>{% endif %}
+</form>
+{% else %}
+<div class="field">
+  <label for="copy-en">Message to copy (English)</label>
+  <p class="field-hint" id="hint-copy-en">Edit it if you want, then select it and copy it. PayPal offers no message option for this dispute, so you send it to the buyer yourself. Proofie does not save or send this text, and PayPal's record will not show it.</p>
+  <textarea id="copy-en" rows="8" data-lang="en" data-state="copy-en" aria-describedby="hint-copy-en">{{ box_text }}</textarea>
+</div>
+{% endif %}
+</section>
+
+<section aria-labelledby="facts-title">
+<h2 id="facts-title">Facts, built by code from PayPal's data</h2>
+{% if facts %}
+<table data-state="facts">
+  <caption>Facts the message may use (from PayPal)</caption>
+  <tbody>
+  {% for key, label, value in facts %}<tr><th scope="row">{{ label }}</th><td>{% if key in ('order date', 'delivery estimate') %}{{ value[:10]|datewords }}{% elif key == 'last tracking status' %}{{ state_label(value) }}{% elif key == 'dispute stage' %}{{ stage_words(value) }}{% elif key == 'carrier' %}{{ carrier_display_name(value) }}{% elif key == 'tracking number' %}<span translate="no">{{ value }}</span>{% else %}{{ value }}{% endif %}</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% if not hosted_demo() %}<details data-state="facts-details"><summary>Facts as data (technical)</summary><pre data-state="facts-raw">{{ facts_raw|tojson(indent=2) }}</pre></details>{% endif %}
+{% else %}<p data-state="no-facts">No facts could be read.</p>{% endif %}
+</section>
+
+<section id="ai" aria-labelledby="ai-title">
+<h2 id="ai-title">Optional: a draft from the AI model</h2>
+<p class="notice" data-state="disclaimer">{{ disclaimer }}</p>
+{% if hosted_demo() %}
+<p data-state="model-off">The AI model is off in the hosted demo. Your message starts as the fixed template.</p>
+{% else %}
+{% if model_notice %}{% call banner('warn', 'model-error', 'The AI model did not write a draft') %}<p>{{ model_notice }}</p>{% endcall %}{% endif %}
+{{ post_button('/disputes/' ~ dispute_id ~ '/draft/model', 'Ask the local assistant for a draft (English and Spanish)', csrf_token, kind='secondary', sending='Writing the draft...', form_state='model-form') }}
+<p class="field-hint">The AI model runs on this computer. It can take a few minutes the first time. Nothing is sent to PayPal or the buyer.</p>
+{% endif %}
+{% if draft_state == 'valid' %}
+<div data-state="draft" data-valid="yes">
+  <p class="notice" data-state="model-label">Written by AI (local model){% if written_at %} at {{ draft.created_at|when }}{% endif %}. For reference only. Not part of your message until you choose it.</p>
+  <div data-lang="en"><h3>English</h3><p>{{ draft.en }}</p></div>
+  <div data-lang="es" lang="es">
+    <label for="ai-copy-es">Escrito por IA (versión en español; revísala antes de copiar)</label>
+    <textarea id="ai-copy-es" rows="6" readonly data-lang="es" lang="es" data-state="copy-es">{{ ai_es }}</textarea>
+  </div>
+  <p class="field-hint">Proofie does not send this Spanish text. Code checked its numbers and dates, not that it says the same as the English.</p>
+  <p class="actions">{% if box_has_ai %}{{ link_button(page_url ~ '#message', 'Keep the fixed template', kind='secondary') }}{% else %}{{ link_button(page_url ~ '?start=ai#message', 'Use this AI text as my starting point', kind='secondary') }}{% endif %}</p>
+</div>
+{% elif draft_state == 'stale' %}
+<div data-state="draft" data-valid="stale">
+  {% if written_at %}<p data-state="model-label">Written by AI (local model) at {{ draft.created_at|when }}.</p>{% endif %}
+  <p data-state="stale">The facts changed after this AI text was written{% if stale_labels %} ({{ stale_labels|join(', ') }}){% endif %}. Ask the AI model again.</p>
+</div>
+{% elif draft_state == 'rejected' %}
+<div data-state="draft" data-valid="no">
+  <h3>The AI text was not used</h3>
+  {% if rejected_sentences %}<ul data-state="problems">{% for sentence in rejected_sentences %}<li>{{ sentence }}</li>{% endfor %}</ul>{% endif %}
+  <p>Your message still holds the fixed template.</p>
+  <details data-state="rejected-text"><summary>Show the rejected text (not usable)</summary>
+    <div class="action-note" data-lang="en"><h4>English</h4><p>{{ draft.en }}</p></div>
+    <div class="action-note" data-lang="es" lang="es"><h4>Español</h4><p>{{ draft.es }}</p></div>
+  </details>
+</div>
+{% elif not hosted_demo() %}<p data-state="no-draft">No AI text yet. The AI model writes only when you ask.</p>{% endif %}
+{% if draft_state != 'valid' %}<p data-state="no-spanish">No Spanish text: the fixed template is in English only.</p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

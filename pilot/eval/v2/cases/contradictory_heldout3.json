@@ -1,0 +1,46 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "contradictory_heldout3",
+ "type": "contradictory",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0020",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 46000,
+  "amount_display": "460.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000020"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1020\nFecha del pedido: 2026-10-04 15:00\nTotal pagado: 460.00 MXN\nID de captura PayPal: EV2CAPTURE0000020",
+  "doc_chat": "[2026-10-05 10:00] Vendedor: Te lo mandé por Estafeta, guía 7712001020.",
+  "doc_guia": "Paquetería: Redpack\nGuía: 7712001020\nEstatus: Entregado\nFecha de entrega: 2026-10-08"
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_chat": "chat_comprador.txt",
+  "doc_guia": "redpack_guia.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [],
+  "conflicts": [
+   {
+    "id": "carrier",
+    "any_of": [
+     "carrier",
+     "paquetería",
+     "estafeta",
+     "redpack"
+    ]
+   }
+  ],
+  "forbidden": [],
+  "must_cite_tracking": null
+ },
+ "notes": "Same guía number, but the chat says Estafeta and the record says Redpack."
+}

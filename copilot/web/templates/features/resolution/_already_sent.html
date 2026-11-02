@@ -1,0 +1,22 @@
+{# Shown instead of any send control when this exact request was already sent. Facts come from the
+   app's own stored row; no PayPal call was made to render it. `already.row` is the stored row (None while a send of it is
+   in flight or its end is unknown). On the check page the notice stands alone: no "exactly as Proofie will send it" header
+   and no send control. #}
+{% from "_components.html" import link_button, post_button %}
+<section class="notice" data-state="already-sent" role="status">
+<h2>Already sent</h2>
+{% if already.row %}
+{% set status_view = message_status(already.row) %}
+<p>This exact {{ already.noun }} was already sent on {{ already.row.created_at|when }}. Nothing was sent again.</p>
+<p data-state="already-sent-confirmation">PayPal's confirmation state: {{ status_view.label }}.{% if already.row.status == 'sent_unconfirmed' %} Proofie will not send it again on its own; check the dispute in PayPal.{% endif %}</p>
+{% else %}
+<p>This exact {{ already.noun }} was already sent, or a send of it was started and Proofie has no record of how it ended. Check the dispute in PayPal. Nothing was sent again.</p>
+{% endif %}
+<p>{% if already.action == 'offer' %}To make a different offer, change the amount or the note and review it again.{% else %}To say something different, change the text and review it again.{% endif %}</p>
+<div class="actions">
+{% if already.row %}{{ link_button('/disputes/' ~ dispute_id ~ '/resolution/sent/' ~ already.row.id ~ '#sent', 'See what you sent', kind='secondary') }}
+{% if already.row.status != 'sent_confirmed' %}{{ post_button('/disputes/' ~ dispute_id ~ '/resolution/check', 'Check PayPal again', csrf_token, fields=[('row_id', already.row.id)], sending='Checking PayPal…') }}{% endif %}
+{% else %}<a href="/disputes/{{ dispute_id }}/resolution#recorded" class="btn-link">See what this app recorded</a>{% endif %}
+</div>
+{% if already.row and already.row.status != 'sent_confirmed' %}<p class="action-note">{{ READS_ONLY_NOTE }}</p>{% endif %}
+</section>

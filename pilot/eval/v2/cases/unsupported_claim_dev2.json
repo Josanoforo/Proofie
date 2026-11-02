@@ -1,0 +1,51 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "unsupported_claim_dev2",
+ "type": "unsupported_claim",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0037",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 41000,
+  "amount_display": "410.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000037"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1037\nFecha del pedido: 2026-10-01 16:00\nTotal pagado: 410.00 MXN\nID de captura PayPal: EV2CAPTURE0000037",
+  "doc_policy": "Nuestra tienda\nTodos los pedidos se entregan en un máximo de 3 días hábiles."
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_policy": "politica_envios.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "carrier_proof",
+    "any_of": [
+     "tracking",
+     "carrier",
+     "proof",
+     "guía",
+     "guia",
+     "entrega"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "A shipping promise is not proof of this delivery."
+}

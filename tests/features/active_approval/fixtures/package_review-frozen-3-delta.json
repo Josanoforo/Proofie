@@ -1,0 +1,825 @@
+[
+ {
+  "at": 1,
+  "id": "edit-1@line2",
+  "old": "{% from \"_components.html\" import banner, checked_bar, tag, button, link_button, post_button, breadcrumbs, next_step_panel, exact_content, done_banner %}",
+  "new": "{% from \"_components.html\" import banner, checked_bar, tag, button, link_button, post_button, breadcrumbs, next_step_panel, exact_content, done_banner, mono_id, field_error %}",
+  "insert_only": false,
+  "reason": "the shared error macro is imported at the top of the page"
+ },
+ {
+  "at": 18,
+  "id": "edit-entry@line19",
+  "old": "",
+  "new": "{# the connection box is drawn below the title #}",
+  "insert_only": true,
+  "reason": "the package review exposes independently flag-guarded entry links for each of these three additions | amended: UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed."
+ },
+ {
+  "at": 19,
+  "id": "nfix-1@line20",
+  "old": "<h1>Evidence package v{{ package.version }}</h1>",
+  "new": "{% set current_case_view = \"package\" %}{% set current_package = package %}\n{% include \"case/_compact_header.html\" %}\n{% if done %}{{ done_banner(done.key, done.text, undo=done.undo, csrf_token=csrf_token) }}{% endif %}\n<div class=\"package-workspace\" data-state=\"package-workspace\">\n<div class=\"package-main\">\n<header class=\"b-package-heading\"><div><p class=\"b-kicker\">Package</p><h1 id=\"package-contents-title\" tabindex=\"-1\">Package contents</h1></div><p class=\"b-package-badge\">{{ tag(chip.kind, chip.label) }} · v{{ package.version }}</p></header>",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 21,
+  "id": "edit-20@line22",
+  "old": "{% if done %}{{ done_banner(done.key, done.text) }}{% endif %}",
+  "new": "",
+  "insert_only": false,
+  "reason": "the done banner offers an undo for a removed or left-out file | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 22,
+  "id": "nfix-2@line23",
+  "old": "<p class=\"package-chip\" data-state=\"package-chip\">{{ tag(chip.kind, chip.label) }}</p>",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 23,
+  "id": "edit-20a@line24",
+  "old": "",
+  "new": "{% if feature_enabled(\"offline_market_mode\") or feature_enabled(\"declared_limits\") or feature_enabled(\"presentation_mode\") %}<details class=\"dossier-fold\" data-state=\"connection-fold\"><summary>Connection and offline capture</summary>{% include \"features/offline_market_mode/_entry.html\" %}</details>{% endif %}\n{% if context_limitations %}\n{% call banner(\"info\", \"paypal-limitations\", \"What PayPal did not return\") %}\n  <ul>{% for l in context_limitations %}<li>{{ l }}</li>{% endfor %}</ul>\n  <p>These checks stay \"Present, but Proofie cannot verify\" until you add the missing detail yourself. {% if not sent_version %}<a href=\"#shipment-details\">Type the details</a>{% endif %}</p>\n  {% if tracking_current %}<p class=\"field-hint\">The package has tracking {{ mono_id(tracking_current) }}{% if carrier_current %} ({{ carrier_display_name(carrier_current) }}){% endif %}; that does not mean it is registered in PayPal.</p>{% endif %}\n{% endcall %}\n{% endif %}\n{% set attached_file_count = file_rows|selectattr('attached')|list|length %}\n<section class=\"panel package-contents-index\" data-state=\"package-contents-index\" aria-labelledby=\"package-contents-title\">\n  <table class=\"stack\">\n    <caption class=\"visually-hidden\">Current package sections and recorded content</caption>\n    <thead><tr><th scope=\"col\">Section</th><th scope=\"col\">Current package data</th><th scope=\"col\">Open</th></tr></thead>\n    <tbody>\n      <tr><th scope=\"row\" data-label=\"Section\">Shipment</th><td data-label=\"Current package data\">{% if tracking_current %}Saved tracking {{ mono_id(tracking_current) }}{% if carrier_current %}; carrier {{ carrier_display_name(carrier_current) }}{% endif %}{% else %}No tracking number saved in this package{% endif %}</td><td data-label=\"Open\"><a href=\"#shipment-fold\">Review shipment</a></td></tr>\n      <tr><th scope=\"row\" data-label=\"Section\">Files</th><td data-label=\"Current package data\">{% for file in file_rows if file.attached %}{{ file.filename or file.name }}{% if not loop.last %}, {% endif %}{% else %}No files attached{% endfor %} · {{ attached_file_count }} of {{ file_rows|length }} attached</td><td data-label=\"Open\"><a href=\"#files-fold\">Review files</a></td></tr>\n      <tr><th scope=\"row\" data-label=\"Section\">Statements</th><td data-label=\"Current package data\">{{ claims|length }} {{ 'statement' if claims|length == 1 else 'statements' }}{% for verdict in claim_verdicts %} · {{ {'verified':'Matches the source', 'unverifiable':'Cannot be verified', 'seller_statement':'Your own statement', 'conflict':'Does not match the source'}.get(verdict, 'Not available') }}{% endfor %}</td><td data-label=\"Open\"><a href=\"#statements-fold\">Review statements</a></td></tr>\n      <tr><th scope=\"row\" data-label=\"Section\">Checks</th><td data-label=\"Current package data\">{% if checks_count %}{{ checks_count.line }}{% else %}No check count is available for this package{% endif %}</td><td data-label=\"Open\"><a href=\"#checks-fold\">Review checks</a></td></tr>\n      <tr><th scope=\"row\" data-label=\"Section\">What will be sent</th><td data-label=\"Current package data\">{% if sent_version %}Sent version, read-only{% elif send_summary.sendable %}To PayPal · dispute {{ dispute_id }} · package v{{ package.version }}{% else %}Not ready to send{% endif %}</td><td data-label=\"Open\"><a href=\"#what-will-be-sent\">Review send content</a></td></tr>\n      <tr><th scope=\"row\" data-label=\"Section\">Approval</th><td data-label=\"Current package data\">{% if approval %}Approval recorded for this package{% elif sent_version %}Approval used for the sent version{% else %}No approval recorded{% endif %}</td><td data-label=\"Open\"><a href=\"#approval\">Review approval status</a></td></tr>\n      {% if feature_enabled(\"evidence_dossier\") %}<tr><th scope=\"row\" data-label=\"Section\">Evidence dossier</th><td data-label=\"Current package data\">Case evidence and source records</td><td data-label=\"Open\"><a href=\"#evidence-dossier\">Review evidence dossier</a></td></tr>{% endif %}\n      <tr><th scope=\"row\" data-label=\"Section\">Technical details</th><td data-label=\"Current package data\">Package validation and model</td><td data-label=\"Open\"><a href=\"#package-technical\">Review technical details</a></td></tr>\n    </tbody>\n  </table>\n</section>",
+  "insert_only": true,
+  "reason": "the local read-only second-opinion entry and package field convention are explicit new integrations | amended: UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed. | amended: UX pass 3 wave 4 (rulebook v2 V13): the review-link section and the field-mark convention sit in one closed block above the next step (the next step moves up the page). Presentation only. | amended: UX pass 3 wave 4a fix: the field-mark convention stays visible above the first marked form (pinned by test_rc42_package: never inside a details); only the review-link section is folded. | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 23,
+  "id": "edit-21@line24",
+  "old": "",
+  "new": "",
+  "insert_only": true,
+  "reason": "the concise visible legend stays above the first marked form; full field-mark wording remains in a closed native disclosure for V13's first-screen copy budget. | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 23,
+  "id": "p3w4-1@line24",
+  "old": "",
+  "new": "",
+  "insert_only": false,
+  "reason": "UX pass 3 wave 4 (rulebook v2 V13): the review-link section and the field-mark convention sit in one closed block above the next step (the next step moves up the page). Presentation only. | amended: UX pass 3 wave 4a fix: the field-mark convention stays visible above the first marked form (pinned by test_rc42_package: never inside a details); only the review-link section is folded."
+ },
+ {
+  "at": 23,
+  "id": "nfix-3@line24",
+  "old": "{% if not_inr %}<p class=\"field-hint\" data-state=\"not-missing-item\">This dispute is not about a missing item. Proofie builds proof of shipment only, which might not answer it.</p>{% endif %}\n",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 27,
+  "id": "nfix-4@line28",
+  "old": "{% call next_step_panel(step, csrf_token) %}",
+  "new": "{% call next_step_panel(step, csrf_token, 'Open approval review' if step.key == 'review_approve' and step.action and not step.action.post else none) %}",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 29,
+  "id": "edit-22@line30",
+  "old": "  <form method=\"post\" action=\"{{ package_path }}/approve\" class=\"approve-form\">",
+  "new": "  <form method=\"post\" action=\"{{ package_path }}/approve\" class=\"approve-form\" novalidate>",
+  "insert_only": false,
+  "reason": "the approve form switches the browser's own validation bubble off; the server answers with its own page"
+ },
+ {
+  "at": 41,
+  "id": "edit-38@line42",
+  "old": "",
+  "new": "  {% if step.data_state == 'evidence-listed' %}<p data-state=\"evidence-listed-link\">If PayPal offers it, you can add to your evidence there: {{ resolution_center_link() }}</p>{% endif %}",
+  "insert_only": true,
+  "reason": "the next-step panel draws the Resolution Center link under a step that says the rule"
+ },
+ {
+  "at": 42,
+  "id": "nfix-5@line43",
+  "old": "",
+  "new": "\n{% if not_inr %}<p class=\"field-hint\" data-state=\"not-missing-item\">This dispute is not about a missing item. Proofie builds proof of shipment only, which might not answer it.</p>{% endif %}\n",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 47,
+  "id": "edit-2@line48",
+  "old": "  <p data-state=\"sent-read-only\">Sent - read-only. PayPal's record showed this version at {{ sent_view.when|when }}, when Proofie checked. To change anything, prepare a new version.</p>",
+  "new": "  {% if sent_view.kind == 'partial' %}<p data-state=\"sent-read-only\">Sent - read-only. Proofie sent this version{% if sent_view.when %} at {{ sent_view.when|when }}{% endif %}, and when Proofie checked, PayPal showed the statements without {{ record.missing_files|join(\", \") if record.missing_files else \"every file\" }}. This version cannot change.</p>\n  {% else %}<p data-state=\"sent-read-only\">Sent - read-only. PayPal's record showed this version at {{ sent_view.when|when }}, when Proofie checked. This version cannot change.</p>{% endif %}\n  {% if later.removed %}<p data-state=\"removed-after-send\">{{ later.removed }}</p>{% endif %}",
+  "insert_only": false,
+  "reason": "a sent version that PayPal holds only in part, and a confirmed one, are told from the record of the check"
+ },
+ {
+  "at": 49,
+  "id": "edit-3@line50",
+  "old": "  {% call exact_content() %}",
+  "new": "",
+  "insert_only": false,
+  "reason": "the exact-text wrapper of the sent statements is removed here; the wrapper is placed below its introducing line"
+ },
+ {
+  "at": 51,
+  "id": "edit-4@line52",
+  "old": "    <li>Tracking number: {{ sent_view.tracking }}{% if sent_view.carrier %} ({{ sent_view.carrier }}){% endif %}</li>\n    <li>Statements: {{ sent_view.notes }}</li>\n    <li>Files: {% if sent_view.files %}{{ sent_view.files|join(\", \") }}{% else %}none{% endif %}</li>",
+  "new": "    <li>Tracking number: {{ mono_id(sent_view.tracking) }}{% if sent_view.carrier %} ({{ sent_view.carrier }}){% endif %}</li>\n    <li>Files: {% if sent_view.files %}{% for f in sent_view.files %}{{ mono_id(f) }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}none{% endif %}</li>",
+  "insert_only": false,
+  "reason": "tracking number and file names of a sent version are shown as identifiers; the statements get their own paragraph"
+ },
+ {
+  "at": 55,
+  "id": "edit-5@line56",
+  "old": "  {% endcall %}",
+  "new": "  <p>Statements, as PayPal received them:</p>\n  {% call exact_content(sent=true) %}{{ sent_view.notes }}{% endcall %}",
+  "insert_only": false,
+  "reason": "the statements of a sent version are introduced by a line and kept in an untranslated block"
+ },
+ {
+  "at": 66,
+  "id": "edit-23@line67",
+  "old": "  <p>We do not know whether PayPal has this evidence. It is not an error and not a success. Nothing will be sent again automatically. <strong>Check again</strong> only asks PayPal (read-only).</p>",
+  "new": "  <p>Proofie does not know whether PayPal has this evidence. It is not an error and not a success. Nothing will be sent again automatically. <strong>Check again</strong> only asks PayPal (read-only).</p>",
+  "insert_only": false,
+  "reason": "the uncertain-send banner says 'Proofie does not know whether PayPal has this evidence'"
+ },
+ {
+  "at": 68,
+  "id": "edit-6@line69",
+  "old": "  <p>Confirmed by PayPal's own record of this dispute (not by this page).</p>",
+  "new": "  <p>Confirmed by PayPal's own record of this dispute (not by this page).{% if later.removed %} {{ later.removed }}{% endif %}</p>",
+  "insert_only": false,
+  "reason": "a confirmed send also names a file that was sent and is no longer attached"
+ },
+ {
+  "at": 70,
+  "id": "edit-7@line71",
+  "old": "  <p>A file was attached after this evidence was sent. PayPal's record does not show it, and Proofie will not send it again on its own.</p>",
+  "new": "  <p>{{ partial.text }}</p>\n  {% elif send_state.state == \"later-file\" %}\n  <p>PayPal confirmed this version. {{ later.text }} {{ later.wont }}{% if later.removed %} {{ later.removed }}{% endif %}</p>",
+  "insert_only": false,
+  "reason": "the banner has separate bodies for a partial send and for a file added after sending"
+ },
+ {
+  "at": 72,
+  "id": "edit-39@line73",
+  "old": "  <p>PayPal refused this evidence. Fix what the message says, then approve and send again.</p>",
+  "new": "  <p>PayPal refused this evidence. {% if listed %}{{ once_per_dispute }}{% elif not offered %}{{ not_asking }}{% else %}Fix what the message says, then approve and send again.{% endif %}</p>",
+  "insert_only": false,
+  "reason": "the refused-send banner says the rule while PayPal lists seller evidence, 'not asking' when it offers no provide-evidence action"
+ },
+ {
+  "at": 74,
+  "id": "edit-40@line75",
+  "old": "  <p>This was not sent: the app stopped it before it reached PayPal. Fix what the message says, then send again.</p>",
+  "new": "  <p>This was not sent: the app stopped it before it reached PayPal. {% if listed %}{{ once_per_dispute }}{% elif not offered %}{{ not_asking }}{% else %}Fix what the message says, then send again.{% endif %}</p>",
+  "insert_only": false,
+  "reason": "the blocked-send banner says the rule while PayPal lists seller evidence, 'not asking' when it offers no provide-evidence action"
+ },
+ {
+  "at": 76,
+  "id": "edit-41@line77",
+  "old": "  <p>You marked this attempt as not received. To send this content you need to edit it first (that makes a new version).</p>",
+  "new": "  {% if abandoned_partial %}<p>You marked this send as not received. When Proofie checked, PayPal showed its statements without the file. {% if listed %}{{ once_per_dispute }}{% elif not offered %}{{ not_asking }}{% else %}To send this content, change it first: that makes a new version to review and approve.{% endif %}</p>\n  {% elif listed %}<p>You marked this attempt as not received. {{ once_per_dispute }}</p>\n  {% elif not offered %}<p>You marked this attempt as not received. {{ not_asking }}</p>\n  {% else %}<p>You marked this attempt as not received. To send this content you need to edit it first (that makes a new version).</p>{% endif %}",
+  "insert_only": false,
+  "reason": "the abandoned-attempt banner says the rule while PayPal lists seller evidence, 'not asking' when it offers no provide-evidence action"
+ },
+ {
+  "at": 83,
+  "id": "edit-35@line84",
+  "old": "<!-- R1 B9: GET-only re-check against PayPal, never a send - distinct from \"Send evidence to PayPal\" in the next step,\n     which is the real send route (POST provide-evidence). -->",
+  "new": "{# GET-only re-check against PayPal, never a send - distinct from \"Send evidence to PayPal\" in the next step,\n   which is the real send route (POST provide-evidence). #}",
+  "insert_only": false,
+  "reason": "a comment that reached the browser becomes a template comment"
+ },
+ {
+  "at": 89,
+  "id": "edit-42@line90",
+  "old": "  <p>An earlier version was sent and PayPal showed it as received ({% for e in send_summary.earlier_confirmed %}{{ e.ts|when }}{% if not loop.last %}; {% endif %}{% endfor %}). That confirmation covers only the content sent then, not this version. Sending this version would be a new submission.</p>",
+  "new": "  <p>An earlier version was sent and PayPal showed it as received ({% for e in send_summary.earlier_confirmed %}{{ e.ts|when }}{% if not loop.last %}; {% endif %}{% endfor %}). That confirmation covers only the content sent then, not this version.{% if listed %} {{ once_per_dispute }}{% endif %}</p>",
+  "insert_only": false,
+  "reason": "the earlier-send banner adds the rule only while PayPal lists seller evidence"
+ },
+ {
+  "at": 100,
+  "id": "edit-ux3-1@line101",
+  "old": "",
+  "new": "<details id=\"package-edit-sections\"{% if form_errors or (delivery_block_items and send_summary and send_summary.approval_cleared and not sent_version) %} open{% endif %}><summary>Open package details</summary>\n<p><a href=\"#package-contents-title\" data-package-return>Back to package contents</a></p>\n{% if not sent_version %}<p class=\"form-convention\" data-state=\"form-convention\">Required labels mark sending, open notices or PayPal's Seller Protection rules; Needed keeps checks red; unmarked fields are optional.</p><details class=\"package-guidance\" data-state=\"form-convention-details\"><summary>How each field mark works</summary><p class=\"form-convention-long\" data-state=\"form-convention-long\">How fields are marked on this page. A mark that starts with Required means that step cannot go on without it. The Required marks are Required to send, Required while a notice is open and Required by PayPal's Seller Protection rules. Needed means a check stays red until you fill it in. A field with no mark is optional.</p></details>{% endif %}\n{% if feature_enabled(\"second_opinion\") and not sent_version %}<details class=\"dossier-fold\" data-state=\"fold-package-notes\"><summary>Ask someone to review this package</summary><section class=\"panel\" data-state=\"second-opinion-entry\"><h2>Ask someone to review this package</h2><p>The link is local, expires, and gives one read-only view plus a separate note. It does not approve the package.</p>{% include \"features/second_opinion/_entry.html\" %}</section></details>{% endif %}\n{% if feature_enabled(\"evidence_dossier\") or feature_enabled(\"evaluation_workbench\") or feature_enabled(\"sale_readiness\") %}\n<details class=\"package-details\" id=\"package-details\" data-state=\"package-details\"><summary>Details: evidence dossier and sale readiness</summary>\n{% if feature_enabled(\"evidence_dossier\") %}\n<section class=\"panel\" id=\"evidence-dossier\" data-state=\"integrated-evidence-dossier\">\n  <h2>Evidence dossier for this case</h2>\n  {% if evidence_dossier_error %}\n  <p data-state=\"dossier-error\">The case dossier could not be assembled from the records in this package: {{ evidence_dossier_error }}</p>\n  {% elif evidence_dossier %}\n  <p data-state=\"dossier-source\">{{ evidence_dossier.source_label }}. {{ evidence_dossier.reason_explanation }}</p>\n  <p data-state=\"dossier-item-type\">{{ evidence_dossier.kind_explanation }}</p>\n  <p class=\"field-hint\">This is an internal organizer, not a list of PayPal requirements. The documented defense scope is shipment proof for physical INR cases; suggestions for other reasons or sale types are not validated PayPal requirements. Uploading a document, attaching it to a response, and sending the response are separate steps.</p>\n  <h3>Reason to proof and source matrix</h3>\n  <p>{{ evidence_dossier.proof_matrix.basis }}</p>\n  {% if sent_version %}<p>The classifications shown below are current seller notes, not a copy of what was sent.</p><p>This sent version is read-only. <a href=\"/disputes/{{ dispute_id }}/workspace/prepare#package\">Return to case preparation</a> to check whether a new version can be prepared.</p>{% endif %}\n  {% if evidence_dossier.proof_matrix[\"items\"] %}<table class=\"stack\"><caption class=\"visually-hidden\">Suggested proof and linked case source matrix</caption><thead><tr><th scope=\"col\">Suggested proof area</th><th scope=\"col\">Status</th><th scope=\"col\">Next step</th></tr></thead><tbody>\n  {% for row in evidence_dossier.proof_matrix[\"items\"] %}<tr><td data-label=\"Suggested proof area\">{{ row.proof_type }}</td><td data-label=\"Status\">{{ row.status }}{% for source in row.sources|default([]) %}<div>{{ source.name }} — {{ source.status }}</div>{% endfor %}</td><td data-label=\"Next step\"><a href=\"/disputes/{{ dispute_id }}/workspace/prepare#documents\">Review case documents and originals</a>{% if evidence_dossier.readiness_capture and feature_enabled(\"fulfilment\") and not sent_version %} · <a href=\"/fulfilment/{{ evidence_dossier.readiness_capture }}?from_dispute={{ dispute_id }}&amp;from_package={{ package.id }}#sale-readiness\">Classify case originals in the sale checklist</a>{% endif %}{% if not sent_version %} · <a href=\"#attachments\">Review response attachments</a>{% endif %}</td></tr>{% endfor %}\n  </tbody></table>{% endif %}\n  {% if feature_enabled(\"claims\") %}\n  {% if adversarial_review_error %}<p role=\"status\">{{ adversarial_review_error }}</p>{% endif %}\n  {% if adversarial_review is defined and adversarial_review %}{% include \"features/claims/_adversarial.html\" %}\n  {% else %}<p><a href=\"/disputes/{{ dispute_id }}/packages/{{ package.id }}/claims-review\">Review source differences and stored version changes</a></p>{% endif %}\n  {% endif %}\n  <h3>Claim sources</h3>\n  {% if evidence_dossier.claims %}<table class=\"stack\"><caption class=\"visually-hidden\">Claims and their sources for this package</caption><thead><tr><th scope=\"col\">Statement</th><th scope=\"col\">Basis recorded in Proofie</th><th scope=\"col\">Sources and status</th><th scope=\"col\">Review status</th></tr></thead><tbody>\n  {% for claim in evidence_dossier.claims %}<tr><td data-label=\"Statement\">{{ claim.text }}</td><td data-label=\"Basis recorded in Proofie\">{{ claim.basis }}</td><td data-label=\"Sources and status\">{% for source in claim.source_links %}<div>{{ source.label }} — {{ source.status }} <a href=\"/disputes/{{ dispute_id }}/workspace/prepare#documents\">Open this case's records</a></div>{% endfor %}{% for missing in claim.missing %}<div>Missing source reference: {{ missing }}</div>{% endfor %}{% if not claim.source_links and not claim.missing %}No source cited{% endif %}</td><td data-label=\"Review status\">{{ claim.status }}{% if not sent_version %} · <a href=\"#statements\">Review statements</a>{% endif %}</td></tr>{% endfor %}\n  </tbody></table>{% else %}<p data-state=\"no-claims\">No statements are stored in this package yet.</p>{% endif %}\n  <h3>Case chronology</h3>\n  {% if evidence_dossier.chronology %}<ol>{% for fact in evidence_dossier.chronology %}<li>{% if fact.at %}{{ fact.at|when }} — {% else %}Time unknown — {% endif %}{{ fact.text }} <small>Source: {{ fact.source }}; {{ fact.status|default(\"recorded data\") }}</small></li>{% endfor %}</ol>{% else %}<p>No dated facts are available.</p>{% endif %}\n  <h3>Annex inventory and package preview</h3>\n  {% if evidence_dossier.annexes %}<table class=\"stack\"><caption class=\"visually-hidden\">Annex inventory and package preview</caption><thead><tr><th scope=\"col\">File</th><th scope=\"col\">Package</th><th scope=\"col\">Original bytes</th><th scope=\"col\">SHA-256</th><th scope=\"col\">Preview</th></tr></thead><tbody>\n  {% for annex in evidence_dossier.annexes %}<tr><td data-label=\"File\">{{ annex.name }} <a href=\"/disputes/{{ dispute_id }}/workspace/prepare#documents\">Open case documents</a></td><td data-label=\"Package\">{{ \"Attached\" if annex.attached else \"Not attached\" }}</td><td data-label=\"Original bytes\">{{ annex.status }}{% if not annex.sendable_type %} · File type is not supported for attachment.{% elif not annex.within_limit %} · File size is not supported for attachment.{% endif %}</td><td data-label=\"SHA-256\"><code>{{ annex.sha256 or \"Unavailable\" }}</code></td><td data-label=\"Preview\">{{ annex.content_preview or \"No text preview for these original bytes\" }}</td></tr>{% endfor %}\n  </tbody></table>{% else %}<p data-state=\"no-annexes\">No source documents are recorded for this case.</p>{% endif %}\n  <p data-state=\"dossier-preview-count\">Preview lists {{ evidence_dossier.preview.annexes|length }} annex records from this package's case documents; attachment status and byte hashes come from the existing package records.</p>\n  {% else %}<p data-state=\"dossier-empty\">No case dossier is available for this package.</p>{% endif %}\n</section>\n{% endif %}\n\n{% if feature_enabled(\"evaluation_workbench\") %}\n<details class=\"panel\" id=\"evaluation-manifest\" data-state=\"integrated-evaluation-manifest\">\n  <summary>Technical detail: evidence provenance and evaluation manifest</summary>\n  <p>Derived from this package's current Proofie claims, attachments, document records, and available original bytes. This is a provenance instrument only; no scorer, benchmark, model, or quality measurement ran.</p>\n  {% if evaluation_error %}<p role=\"alert\">Manifest unavailable: {{ evaluation_error }}</p>\n  {% elif evaluation_manifest %}\n  <p>Case <span translate=\"no\">{{ evaluation_manifest.case_id }}</span>, package {{ evaluation_manifest.package_id }} version {{ evaluation_manifest.package_version }}. <strong>{{ evaluation_manifest.instrument_status }}</strong></p>\n  <h3>Artifact provenance</h3>\n  <table><thead><tr><th>Record</th><th>Original SHA-256</th><th>Provenance</th><th>Attachment/content state</th></tr></thead><tbody>\n    {% for artifact in evaluation_manifest.artifacts %}<tr><td>{{ artifact.name }} ({{ artifact.id }})</td><td><code>{{ artifact.sha256 or \"UNKNOWN\" }}</code></td><td>{{ artifact.status }}</td><td>{{ artifact.attachment_status }}</td></tr>{% else %}<tr><td colspan=\"4\">No package document records.</td></tr>{% endfor %}\n  </tbody></table>\n  <h3>Claim source references</h3>\n  <table><thead><tr><th>Claim</th><th>Source IDs</th><th>Hashed source refs</th><th>Provenance</th></tr></thead><tbody>\n    {% for claim in evaluation_manifest.claims %}<tr><td>{{ claim.text }}</td><td>{{ claim.source_refs|join(\", \") or \"None recorded\" }}</td><td>{{ claim.resolved_hashed_refs|join(\", \") or \"None\" }}</td><td>{{ claim.provenance }}; {{ claim.review_status }}</td></tr>{% else %}<tr><td colspan=\"4\">No claims in this package.</td></tr>{% endfor %}\n  </tbody></table>\n  <p>Historical CUT72 R04 52/72 is fixed to source SHA {{ evaluation_manifest.historic_reference.source_sha }} and is not attributable to this package or delivered code.</p>\n  {% endif %}\n</details>\n{% endif %}\n\n{% if feature_enabled(\"sale_readiness\") %}\n<section class=\"panel\" id=\"sale-readiness\" data-state=\"integrated-sale-readiness\">\n<h2>Sale readiness for this case</h2>\n{% if sale_readiness_error %}<p role=\"alert\">{{ sale_readiness_error }}</p>\n{% elif sale_capture and sale_readiness %}\n<p>Same dispute <span translate=\"no\">{{ dispute_id }}</span> and transaction <span translate=\"no\">{{ sale_capture }}</span>. {{ sale_readiness.source_label }}</p>\n<p class=\"field-hint\">This internal checklist is not a PayPal requirement or eligibility decision. Delivery is a later-stage record; its absence does not block safe local tracking preparation.</p>\n{% if sale_readiness_words and sale_readiness_words.status %}<p>{{ sale_readiness_words.status }}{% if sale_readiness_words.price %} Price you recorded: {{ sale_readiness_words.price }}.{% endif %}</p>{% endif %}\n{% if sale_readiness_words and sale_readiness_words.missing %}<h3>What is still missing</h3><ul>{% for item in sale_readiness_words.missing %}<li>{{ item }}</li>{% endfor %}</ul>{% else %}<p>Nothing is missing from the sale record.</p>{% endif %}\n{% if sale_readiness.result and sale_readiness.result.tracking_payload %}<p>Tracking preparation is available for {{ sale_readiness.result.tracking_payload.carrier }} {{ sale_readiness.result.tracking_payload.tracking_number }}. Prepared locally only; nothing was registered.</p>{% endif %}\n<h3>Existing case documents</h3><ul>{% for doc in sale_readiness.documents %}<li>{{ doc.filename }} (ID {{ doc.id }}): {{ doc.seller_classified_kind or \"not classified\" }}; {{ \"attached to latest package\" if doc.attached_to_latest_package else \"not attached to latest package\" }}. Seller classification; contents not authenticated.</li>{% else %}<li>No documents are stored on this case.</li>{% endfor %}</ul>\n<p>{% if feature_enabled(\"fulfilment\") %}<a href=\"/fulfilment/{{ sale_capture }}?from_dispute={{ dispute_id }}#sale-readiness\">Open this sale's integrated readiness checklist</a>{% else %}Enable COPILOT_FEATURE_FULFILMENT to open the sale checklist.{% endif %}</p>\n{% else %}<p>No sale transaction reference is present in the current case read from PayPal.</p>{% endif %}\n</section>\n{% endif %}\n</details>\n{% endif %}\n",
+  "insert_only": true,
+  "reason": "evidence_dossier, evaluation_workbench and sale_readiness blocks (each behind its own flag, off by default in the template path) inserted as one contiguous run | amended: UX recovery step 1: the evidence dossier, the evaluation manifest and sale readiness sit in one closed Details disclosure (the package page was 10.7k px); no text removed | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 101,
+  "id": "edit-8@line102",
+  "old": "{% call banner(\"warn\", \"ai-unchecked\", \"The AI text did not pass Proofie's checks\") %}",
+  "new": "{% call banner(\"warn\", \"ai-unchecked\", \"The assistant's answer could not be checked\") %}",
+  "insert_only": false,
+  "reason": "the assistant banner title says the answer could not be checked"
+ },
+ {
+  "at": 116,
+  "id": "nfix-6@line117",
+  "old": "{% if context_limitations %}",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 117,
+  "id": "edit-24@line118",
+  "old": "{% call banner(\"info\", \"paypal-limitations\", \"What PayPal could not tell us\") %}",
+  "new": "",
+  "insert_only": false,
+  "reason": "'What PayPal could not tell us' becomes 'What PayPal did not return' | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 118,
+  "id": "nfix-7@line119",
+  "old": "  <ul>{% for l in context_limitations %}<li>{{ l }}</li>{% endfor %}</ul>",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 119,
+  "id": "edit-25@line120",
+  "old": "  <p>These checks stay \"cannot verify\" until you add the missing detail yourself. {% if not sent_version %}<a href=\"#shipment-details\">Type the details</a>{% endif %}</p>",
+  "new": "",
+  "insert_only": false,
+  "reason": "the limitations note quotes the real tag text 'Present, but Proofie cannot verify' | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 120,
+  "id": "nfix-8@line121",
+  "old": "{% endcall %}\n{% endif %}\n",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 123,
+  "id": "edit-uxr2-1@line124",
+  "old": "<section class=\"panel\" id=\"where-it-stands\" data-state=\"where-it-stands\">\n  <h2>Where this package stands</h2>",
+  "new": "",
+  "insert_only": false,
+  "reason": "UX recovery step 2: 'Where this package stands' is a closed Details (it repeats the case overview and the checks); 'What will be sent' moves, unchanged, to its own panel right above Approval | amended: UX recovery step 2b: the status line of 'Where this package stands' stays visible; only the long lists are folded (a hidden status broke the approved-state check) | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 125,
+  "id": "nfix-9@line126",
+  "old": "  {% set states = check_rows|map(attribute='tag_state')|list %}\n  {% if record.state == 'none' %}<p data-state=\"{{ send_state.state }}\">{{ tag('info' if send_state.state == 'approved' else 'todo', send_status) }}</p>{% endif %}\n  {% if send_state.state == \"confirmed\" %}<p data-state=\"package-sent\">{{ tag('ok', 'Sent to PayPal') }}</p>\n  {% if 'bad' in states or 'warn' in states %}<p class=\"hint\" data-state=\"checks-after-sending\">Checks run after sending: {{ 'a difference needs review' if 'bad' in states else 'some facts cannot be verified' }}. Nothing was re-sent.</p>{% endif %}\n  {% else %}<p>{{ tag('bad' if 'bad' in states else 'warn' if 'warn' in states else 'ok', 'Needs attention' if 'bad' in states else 'Some facts cannot be verified' if 'warn' in states else 'Checks complete') }}</p>{% endif %}",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 130,
+  "id": "edit-uxr2b-1@line131",
+  "old": "",
+  "new": "",
+  "insert_only": false,
+  "reason": "UX recovery step 2b: the status line of 'Where this package stands' stays visible; only the long lists are folded (a hidden status broke the approved-state check) | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 130,
+  "id": "nfix-10@line131",
+  "old": "  <h3>What you still need to give</h3>\n  <ul data-state=\"requirement-groups\">\n  {% for title, items in shipment_groups.items() if items %}\n    <li data-requirement-group=\"{{ title }}\"><strong>{{ title }} ({{ items|length }}):</strong> {% for label, has_value in items %}{{ tag('ok' if has_value else 'todo', label ~ (': has a value' if has_value else ': no value yet')) }}{% if not loop.last %} {% endif %}{% endfor %}</li>\n  {% endfor %}\n  </ul>",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 136,
+  "id": "edit-26@line137",
+  "old": "  <h3>What we know, what is missing, what does not match</h3>",
+  "new": "",
+  "insert_only": false,
+  "reason": "the checks group heading reads 'What is known, what is missing, what does not match' | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 137,
+  "id": "nfix-11@line138",
+  "old": "  <ul>\n  {% for title, items in check_groups %}{% if items %}\n    <li data-check-group=\"{{ title }}\"><strong><a href=\"#check-{{ items[0].id }}\">{{ title }} ({{ items|length }})</a>:</strong> {% for c in items %}<a href=\"#check-{{ c.id }}\">{{ check_labels[c.id] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 140,
+  "id": "edit-ws1@line141",
+  "old": "      {% if not sent_version %}{% if title == \"Missing\" %}&middot; <a href=\"#shipment-details\">Type the details</a> or <a href=\"/disputes/{{ dispute_id }}#documents\">add a document</a>",
+  "new": "",
+  "reason": " | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 141,
+  "id": "nfix-12@line142",
+  "old": "      {% elif title == \"Does not match\" %}&middot; <a href=\"#check-{{ items[0].id }}\">Review the difference</a>",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 142,
+  "id": "edit-27@line143",
+  "old": "      {% elif title == \"Present but we cannot verify\" %}&middot; <a href=\"#shipment-details\">Type the details</a>{% endif %}{% endif %}</li>",
+  "new": "",
+  "insert_only": false,
+  "reason": "the group title 'Present, but Proofie cannot verify' keeps its type-the-details link | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 143,
+  "id": "nfix-13@line144",
+  "old": "  {% endif %}{% endfor %}\n  </ul>",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 145,
+  "id": "edit-uxr2-2@line146",
+  "old": "  <h3>What will be sent</h3>",
+  "new": "",
+  "insert_only": false,
+  "reason": "UX recovery step 2: 'Where this package stands' is a closed Details (it repeats the case overview and the checks); 'What will be sent' moves, unchanged, to its own panel right above Approval"
+ },
+ {
+  "at": 146,
+  "id": "edit-9@line147",
+  "old": "  {% call exact_content() %}",
+  "new": "",
+  "insert_only": false,
+  "reason": "the exact-text wrapper that opened here is removed; the text is wrapped where it is shown"
+ },
+ {
+  "at": 147,
+  "id": "edit-ux3-2@line148",
+  "old": "",
+  "new": "",
+  "insert_only": true,
+  "reason": "UX-03 / UX v3: the page states where the package goes (unflagged, declared) | amended: UX recovery step 2: 'Where this package stands' is a closed Details (it repeats the case overview and the checks); 'What will be sent' moves, unchanged, to its own panel right above Approval"
+ },
+ {
+  "at": 147,
+  "id": "edit-uxr2-3@line148",
+  "old": "  <ul data-state=\"will-send\">\n    <li>{{ send_summary.claims_count }} {{ 'statement' if send_summary.claims_count == 1 else 'statements' }} from the list below</li>",
+  "new": "",
+  "insert_only": false,
+  "reason": "UX recovery step 2: 'Where this package stands' is a closed Details (it repeats the case overview and the checks); 'What will be sent' moves, unchanged, to its own panel right above Approval"
+ },
+ {
+  "at": 149,
+  "id": "edit-10@line150",
+  "old": "    <li>Tracking: {% if send_summary.sendable %}{{ send_summary.tracking_number }}{% if send_summary.carrier %} ({{ carrier_display_name(send_summary.carrier) }}){% endif %}{% else %}<span data-state=\"no-tracking\">none yet, so this cannot be sent. {% if not sent_version %}<a href=\"#shipment-details\">Type the tracking number</a> or upload the carrier's document.{% endif %}</span>{% endif %}</li>\n    <li>Attachments: {% if send_summary.attachments %}{{ send_summary.attachments | join(\", \") }}{% else %}none{% if not sent_version %} (<a href=\"#attachments\">attach a document</a>){% endif %}{% endif %}</li>",
+  "new": "",
+  "insert_only": false,
+  "reason": "the tracking link has one target on the page | amended: UX recovery step 2: 'Where this package stands' is a closed Details (it repeats the case overview and the checks); 'What will be sent' moves, unchanged, to its own panel right above Approval"
+ },
+ {
+  "at": 151,
+  "id": "edit-uxr2-4@line152",
+  "old": "  </ul>",
+  "new": "",
+  "insert_only": false,
+  "reason": "UX recovery step 2: 'Where this package stands' is a closed Details (it repeats the case overview and the checks); 'What will be sent' moves, unchanged, to its own panel right above Approval"
+ },
+ {
+  "at": 152,
+  "id": "edit-11@line153",
+  "old": "  {% endcall %}",
+  "new": "",
+  "insert_only": false,
+  "reason": "the closing of the removed exact-text wrapper goes with it"
+ },
+ {
+  "at": 152,
+  "id": "edit-entry-read-aloud@line153",
+  "old": "  {% endcall %}",
+  "new": "  {% endcall %}",
+  "insert_only": false,
+  "reason": "the flagged read-aloud control is part of the active package review | amended: UX recovery step 2: 'Where this package stands' is a closed Details (it repeats the case overview and the checks); 'What will be sent' moves, unchanged, to its own panel right above Approval"
+ },
+ {
+  "at": 153,
+  "id": "nfix-14@line154",
+  "old": "  <h3>What PayPal confirmed</h3>\n  {% if send_state.state == \"confirmed\" %}<p data-state=\"paypal-confirmed\">{{ send_status }}</p>\n  {% if send_summary.current_confirmation %}<p data-state=\"readback-confirmed\">Confirmed by reading the dispute back from PayPal at {{ send_summary.current_confirmation|when }}.</p>{% endif %}",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 156,
+  "id": "edit-12@line157",
+  "old": "",
+  "new": "",
+  "insert_only": true,
+  "reason": "a partial send and a file added after sending have their own 'what PayPal confirmed' lines, told from the record | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 156,
+  "id": "nfix-15@line157",
+  "old": "  {% elif send_state.state == \"result-uncertain\" %}<p data-state=\"paypal-confirmed-none\">PayPal has not confirmed this content yet: the result is still unknown. Use Check again.</p>\n  {% else %}<p data-state=\"paypal-confirmed-none\">PayPal has not confirmed anything for this content.</p>{% endif %}",
+  "new": "",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 158,
+  "id": "edit-uxr2-5@line159",
+  "old": "</section>",
+  "new": "",
+  "insert_only": false,
+  "reason": "UX recovery step 2: 'Where this package stands' is a closed Details (it repeats the case overview and the checks); 'What will be sent' moves, unchanged, to its own panel right above Approval | amended: UX recovery step 2b: the status line of 'Where this package stands' stays visible; only the long lists are folded (a hidden status broke the approved-state check) | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 158,
+  "id": "nfix-16@line159",
+  "old": "</section>\n",
+  "new": "</section>",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 161,
+  "id": "edit-36@line162",
+  "old": "{# C3 (table 2's UI copy spec): label and hint per field. The tracking number and the carrier come from the shell's own",
+  "new": "{# Label and hint per field. The tracking number and the carrier come from the shell's own",
+  "insert_only": false,
+  "reason": "a comment names no work item"
+ },
+ {
+  "at": 165,
+  "id": "edit-lane-r@line166",
+  "old": "{% set mark = 'Required by the loaded policy' if name == 'signature' and signature_required else 'Needed' if name in shipment_needed else '' %}",
+  "new": "{% set mark = \"Required by PayPal's Seller Protection rules\" if name == 'signature' and signature_required else 'Needed' if name in shipment_needed else '' %}",
+  "insert_only": false,
+  "reason": "the field-mark legend names PayPal's Seller Protection rules"
+ },
+ {
+  "at": 171,
+  "id": "edit-13@line173",
+  "old": "{% if form_errors.get(name) %}<p class=\"field-error\" id=\"error-{{ name }}\">{{ form_errors[name] }}</p>{% endif %}\n<select id=\"field-{{ name }}\" name=\"{{ name }}\" aria-describedby=\"hint-{{ name }}{% if form_errors.get(name) %} error-{{ name }}{% endif %}\"{% if form_errors.get(name) %} aria-invalid=\"true\"{% endif %}>",
+  "new": "{% if form_errors.get(name) %}{{ field_error('error-' ~ name, form_errors[name]) }}{% endif %}\n<select id=\"field-{{ name }}\" name=\"{{ name }}\"{% if 'Required' in mark %} aria-required=\"true\"{% endif %} aria-describedby=\"hint-{{ name }}{% if form_errors.get(name) %} error-{{ name }}{% endif %}\"{% if form_errors.get(name) %} aria-invalid=\"true\"{% endif %}>",
+  "insert_only": false,
+  "reason": "the select field error uses the shared error macro"
+ },
+ {
+  "at": 181,
+  "id": "edit-entry-transit-guide@line182",
+  "old": "",
+  "new": "<details class=\"dossier-fold\" id=\"shipment-fold\" data-state=\"fold-shipment\"{% if shipment_open or form_errors %} open{% endif %}><summary>{{ 'Shipment details are filled in: show or change them' if shipment_filled else 'Shipment details still to fill in' }}</summary>\n{% if feature_enabled(\"transit_delivered_guide\") and transit_delivered_guidance %}{% include \"features/transit_delivered_guide/_entry.html\" %}{% endif %}",
+  "insert_only": true,
+  "reason": "the flagged transit guidance is part of the package review | amended: UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed. | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 183,
+  "id": "edit-28@line184",
+  "old": "{% if payment_date %}<p id=\"field-payment_date\">Payment date: {{ payment_date[:10]|datewords }}{% if form_errors.get('payment_date') %}<span class=\"field-error\">{{ form_errors['payment_date'] }}</span>{% endif %}</p>{% endif %}",
+  "new": "{% if payment_date %}<p id=\"field-payment_date\">Payment date: {{ payment_date[:10]|datewords }}{% if form_errors.get('payment_date') %}<span class=\"field-error\"><span aria-hidden=\"true\">✕</span> {{ form_errors['payment_date'] }}</span>{% endif %}</p>{% endif %}\n{% if tracker_note %}<p class=\"field-hint\" data-state=\"tracker-on-file\">{% if tracker_note.used %}Filled in from the tracking file. Check them, then press Save shipment details.{% else %}{% if tracker_note.package_number %}This package uses tracking {{ mono_id(tracker_note.package_number) }}. {% endif %}Tracking {{ mono_id(tracker_note.number) }}{% if tracker_note.carrier %} ({{ tracker_note.carrier }}){% endif %} is saved in Proofie for sale {{ tracker_note.capture }}. <a href=\"{{ package_path }}?use_tracking=1#shipment-details\">Use these values<span class=\"visually-hidden\"> from the tracking file of sale {{ tracker_note.capture }}</span></a>{% endif %}</p>{% endif %}",
+  "insert_only": false,
+  "reason": "the tracking number saved for the sale is offered, never saved on its own"
+ },
+ {
+  "at": 185,
+  "id": "edit-ws2@line186",
+  "old": "<summary>{{ 'Fill in the shipment details' if shipment_open else 'Change the shipment details' }}</summary>",
+  "new": "<summary>{{ 'Change the shipment details' if shipment_filled and not shipment_open else 'Fill in the shipment details' }}</summary>",
+  "insert_only": false,
+  "reason": "the shipment summary says Fill in until the seller has saved something (walk fix, D-88)"
+ },
+ {
+  "at": 187,
+  "id": "seller-shortcuts-document-proposal@line188",
+  "old": "",
+  "new": "{% if document_proposal and document_proposal.details %}<p class=\"field-hint\" data-state=\"document-proposal\">Proposed from {{ document_proposal.filename }}: the carrier and tracking number the document states. Check them against the document, change what is wrong, then press Save shipment details.</p>{% endif %}",
+  "insert_only": true,
+  "reason": "D-101 seller item 4 (COPILOT_FEATURE_SELLER_SHORTCUTS): a proposal read from the uploaded document, shown only while the setting is on and the document states the carrier and the tracking number; labelled as a proposal; the writes stay Save shipment details and Add this statement"
+ },
+ {
+  "at": 193,
+  "id": "ux-v13-optional-fields@line194",
+  "old": "<details data-state=\"optional-details\" open><summary>Optional details that help the checks</summary>",
+  "new": "{% set optional_open = namespace(value=false) %}\n{% for item in shipment_fields if item[0] not in ['tracking_number','carrier'] and item[0] not in shipment_needed %}\n{% set name = item[0] %}{% if form_errors.get(name) or form_values.get(name, manual_fields.get(name, {}).get('value', '')) %}{% set optional_open.value = true %}{% endif %}\n{% endfor %}\n<details data-state=\"optional-details\"{% if optional_open.value %} open{% endif %}><summary>Optional details that help the checks</summary>",
+  "insert_only": false,
+  "reason": "2026-10-30 UX V13: optional shipment fields start folded when empty, and saved values or field errors keep them open; required fields and form/error visibility are unchanged."
+ },
+ {
+  "at": 199,
+  "id": "p3w3-1@line200",
+  "old": "",
+  "new": "</details>",
+  "insert_only": false,
+  "reason": "UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed."
+ },
+ {
+  "at": 201,
+  "id": "edit-ux3-3@line202",
+  "old": "",
+  "new": "<p class=\"field-hint\" data-state=\"attachment-storage-note\">Removing a file from this response detaches it; its stored copy remains in the configured Proofie data folder. Nothing is sent to PayPal until you review and approve this package and then send it.</p>",
+  "insert_only": true,
+  "reason": "UX-05 / UX v3: where a removed attachment's stored copy remains (unflagged, declared) | amended: UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed. | amended: UX pass 3 wave 3: the attachment storage note stays visible above the files fold (test_ux05_privacy_copy pins it as visible)"
+ },
+ {
+  "at": 202,
+  "id": "p3w3b-1@line203",
+  "old": "",
+  "new": "<details class=\"dossier-fold\" id=\"files-fold\" data-state=\"fold-attachments\"><summary>{{ file_rows|selectattr('attached')|list|length }} of {{ file_rows|length }} {{ 'document' if file_rows|length == 1 else 'documents' }} in the response: show the files</summary>",
+  "insert_only": false,
+  "reason": "UX pass 3 wave 3: the attachment storage note stays visible above the files fold (test_ux05_privacy_copy pins it as visible) | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 203,
+  "id": "edit-45@line204",
+  "old": "<p>No documents uploaded yet. <a href=\"/disputes/{{ dispute_id }}#documents\">Upload a document on the dispute page</a>.</p>",
+  "new": "{% if listed %}<p>No documents uploaded. {{ tag('na', 'Document changes are not available') }} {{ once_per_dispute }}</p>\n{% else %}<p>No documents uploaded yet. <a href=\"/disputes/{{ dispute_id }}/workspace/prepare#documents\">Upload a document on the dispute page</a>.</p>{% endif %}",
+  "insert_only": false,
+  "reason": "the package page does not invite an upload while PayPal lists seller evidence; it says document changes are not available"
+ },
+ {
+  "at": 206,
+  "id": "edit-29@line207",
+  "old": "<thead><tr><th>In the response?</th><th>Document</th><th>Type</th><th>Size</th><th>What you can do</th></tr></thead>",
+  "new": "<caption class=\"visually-hidden\">Files you can add to the response</caption>\n<thead><tr><th scope=\"col\">In the response?</th><th scope=\"col\">Document</th><th scope=\"col\">Type</th><th scope=\"col\">Size</th><th scope=\"col\">What you can do</th></tr></thead>",
+  "insert_only": false,
+  "reason": "the files table gets a hidden caption and column scopes"
+ },
+ {
+  "at": 211,
+  "id": "edit-ux3-4@line212",
+  "old": "  <td data-label=\"Document\">{{ d.filename }}</td>",
+  "new": "  <td data-label=\"Document\">{{ d.filename }}{% if not hosted_demo() %} · <a href=\"/disputes/{{ dispute_id }}/documents/{{ d.id }}/original\">Open original</a>{% endif %}</td>",
+  "insert_only": false,
+  "reason": "UX-05 / UX v3: document cell links to the original file (unflagged, declared; hidden in hosted demo)"
+ },
+ {
+  "at": 224,
+  "id": "p3w3-2@line225",
+  "old": "",
+  "new": "</details>",
+  "insert_only": false,
+  "reason": "UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed."
+ },
+ {
+  "at": 226,
+  "id": "p3w3-3@line227",
+  "old": "",
+  "new": "<details class=\"dossier-fold\" id=\"statements-fold\" data-state=\"fold-statements\"{% if form_errors %} open{% endif %}><summary>Show the {{ claims|length }} {{ 'statement' if claims|length == 1 else 'statements' }}: read, change or add one</summary>",
+  "insert_only": false,
+  "reason": "UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed. | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 238,
+  "id": "edit-ux3-5@line239",
+  "old": "",
+  "new": "  {% for source_doc in c.source_documents %}\n  <div class=\"claim-source-detail\" data-source-document=\"{{ source_doc.id }}\">\n    <p>Source file: {{ source_doc.filename }} · {% if source_doc.extraction_ok %}text extracted{% else %}text extraction unavailable{% endif %}{% if not hosted_demo() %} · <a href=\"/disputes/{{ dispute_id }}/documents/{{ source_doc.id }}/original\">Open original</a>{% endif %}</p>\n    {% if source_doc.extraction_ok and source_doc.extracted_text %}<blockquote><strong>Extracted text excerpt — not the original:</strong> {{ source_doc.extracted_text[:320] }}{% if source_doc.extracted_text|length > 320 %}…{% endif %}</blockquote>{% elif not source_doc.extraction_ok %}<p>The original is available; its text could not be extracted. Review the original directly. This does not confirm the statement.</p>{% endif %}\n  </div>\n  {% endfor %}",
+  "insert_only": true,
+  "reason": "UX-05 / UX v3: each cited statement shows its source file and extracted-text excerpt (unflagged, declared)"
+ },
+ {
+  "at": 249,
+  "id": "edit-14@line250",
+  "old": "    <div class=\"field\" id=\"field-claim-{{ c.id }}\">\n      <label for=\"claim-text-{{ c.id }}\">Edit statement {{ loop.index }} <strong class=\"field-mark\">Required</strong></label>\n      {% if form_errors.get(claim_key) %}<p class=\"field-error\" id=\"error-{{ claim_key }}\">{{ form_errors[claim_key] }}</p>{% endif %}\n      <textarea id=\"claim-text-{{ c.id }}\" name=\"text\" rows=\"3\" aria-required=\"true\"{% if form_errors.get(claim_key) %} aria-invalid=\"true\" aria-describedby=\"error-{{ claim_key }}\"{% endif %}>{{ form_values.get(claim_key, c.text) }}</textarea>",
+  "new": "    <div class=\"field\">\n      <label for=\"field-claim-{{ c.id }}\">Edit statement {{ loop.index }} <strong class=\"field-mark\">Required</strong></label>\n      {% if form_errors.get(claim_key) %}{{ field_error('error-' ~ claim_key, form_errors[claim_key]) }}{% endif %}\n      <textarea id=\"field-claim-{{ c.id }}\" name=\"text\" rows=\"3\" aria-required=\"true\"{% if form_errors.get(claim_key) %} aria-invalid=\"true\" aria-describedby=\"error-{{ claim_key }}\"{% endif %}>{{ form_values.get(claim_key, c.text) }}</textarea>",
+  "insert_only": false,
+  "reason": "the statement edit error uses the shared error macro"
+ },
+ {
+  "at": 264,
+  "id": "edit-16@line265",
+  "old": "  <div class=\"field\" id=\"field-new-claim\">\n    <label for=\"new-claim\">New statement <strong class=\"field-mark\">Required</strong></label>\n    {% if form_errors.get('new-claim') %}<p class=\"field-error\" id=\"error-new-claim\">{{ form_errors['new-claim'] }}</p>{% endif %}\n    <textarea id=\"new-claim\" name=\"text\" rows=\"3\" aria-required=\"true\"{% if form_errors.get('new-claim') %} aria-invalid=\"true\" aria-describedby=\"error-new-claim\"{% endif %}>{{ form_values.get('new-claim','') }}</textarea>",
+  "new": "  <div class=\"field\">\n    <label for=\"field-new-claim\">New statement <strong class=\"field-mark\">Required</strong></label>\n    {% if form_errors.get('new-claim') %}{{ field_error('error-new-claim', form_errors['new-claim']) }}{% endif %}\n    <textarea id=\"field-new-claim\" name=\"text\" rows=\"3\" aria-required=\"true\"{% if form_errors.get('new-claim') %} aria-invalid=\"true\" aria-describedby=\"error-new-claim\"{% endif %}>{{ form_values.get('new-claim','') }}</textarea>",
+  "insert_only": false,
+  "reason": "the new statement error uses the shared error macro"
+ },
+ {
+  "at": 269,
+  "id": "seller-shortcuts-statement-proposal@line270",
+  "old": "",
+  "new": "  {% if document_proposal and document_proposal.statement_proposed %}<p class=\"field-hint\" data-state=\"statement-proposal\">Proposed from the same reading of {{ document_proposal.filename }}. Edit it into your own words if you like, then press Add this statement.</p>{% endif %}",
+  "insert_only": true,
+  "reason": "D-101 seller item 4 (COPILOT_FEATURE_SELLER_SHORTCUTS): a proposal read from the uploaded document, shown only while the setting is on and the document states the carrier and the tracking number; labelled as a proposal; the writes stay Save shipment details and Add this statement"
+ },
+ {
+  "at": 272,
+  "id": "edit-pk2@line273",
+  "old": "",
+  "new": "{%- if feature_enabled(\"bilingual\") and bilingual %}{% include \"features/bilingual/_statements.html\" ignore missing %}{% endif %}",
+  "insert_only": true,
+  "reason": "rc4.3 hook: the Spanish version of each statement (lane BI's partial) under the statements block, behind COPILOT_FEATURE_BILINGUAL; off, the leading dash keeps the page byte-identical"
+ },
+ {
+  "at": 272,
+  "id": "p3w3-4@line273",
+  "old": "",
+  "new": "</details>",
+  "insert_only": false,
+  "reason": "UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed."
+ },
+ {
+  "at": 274,
+  "id": "edit-30@line275",
+  "old": "",
+  "new": "<details class=\"dossier-fold\" id=\"checks-fold\" data-state=\"fold-checks\"><summary>Show the checks and where each comes from</summary>\n{% if checks_count %}<p class=\"checks-count\" data-state=\"checks-count\">{% if checks_count.first_verified %}<a href=\"#check-{{ checks_count.first_verified }}\">{{ checks_count.verified }} of {{ checks_count.total }} {{ checks_count.noun }} verified</a>{% else %}{{ checks_count.verified }} of {{ checks_count.total }} {{ checks_count.noun }} verified{% endif %}; {% if checks_count.first_cannot %}<a href=\"#check-{{ checks_count.first_cannot }}\">{{ checks_count.cannot }} cannot be checked</a>{% else %}{{ checks_count.cannot }} cannot be checked{% endif %}.</p>{% endif %}",
+  "insert_only": true,
+  "reason": "the counts sentence under the Checks heading | amended: UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed. | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 275,
+  "id": "edit-lane-r@line276",
+  "old": "{% else %}<p class=\"checked-at\">Rules: <a href=\"{{ rules_source_url }}\">{{ rules_source_title }}</a></p>{% endif %}",
+  "new": "{% else %}<p class=\"checked-at\">Rules: <a href=\"{{ rules_source_url }}\">{{ rules_source_title|mark_spanish }}</a></p>{% endif %}",
+  "insert_only": false,
+  "reason": "the Spanish rule title and the Spanish citation are marked as Spanish"
+ },
+ {
+  "at": 277,
+  "id": "edit-uxr3-1@line278",
+  "old": "",
+  "new": "{% set verified_rows = check_rows|selectattr(\"tag_state\", \"equalto\", \"ok\")|list %}\n{% set open_rows = check_rows|rejectattr(\"tag_state\", \"equalto\", \"ok\")|list %}\n{% for group_name, group_rows in ((\"open\", open_rows), (\"verified\", verified_rows)) if group_rows %}\n{% if group_name == \"verified\" %}<details data-state=\"verified-checks\"><summary>{{ verified_rows|length }} {{ \"check\" if verified_rows|length == 1 else \"checks\" }} verified</summary>{% endif %}",
+  "insert_only": false,
+  "reason": "UX recovery step 3: checks that are not verified come first and stay visible; verified checks sit in a closed Details with their count (all rows stay in the page)"
+ },
+ {
+  "at": 278,
+  "id": "edit-31@line279",
+  "old": "<thead><tr><th>Check</th><th>Status</th><th>Why</th><th>What you can do</th></tr></thead>",
+  "new": "<caption class=\"visually-hidden\">Checks on this package</caption>\n<thead><tr><th scope=\"col\">Check</th><th scope=\"col\">Status</th><th scope=\"col\">Why</th><th scope=\"col\">What you can do</th></tr></thead>",
+  "insert_only": false,
+  "reason": "the checks table gets a hidden caption and column scopes"
+ },
+ {
+  "at": 280,
+  "id": "edit-uxr3-2@line281",
+  "old": "{% for row in check_rows %}{% set c = row.check %}",
+  "new": "{% for row in group_rows %}{% set c = row.check %}",
+  "insert_only": false,
+  "reason": "UX recovery step 3: checks that are not verified come first and stay visible; verified checks sit in a closed Details with their count (all rows stay in the page)"
+ },
+ {
+  "at": 284,
+  "id": "edit-pk3@line285",
+  "old": "  <td data-label=\"Why\">{{ row.why or c.seller_message }}{% if check_notes.get(c.id) %} <em>({{ check_notes[c.id] }})</em>{% endif %}</td>",
+  "new": "  <td data-label=\"Why\">{{ row.why or c.seller_message }}{% if check_notes.get(c.id) %} <em>({{ check_notes[c.id] }})</em>{% endif %}{% if feature_enabled(\"clauses\") %}{% include \"features/clauses/_clause.html\" ignore missing %}{% endif %}</td>",
+  "insert_only": false,
+  "reason": "rc4.3 hook: the published clause behind each check, inside the Why cell, behind COPILOT_FEATURE_CLAUSES"
+ },
+ {
+  "at": 293,
+  "id": "edit-uxr3-3@line294",
+  "old": "",
+  "new": "{% if group_name == \"verified\" %}</details>{% endif %}\n{% endfor %}",
+  "insert_only": false,
+  "reason": "UX recovery step 3: checks that are not verified come first and stay visible; verified checks sit in a closed Details with their count (all rows stay in the page)"
+ },
+ {
+  "at": 293,
+  "id": "p3w3-5@line294",
+  "old": "",
+  "new": "</details>",
+  "insert_only": false,
+  "reason": "UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed."
+ },
+ {
+  "at": 294,
+  "id": "edit-37@line295",
+  "old": "{# RULES-US1: PayPal's published words matched by code on this dispute's reason/channel; information only, no action, no verdict. #}",
+  "new": "{# PayPal's published words matched by code on this dispute's reason/channel; information only, no action, no verdict. #}",
+  "insert_only": false,
+  "reason": "a comment names no work item (checks table)"
+ },
+ {
+  "at": 295,
+  "id": "ux-v13-sources-open@line296",
+  "old": "{% if eligibility_notes %}",
+  "new": "{% if eligibility_notes %}\n<details class=\"package-guidance\" data-state=\"eligibility-sources\"><summary>Published policy sources ({{ eligibility_notes|length }})</summary>",
+  "insert_only": false,
+  "reason": "2026-10-30 UX V13/V15: policy citations become a closed native disclosure; their exact quotes, source links, conditions and status remain available."
+ },
+ {
+  "at": 303,
+  "id": "edit-lane-r@line304",
+  "old": "    <p><small>Source: {{ n.citation_text }}{% if n.citation_url or rules_source_url %} · <a href=\"{{ n.citation_url or rules_source_url }}\" rel=\"noopener\">Read the full terms on PayPal</a>{% endif %}</small></p>",
+  "new": "    <p><small>Source: {{ n.citation_text|mark_spanish }}{% if n.citation_url or rules_source_url %} · <a href=\"{{ n.citation_url or rules_source_url }}\" rel=\"noopener\">Read the full terms on PayPal</a>{% endif %}</small></p>",
+  "insert_only": false,
+  "reason": "the Spanish rule title and the Spanish citation are marked as Spanish"
+ },
+ {
+  "at": 307,
+  "id": "ux-v13-sources-close@line309",
+  "old": "",
+  "new": "</details>",
+  "insert_only": true,
+  "reason": "Closes the optional policy-source disclosure after the existing eligibility-note section; no source or condition is removed."
+ },
+ {
+  "at": 309,
+  "id": "edit-uxr2-6@line310",
+  "old": "",
+  "new": "<section class=\"panel\" id=\"what-will-be-sent\" data-state=\"what-will-be-sent\">\n  <h2>What will be sent</h2>\n  <p data-state=\"send-recipient\">To PayPal · dispute {{ dispute_id }} · package v{{ package.version }}.</p>\n  <ul data-state=\"will-send\">\n    <li>{{ send_summary.claims_count }} {{ 'statement' if send_summary.claims_count == 1 else 'statements' }} from the list below</li>\n    <li>Tracking: {% if send_summary.sendable %}{{ mono_id(send_summary.tracking_number) }}{% if send_summary.carrier %} ({{ carrier_display_name(send_summary.carrier) }}){% endif %}{% else %}<span data-state=\"no-tracking\">none yet, so this cannot be sent. {% if not sent_version %}<a href=\"#field-tracking_number\">Type the tracking number</a> or upload the carrier's document.{% endif %}</span>{% endif %}</li>\n    <li>Attachments: {% if send_summary.attachments %}{% for name in send_summary.attachments %}{{ mono_id(name) }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}none{% if not sent_version %} (<a href=\"#attachments\">attach a document</a>){% endif %}{% endif %}</li>\n  </ul>\n  {% if feature_enabled(\"read_aloud_review\") and not sent_version and send_summary and send_summary.sendable %}{% include \"features/read_aloud_review/_entry.html\" %}{% endif %}\n</section>",
+  "insert_only": false,
+  "reason": "UX recovery step 2: 'Where this package stands' is a closed Details (it repeats the case overview and the checks); 'What will be sent' moves, unchanged, to its own panel right above Approval"
+ },
+ {
+  "at": 310,
+  "id": "edit-ux3-6@line311",
+  "old": "",
+  "new": "{% if delivery_block_items and send_summary.approval_cleared and not sent_version %}\n<section class=\"panel\" data-state=\"approval-blocked-and-cleared\" role=\"alert\" aria-labelledby=\"approval-blocked-and-cleared-title\">\n  <h3 id=\"approval-blocked-and-cleared-title\">Approval is blocked until these delivery statements are corrected</h3>\n  <p>The approval for package v{{ package.version }} was cleared because the content changed. Approval applies only to the exact content reviewed; the earlier approval cannot be reused.</p>\n  <ul>{% for item in delivery_block_items %}<li><a href=\"#statements\">Review the statement and its source</a>: {{ item }}</li>{% endfor %}</ul>\n  <p>This block cannot be overridden. The original and extracted text are shown with each cited statement above.</p>\n  <p>Correct the statement above, review “What will be sent”, then approve again.</p>\n</section>\n{% elif delivery_block_items %}\n<section class=\"panel\" data-state=\"unsupported-delivery-approval-block\" role=\"alert\" aria-labelledby=\"delivery-approval-block-title\">\n  <h3 id=\"delivery-approval-block-title\">Approval is blocked until these delivery statements are corrected</h3>\n  <ul>{% for item in delivery_block_items %}<li><a href=\"#statements\">Review the statement and its source</a>: {{ item }}</li>{% endfor %}</ul>\n  <p>This block cannot be overridden. The original and extracted text are shown with each cited statement above.</p>\n</section>\n{% endif %}",
+  "insert_only": true,
+  "reason": "UX-04 / UX v3: approval-blocked-and-cleared and unsupported-delivery sections (unflagged, declared)"
+ },
+ {
+  "at": 318,
+  "id": "edit-18@line319",
+  "old": "<p data-state=\"send-withheld\">{% if send_state.state == \"result-uncertain\" %}A send of this content may already have reached PayPal, so there is no Send button until you use Check again and see what PayPal has.{% else %}This content cannot be sent as it is. Edit it (that makes a new version) and approve again.{% endif %}</p>",
+  "new": "<p data-state=\"send-withheld\">{% if send_state.state == \"result-uncertain\" %}A send of this content may already have reached PayPal, so there is no Send button until Check again shows what PayPal has.{% elif sent_version %}This version was sent to PayPal, so it cannot change.{% elif listed %}{{ once_per_dispute }}{% elif not offered %}{{ not_asking }}{% else %}This content cannot be sent as it is. Edit it (that makes a new version) and approve again.{% endif %}</p>",
+  "insert_only": false,
+  "reason": "the send-withheld sentence is shorter, says the rule while PayPal lists seller evidence and that PayPal is not asking when it offers no provide-evidence action"
+ },
+ {
+  "at": 320,
+  "id": "edit-ux3-7@line321",
+  "old": "{% elif send_summary.approval_cleared and not sent_version %}",
+  "new": "{% elif send_summary.approval_cleared and not sent_version and not delivery_block_items %}",
+  "insert_only": false,
+  "reason": "UX-04 / UX v3: cleared-approval panel does not duplicate the delivery block (unflagged, declared)"
+ },
+ {
+  "at": 322,
+  "id": "edit-43@line323",
+  "old": "  {% if send_summary.approval_stale %}<p>The content that would be sent no longer matches what you approved (for example the tracking number or an attachment changed). The old approval cannot be used. Review \"What will be sent\" above, then approve again.</p>\n  {% else %}<p>You approved an earlier version of this package. Approval is tied to the exact content, so it was cleared. Review what will be sent above, then approve again.</p>{% endif %}",
+  "new": "  {% if send_summary.approval_stale %}<p>The content that would be sent no longer matches what you approved (for example the tracking number or an attachment changed). The old approval cannot be used. {% if listed %}{{ once_per_dispute }}{% elif not offered %}{{ not_asking }}{% else %}Review \"What will be sent\" above, then approve again.{% endif %}</p>\n  {% else %}<p>You approved an earlier version of this package. Approval is tied to the exact content, so it was cleared. {% if listed %}{{ once_per_dispute }}{% elif not offered %}{{ not_asking }}{% else %}Review what will be sent above, then approve again.{% endif %}</p>{% endif %}",
+  "insert_only": false,
+  "reason": "the cleared-approval banner says the rule while PayPal lists seller evidence, 'not asking' when it offers no provide-evidence action"
+ },
+ {
+  "at": 328,
+  "id": "edit-32@line329",
+  "old": "",
+  "new": "{% set rc = resolution_center_link(resolution_center_name) %}",
+  "insert_only": true,
+  "reason": "the Resolution Center words in the first why-blocked step are a link"
+ },
+ {
+  "at": 329,
+  "id": "edit-19@line332",
+  "old": "  <summary>Sending is paused: an earlier send is not confirmed yet</summary>\n  <p>An earlier send for this dispute is not confirmed, because that send may already have reached PayPal. Proofie will not send again until you know.</p>\n  <p>1. Press Check again.</p>\n  <p>2. If PayPal still shows nothing, open this dispute in PayPal's Resolution Center.</p>\n  <p>3. If the earlier send is not there, tick the box and press Mark as not received.</p>\n  <form method=\"post\" action=\"{{ package_path }}/confirm-not-received\">",
+  "new": "  <summary>{% if listed %}{% if earlier_partial %}An earlier send reached PayPal without every file{% else %}An earlier send is not confirmed yet{% endif %}{% elif earlier_partial %}Sending is paused: an earlier send reached PayPal without every file{% else %}Sending is paused: an earlier send is not confirmed yet{% endif %}</summary>\n  {% if listed or not offered %}\n  <p>{% if earlier_partial %}An earlier send for this dispute reached PayPal, but not every file: when Proofie checked, PayPal showed its statements without them.{% else %}An earlier send for this dispute is not confirmed, because that send may already have reached PayPal.{% endif %} {% if listed %}{{ once_per_dispute }}{% else %}{{ not_asking }}{% endif %}</p>\n  <p>Check again only reads PayPal.</p>\n  {% else %}\n  {% if earlier_partial %}<p>An earlier send for this dispute reached PayPal, but not every file: when Proofie checked, PayPal showed its statements without them. Proofie will not send again until you know.</p>\n  {% else %}<p>An earlier send for this dispute is not confirmed, because that send may already have reached PayPal. Proofie will not send again until you know.</p>{% endif %}\n  {% if same_statements_pending %}\n  <p>1. Change a statement in this package (for example add one sentence).</p>\n  <p>2. Then open this dispute in {{ rc }}. {% if earlier_partial %}If the earlier send is incomplete there, tick the box and press Start a new submission. It has the same statements as this package, so it can be started only after step 1.{% else %}If the earlier send is not there, tick the box and press Mark as not received. It has the same statements as this package, so it can be marked only after step 1.{% endif %}</p>\n  <p>3. Then {% if earlier_partial %}press Send evidence to PayPal{% else %}send this package{% endif %}.</p>\n  {% else %}\n  <p>1. Press Check again.</p>\n  <p>2. Open this dispute in {{ rc }}.</p>\n  <p>3. If the earlier send is {% if earlier_partial %}incomplete there, tick the box and press Start a new submission, then press Send evidence to PayPal.{% else %}not there, tick the box and press Mark as not received.{% endif %}</p>\n  {% endif %}\n  <form method=\"post\" action=\"{{ package_path }}/confirm-not-received\" novalidate>",
+  "insert_only": false,
+  "reason": "the why-blocked block is one block per situation: the rule or 'not asking' without a tick box while no send is possible, the earlier way out otherwise"
+ },
+ {
+  "at": 337,
+  "id": "edit-33@line338",
+  "old": "      I checked PayPal's Resolution Center and the earlier send is not there. <strong class=\"field-mark\">Required</strong></label>\n    {{ button('Mark as not received', kind='secondary') }}",
+  "new": "      {% if earlier_partial %}I checked {{ rc }}. The earlier send is incomplete there, and I want to send this package as a new submission.{% else %}I checked {{ rc }} and the earlier send is not there.{% endif %} <strong class=\"field-mark\">Required</strong></label>\n    {{ button('Start a new submission' if earlier_partial else 'Mark as not received', kind='secondary') }}",
+  "insert_only": false,
+  "reason": "the tick box and the button read differently for an earlier send that reached PayPal without every file"
+ },
+ {
+  "at": 340,
+  "id": "edit-44@line341",
+  "old": "",
+  "new": "  {% endif %}",
+  "insert_only": true,
+  "reason": "the variant block of the why-blocked form is closed"
+ },
+ {
+  "at": 344,
+  "id": "edit-34@line345",
+  "old": "{% if feature_enabled(\"package_print\") %}<li><a href=\"/disputes/{{ dispute_id }}/packages/{{ package.id }}/print\">Print the evidence package</a></li>{% endif %}",
+  "new": "{% if feature_enabled(\"package_print\") %}<li><a href=\"/disputes/{{ dispute_id }}/packages/{{ package.id }}/print\">{{ 'Save a copy of what you sent' if sent_version else 'Print the evidence package' }}</a></li>{% endif %}",
+  "insert_only": false,
+  "reason": "a sent version links to a printable copy of what was sent"
+ },
+ {
+  "at": 348,
+  "id": "nfix-17@line349",
+  "old": "<details>",
+  "new": "<details id=\"package-technical\">",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 355,
+  "id": "nfix-18@line356",
+  "old": "",
+  "new": "<p><a href=\"#package-contents-title\" data-package-return>Back to package contents</a></p>\n</details>\n</div>\n<aside class=\"package-state-rail\" aria-label=\"Package state\">\n<section class=\"panel\" id=\"where-it-stands\" data-state=\"where-it-stands\">\n  <h2>Package state</h2>\n  <p class=\"package-chip\" data-state=\"package-chip\"><span class=\"b-label\">Package</span>{{ tag(chip.kind, chip.label) }} · v{{ package.version }}</p>\n  {% set states = check_rows|map(attribute='tag_state')|list %}\n  <p><span class=\"b-label\">Review</span>{% if step and step.key in ('review', 'review_approve') %}Ready to review{% elif approval %}Approval recorded{% else %}{{ step.title if step and step.title else chip.label }}{% endif %}</p>\n  {% if send_state.state == \"confirmed\" %}\n  {% if 'bad' in states or 'warn' in states %}<p class=\"hint\" data-state=\"checks-after-sending\">Checks run after sending: {{ 'a difference needs review' if 'bad' in states else 'some facts cannot be verified' }}. Nothing was re-sent.</p>{% endif %}\n  {% else %}<p><span class=\"b-label\">Attention</span>{{ tag('bad' if 'bad' in states else 'warn' if 'warn' in states else 'ok', 'Needs attention' if 'bad' in states else 'Some facts cannot be verified' if 'warn' in states else 'Checks complete') }}{% if step and step.key in ('review', 'review_approve') and ('bad' in states or 'warn' in states) %} <span class=\"hint\" data-state=\"review-vs-send\">Ready to review; check the groups below for missing, differing or unverifiable facts before sending.</span>{% endif %}</p>{% endif %}\n  <p data-state=\"{{ 'package-sent' if send_state.state == 'confirmed' else send_state.state }}\"><span class=\"b-label\">Sending</span>{{ tag('ok' if send_state.state == 'confirmed' else 'info' if send_state.state == 'approved' else 'todo', 'Sent to PayPal' if send_state.state == 'confirmed' else send_status) }}</p>\n  <p><a href=\"#shipment-fold\">Open shipment details</a></p>\n  <details data-state=\"where-it-stands-details\"><summary>What you still need to give, what is known and what PayPal confirmed</summary>\n  <h3>What you still need to give</h3>\n  <ul data-state=\"requirement-groups\">\n  {% for title, items in shipment_groups.items() if items %}\n    <li data-requirement-group=\"{{ title }}\"><strong>{{ title }} ({{ items|length }}):</strong> {% for label, has_value in items %}{{ tag('ok' if has_value else 'todo', label ~ (': has a value' if has_value else ': no value yet')) }}{% if not loop.last %} {% endif %}{% endfor %}</li>\n  {% endfor %}\n  </ul>\n  <h3>What is known, what is missing, what does not match</h3>\n  <ul>\n  {% for title, items in check_groups %}{% if items %}\n    <li data-check-group=\"{{ title }}\"><strong><a href=\"#check-{{ items[0].id }}\">{{ title }} ({{ items|length }})</a>:</strong> {% for c in items %}<a href=\"#check-{{ c.id }}\">{{ check_labels[c.id] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}\n      {% if not sent_version %}{% if title == \"Missing\" %}&middot; <a href=\"#shipment-details\">Type the details</a> or <a href=\"/disputes/{{ dispute_id }}/workspace/prepare#documents\">add a document</a>\n      {% elif title == \"Does not match\" %}&middot; <a href=\"#check-{{ items[0].id }}\">Review the difference</a>\n      {% elif title == \"Present, but Proofie cannot verify\" %}&middot; <a href=\"#shipment-details\">Type the details</a>{% endif %}{% endif %}</li>\n  {% endif %}{% endfor %}\n  </ul>\n  <h3>What PayPal confirmed</h3>\n  {% if send_state.state == \"confirmed\" %}<p data-state=\"paypal-confirmed\">{{ send_status }}</p>\n  {% if send_summary.current_confirmation %}<p data-state=\"readback-confirmed\">Confirmed by reading the dispute back from PayPal at {{ send_summary.current_confirmation|when }}.</p>{% endif %}\n  {% elif send_state.state == \"later-file\" %}<p data-state=\"paypal-confirmed\">PayPal confirmed the statements of this version. {{ later.text }}</p>\n  {% elif send_state.state == \"partial\" %}<p data-state=\"paypal-confirmed-partial\">When Proofie checked, PayPal showed your statements without {{ record.missing_files|join(\", \") if record.missing_files else \"every file\" }}.</p>\n  {% elif send_state.state == \"result-uncertain\" %}<p data-state=\"paypal-confirmed-none\">PayPal has not confirmed this content yet: the result is still unknown. Use Check again.</p>\n  {% else %}<p data-state=\"paypal-confirmed-none\">PayPal has not confirmed anything for this content.</p>{% endif %}",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ },
+ {
+  "at": 355,
+  "id": "edit-pk1@line356",
+  "old": "",
+  "new": "  {%- if record and record.readback %}{% include \"_paypal_record.html\" ignore missing %}{% endif %}",
+  "insert_only": true,
+  "reason": "rc4.3 hook: what PayPal listed after the send (SendRecord.readback), shown beside What PayPal confirmed; renders nothing until the record carries a read-back, and the leading dash keeps the page byte-identical"
+ },
+ {
+  "at": 355,
+  "id": "nfix-19@line356",
+  "old": "",
+  "new": "  </details>\n</section>\n</aside>\n</div>\n{% set b_record = record %}{% include \"case/_package_sending_status.html\" %}",
+  "insert_only": false,
+  "reason": "NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+ }
+]

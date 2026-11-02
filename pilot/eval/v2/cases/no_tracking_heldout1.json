@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "no_tracking_heldout1",
+ "type": "no_tracking",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0013",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 39000,
+  "amount_display": "390.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000013"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1013\nFecha del pedido: 2026-10-02 10:10\nTotal pagado: 390.00 MXN\nID de captura PayPal: EV2CAPTURE0000013",
+  "doc_chat": "[2026-10-03 09:00] Vendedor: Ya lo envié por Estafeta, llega en tres días.\n[2026-10-03 09:20] Comprador: ¿me pasas la guía?\n[2026-10-03 09:25] Vendedor: luego te la paso"
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_chat": "chat_comprador.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "tracking",
+    "any_of": [
+     "tracking",
+     "guía",
+     "guia",
+     "waybill"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "The seller names the carrier but never gives the guía."
+}

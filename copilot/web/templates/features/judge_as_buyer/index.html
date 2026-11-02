@@ -1,0 +1,16 @@
+{% extends "_base.html" %}
+{% from "_components.html" import button %}
+{% block title %}Judge as buyer - Proofie{% endblock %}
+{% block content %}
+<h1>Open the case as the sandbox buyer</h1>
+<p><strong>Next step:</strong> follow the numbered steps below in your own PayPal Sandbox buyer account, then refresh All disputes. If you ran the setup script from this project folder, its capture IDs are already known here and there is nothing to paste.</p>
+<p>This is a human-operated guide for your own PayPal Sandbox accounts. Proofie does not sign in, open a dispute, or send anything on the buyer's behalf.</p>
+<ol>{% for step in guide %}<li><h2>{{ step.title }}</h2><p>{{ step.text }}</p>{% if step.url %}<p><a href="{{ step.url }}" target="_blank" rel="noopener">Open PayPal Sandbox</a></p>{% endif %}</li>{% endfor %}</ol>
+<section class="panel"><h2>Match this seed run in the dispute queue</h2>
+<p>The IDs come from the setup script's state file in <code>data/sandbox-seed</code>; only if you ran it elsewhere, copy one or both 17-character capture IDs from its output. Proofie compares exact IDs only; this local note does not verify a PayPal account or make a dispute.</p>
+{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+{% if captures %}<p>Saved seed capture IDs: {% for value in captures %}<code>{{ value }}</code>{% if not loop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+<form method="post" action="/features/judge_as_buyer/seed-captures"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><label for="capture-ids">Seed capture IDs (one per line)</label><textarea id="capture-ids" name="capture_ids" maxlength="40" required></textarea>{{ button("Save local seed IDs") }}</form>
+</section>
+<p>The queue marker is based on a matching seller transaction ID. Its timer uses the dispute creation time returned by PayPal and, when available, the confirmed send read-back recorded by Proofie.</p>
+{% endblock %}

@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "irrelevant_docs_dev2",
+ "type": "irrelevant_docs",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0022",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 64000,
+  "amount_display": "640.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000022"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1022\nFecha del pedido: 2026-10-01 12:30\nTotal pagado: 640.00 MXN\nID de captura PayPal: EV2CAPTURE0000022",
+  "doc_invoice": "Factura de proveedor\nConcepto: 20 tazas de cerámica para inventario\nFecha: 2026-09-15\nImporte: 2,400.00 MXN"
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_invoice": "factura_proveedor.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "tracking",
+    "any_of": [
+     "tracking",
+     "guía",
+     "guia",
+     "waybill"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "The seller's own purchase invoice is unrelated to this shipment."
+}

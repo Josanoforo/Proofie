@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "no_tracking_heldout2",
+ "type": "no_tracking",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0014",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 12000,
+  "amount_display": "120.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000014"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1014\nOrder date: 2026-09-30 14:00\nTotal paid: 120.00 USD\nPayPal capture id: EV2CAPTURE0000014",
+  "doc_pickup": "DHL pickup confirmation\nPickup scheduled: 2026-10-01 between 13:00 and 17:00\nPieces: 1\nShipment reference: TS-EV2-1014"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_pickup": "dhl_pickup.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "tracking",
+    "any_of": [
+     "tracking",
+     "guía",
+     "guia",
+     "waybill"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "A pickup booking with the order reference, but no waybill number."
+}

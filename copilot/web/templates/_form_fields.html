@@ -1,0 +1,72 @@
+{# Form components. Every form that re-renders an error summary carries
+   novalidate on its <form> (the browser's own bubbles would hide the summary); the summary is the one place the
+   problems are listed, each entry links to its field. #}
+{% from "_components.html" import field_error %}
+{% macro error_summary(errors, date_fields=[]) -%}
+{% if errors %}<section class="error-summary" role="alert" tabindex="-1" autofocus aria-labelledby="error-summary-title">
+<h2 id="error-summary-title"><span aria-hidden="true">✕</span> There is a problem</h2>
+<ul>{% for key, message in errors.items() %}<li><a href="#field-{{ key }}">{{ message }}</a></li>{% endfor %}</ul>
+</section>{% endif %}
+{%- endmacro %}
+
+{# The convention sentence appears once per form, and only where it helps: two or more fields and at least one Required. #}
+{% macro required_note(field_count, has_required) -%}
+{% if field_count >= 2 and has_required %}<p class="form-convention">Fields marked Required must be completed.</p>{% endif %}
+{%- endmacro %}
+
+{% macro date_fields(name, label, current='', values={}, errors={}, marking='', description='') -%}
+{# One native date control (type="date"): it submits YYYY-MM-DD in the field `name`. The id stays field-<name>. #}
+<div class="field date-field">
+<label for="field-{{ name }}">{{ label }}{% if marking %} <strong class="field-mark">{{ marking }}</strong>{% endif %}</label>
+<p class="field-hint" id="hint-{{ name }}">{{ description }}{% if description %} {% endif %}Pick the date in the calendar, or type it.</p>
+{% if errors.get(name) %}{{ field_error('error-' ~ name, errors[name]) }}{% endif %}
+<input type="date" id="field-{{ name }}" name="{{ name }}" value="{{ values.get(name, current) }}" aria-describedby="hint-{{ name }}{% if errors.get(name) %} error-{{ name }}{% endif %}"{% if errors.get(name) %} aria-invalid="true"{% endif %}>
+{% if current %}<p>Saved date: <time datetime="{{ current }}">{{ current|datewords }}</time></p>{% endif %}
+</div>
+{%- endmacro %}
+
+{# One labelled field: label, hint (optionally with a Spanish gloss), the field message once, then the control.
+   mark is the visible words ('Required', 'Required to send', 'Optional'); a mark containing Required sets aria-required.
+   Textareas are full width and never carry maxlength. width: 'w10' | 'w20' narrows a text input. #}
+{% macro field(name, label, value='', hint=None, mark=None, error=None, textarea=False, rows=8, type='text', inputmode=None, autocomplete=None, spellcheck=None, hint_es=None, width=None, autocapitalize=None) -%}
+{% set described = (['hint-' ~ name] if (hint or hint_es) else []) + (['error-' ~ name] if error else []) %}
+<div class="field">
+<label for="field-{{ name }}">{{ label }}{% if mark %} <strong class="field-mark">{{ mark }}</strong>{% endif %}</label>
+{% if hint or hint_es %}<p class="field-hint" id="hint-{{ name }}">{{ hint }}{% if hint and hint_es %} {% endif %}{% if hint_es %}<span lang="es" class="hint-es">{{ hint_es }}</span>{% endif %}</p>{% endif %}
+{% if error %}{{ field_error('error-' ~ name, error) }}{% endif %}
+{% if textarea -%}
+<textarea id="field-{{ name }}" name="{{ name }}" rows="{{ rows }}"{% if described %} aria-describedby="{{ described|join(' ') }}"{% endif %}{% if error %} aria-invalid="true"{% endif %}{% if mark and 'Required' in mark %} aria-required="true"{% endif %}{% if spellcheck %} spellcheck="{{ spellcheck }}"{% endif %}>{{ value }}</textarea>
+{%- else -%}
+<input type="{{ type }}" id="field-{{ name }}" name="{{ name }}" value="{{ value }}"{% if width in ('w10', 'w20') %} class="input-{{ width }}"{% endif %}{% if inputmode %} inputmode="{{ inputmode }}"{% endif %}{% if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}{% if autocapitalize %} autocapitalize="{{ autocapitalize }}"{% endif %}{% if spellcheck %} spellcheck="{{ spellcheck }}"{% endif %}{% if described %} aria-describedby="{{ described|join(' ') }}"{% endif %}{% if error %} aria-invalid="true"{% endif %}{% if mark and 'Required' in mark %} aria-required="true"{% endif %}>
+{%- endif %}
+</div>
+{%- endmacro %}
+
+{# Carrier first, tracking number second, on every form. #}
+{% macro carrier_field(current='', other_name='', error=None, other_error=None, mark='Required to send') -%}
+{% set codes = CARRIER_OPTIONS|map(attribute=0)|list %}
+{% set described = ['hint-carrier'] + (['error-carrier'] if error else []) %}
+<div class="field">
+<label for="field-carrier">Carrier (shipping company) <strong class="field-mark">{{ mark }}</strong></label>
+<p class="field-hint" id="hint-carrier">The company that delivers the parcel, for example FedEx, DHL, Estafeta or UPS. <span lang="es" class="hint-es">Paquetería o empresa transportista.</span></p>
+{% if error %}{{ field_error('error-carrier', error) }}{% endif %}
+<select id="field-carrier" name="carrier" aria-describedby="{{ described|join(' ') }}"{% if error %} aria-invalid="true"{% endif %}{% if mark and 'Required' in mark %} aria-required="true"{% endif %}>
+<option value=""{% if not current %} selected{% endif %}>Choose the shipping company</option>
+{%- if current and current not in codes %}
+<option value="{{ current }}" selected>Your entry: {{ current }}</option>
+{%- endif %}
+{%- for code, name in CARRIER_OPTIONS %}
+<option value="{{ code }}"{% if current == code %} selected{% endif %}>{{ name }}</option>
+{%- endfor %}
+</select>
+</div>
+<div class="field">
+<label for="field-carrier_other_name">Carrier name (only if you chose Other carrier)</label>
+{% if other_error %}{{ field_error('error-carrier_other_name', other_error) }}{% endif %}
+<input type="text" id="field-carrier_other_name" name="carrier_other_name" value="{{ other_name }}" autocomplete="off"{% if other_error %} aria-describedby="error-carrier_other_name" aria-invalid="true"{% endif %}>
+</div>
+{%- endmacro %}
+
+{% macro tracking_field(value='', error=None, mark='Required to send') -%}
+{{ field('tracking_number', "Tracking number (from the carrier's receipt)", value, hint="The code on the carrier's receipt or tracking page, usually letters and digits. It is not the company name. Spaces are removed for you.", hint_es='También llamado número de guía o número de rastreo.', mark=mark, error=error, spellcheck='false', autocomplete='off', autocapitalize='off', width='w20') }}
+{%- endmacro %}

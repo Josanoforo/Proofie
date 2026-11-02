@@ -1,0 +1,64 @@
+{% extends "_base.html" %}
+{% from "_components.html" import link_button, post_button, breadcrumbs, exact_content, tag %}
+{% set is_offer = row.action == 'offer' %}
+{% set noun = 'offer' if is_offer else 'message' %}
+{% set status_view = message_status(row) %}
+{% set headline = {'sent_pending_settle': 'PayPal answered OK; not listed yet',
+                   'sent_confirmed': 'Refund offer sent to PayPal' if is_offer else 'Message sent to the buyer',
+                   'sent_unconfirmed': 'Send attempted - not confirmed by PayPal'}.get(row.status, status_view.label) %}
+{% set absent = row.status == 'sent_unconfirmed' and not is_offer and readback.get('message_absent') and readback.get('checked_at') %}
+{% set released = absent and readback.get('released') %}
+{% set refused = row.status in ('failed', 'refused_422') %}
+{# The past-tense note only where PayPal answered that it took the request (accepted or confirmed). A refused row
+   was not sent, and an unconfirmed one may not be in PayPal: neither says "as PayPal received it". #}
+{% set received = row.status in ('sent_pending_settle', 'sent_confirmed') %}
+{# A refused row says "tried to send", an unconfirmed one "sent" (the request left Proofie; PayPal has not confirmed it). #}
+{% set exact_state = 'refused' if refused else 'attempted' %}
+{% block title %}{{ headline }}: {{ dispute_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('Resolution options and buyer messages', '/disputes/' ~ dispute_id ~ '/resolution'), ('Send result' if refused else ('Offer sent' if is_offer else 'Message sent'), None)]) }}{% endblock %}
+{% block content %}
+<h1>{{ headline }}</h1>
+<section id="sent" data-state="sent" data-status="{{ row.status }}" data-action="{{ row.action }}">
+<p data-state="sent-status">{{ tag(status_view.kind, status_view.label) }}</p>
+{% if checked_note %}<p class="notice" data-state="checked-note">{{ checked_note }}</p>{% endif %}
+{% if refused %}
+<p data-state="sent-evidence">Proofie tried to send this at {{ row.created_at|when }}. PayPal refused it, so nothing was sent. Proofie sends nothing on its own; you can review it and send it again.</p>
+{% elif row.status == 'sent_confirmed' and not is_offer and readback.get('message_listed') is true %}
+<p data-state="sent-evidence">PayPal lists your message{% if readback.get('checked_at') %} (read at {{ readback.get('checked_at')|when }}){% endif %}.{% if (readback.get('message_count') or 0) > 1 %} PayPal shows {{ readback.get('message_count') }} messages from you with this text.{% endif %}</p>
+{% elif row.status == 'sent_confirmed' and not is_offer %}
+<p data-state="sent-evidence">Confirmed by reading the dispute back. Proofie did not check whether PayPal lists this message.</p>
+{% elif row.status == 'sent_confirmed' %}
+<p data-state="sent-evidence">PayPal no longer shows the refund-offer option for this dispute{% if readback.get('checked_at') %} (read at {{ readback.get('checked_at')|when }}){% endif %}.</p>
+{% elif row.status == 'sent_pending_settle' %}
+<p data-state="sent-evidence">PayPal answered OK; not listed yet. PayPal is still updating this dispute.</p>
+{% elif released %}
+<p data-state="sent-evidence">PayPal does not list this message {{ readback.get('minutes_after_send') }} minutes after it was sent. You can prepare it again; nothing is sent automatically.</p>
+{% elif absent %}
+<p data-state="sent-evidence">PayPal does not list this message yet. Proofie will not send it again; check again later.</p>
+{% elif row.status == 'sent_unconfirmed' %}
+<p data-state="sent-evidence">Proofie will not send it again on its own.</p>
+{% endif %}
+{% if readback.get('checked_at') and row.status != 'sent_confirmed' %}<p data-state="last-checked">Last checked with PayPal at {{ readback.get('checked_at')|when }}.</p>{% endif %}
+{% if not refused %}<p data-state="sent-time">Sent from Proofie at {{ row.created_at|when }}.</p>{% endif %}
+<div class="actions">
+{% if refused %}{{ link_button('/disputes/' ~ dispute_id ~ '/resolution', 'Back to resolution options', kind='secondary') }}{% endif %}
+{% if row.status != 'sent_confirmed' and not refused and not released %}{{ post_button('/disputes/' ~ dispute_id ~ '/resolution/check', 'Check PayPal again', csrf_token, fields=[('row_id', row.id)], sending='Checking PayPal…') }}{% endif %}
+{% if released %}{{ post_button('/disputes/' ~ dispute_id ~ '/resolution/preview', 'Prepare it again', csrf_token, fields=[('action', 'message'), ('text', text)]) }}{% endif %}
+</div>
+{% if row.status != 'sent_confirmed' and not refused and not released %}<p class="action-note">{{ READS_ONLY_NOTE }}</p>{% endif %}
+{% if not refused %}<p>What happens next: the buyer can reply in PayPal. Proofie sends nothing else.</p>{% endif %}
+</section>
+<section data-state="sent-record">
+<h2>{% if refused %}What Proofie tried to send{% else %}What you sent (Proofie's record){% endif %}</h2>
+{% if is_offer %}
+{% if offer %}<p><strong>Offer:</strong> {{ offer.value }} {{ offer.currency }}</p>
+<p><strong>Note to the buyer:</strong></p>
+{% call exact_content(sent=received, state=exact_state) %}{{ offer.note }}{% endcall %}{% endif %}
+{% else %}
+{% call exact_content(sent=received, state=exact_state) %}{{ text }}{% endcall %}
+{% if origin %}<p><strong>Where this text came from:</strong> {{ origin }}</p>{% endif %}
+{% endif %}
+</section>
+{% if hosted_demo() %}<p>This demo shares one PayPal sandbox account: what you send is visible to everyone who opens it.</p>{% endif %}
+<p>{{ link_button('/disputes/' ~ dispute_id, 'Return to dispute ' ~ dispute_id) }}</p>
+{% endblock %}

@@ -1,0 +1,136 @@
+{
+  "_synthetic": "SYNTHETIC / DEMO DATA - fictitious people, addresses and tracking numbers; none resolve with a real carrier.",
+  "case": "v_seller_declared_address",
+  "description": "PayPal returns no shipping address; the seller declares one.",
+  "today": "2026-10-04",
+  "dispute_norm": {
+    "dispute_id": "PP-D-DEMO-0001",
+    "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+    "status": "WAITING_FOR_SELLER_RESPONSE",
+    "stage": "INQUIRY",
+    "amount_cents": 450000,
+    "currency": "MXN",
+    "seller_transaction_ids": [
+      "DEMOTXN0000000001"
+    ],
+    "create_time": "2026-09-25T16:00:00Z",
+    "evidence_requested_from_seller": [
+      "PROOF_OF_FULFILLMENT"
+    ],
+    "evidence_submitted_by_seller": []
+  },
+  "paypal": {
+    "transactions": {
+      "transaction_details": [
+        {
+          "transaction_info": {
+            "transaction_id": "DEMOTXN0000000001",
+            "transaction_initiation_date": "2026-09-10T15:00:00+0000",
+            "transaction_amount": {
+              "currency_code": "MXN",
+              "value": "4500.00"
+            }
+          },
+          "shipping_info": {
+            "name": "Ana Demo Ficticia"
+          }
+        }
+      ],
+      "total_items": 1
+    },
+    "trackers": {
+      "trackers": [
+        {
+          "transaction_id": "DEMOTXN0000000001",
+          "tracking_number": "DEMO-FDX-000001",
+          "carrier": "FEDEX",
+          "status": "DELIVERED"
+        }
+      ]
+    }
+  },
+  "seller_statement": {
+    "shipping_address": {
+      "postal_code": "06600",
+      "city": "Ciudad de Mexico",
+      "state": "CDMX",
+      "line1": "Calle Falsa 123"
+    }
+  },
+  "docs": [
+    {
+      "doc_id": "doc_fedex_letter",
+      "text_file": "doc_fedex_letter.txt",
+      "fields": {
+        "tracking_number": {
+          "value": "DEMO-FDX-000001",
+          "confidence": "read"
+        },
+        "carrier": {
+          "value": "FedEx",
+          "confidence": "read"
+        },
+        "delivery_status": {
+          "value": "Entregado",
+          "confidence": "read"
+        },
+        "delivery_date": {
+          "value": "2026-09-14",
+          "confidence": "read"
+        },
+        "ship_date": {
+          "value": "2026-09-11",
+          "confidence": "read"
+        },
+        "postal_code": {
+          "value": "06600",
+          "confidence": "read"
+        },
+        "city": {
+          "value": "Ciudad de México",
+          "confidence": "read"
+        },
+        "state": {
+          "value": "CDMX",
+          "confidence": "read"
+        },
+        "street": {
+          "value": "Calle Falsa 123 Col Demo",
+          "confidence": "read"
+        },
+        "receiver_name": {
+          "value": "Ana Demo",
+          "confidence": "read"
+        },
+        "signature": {
+          "value": "online",
+          "confidence": "read"
+        },
+        "delivery_type": {
+          "value": "home",
+          "confidence": "read"
+        },
+        "capture_date": {
+          "value": "2026-09-30",
+          "confidence": "read"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "tracking_number": "verified",
+    "carrier": "verified",
+    "delivery_status": "verified",
+    "delivery_date": "verified",
+    "dates_coherent": "verified",
+    "destination": "present_unverifiable",
+    "full_address": "present_unverifiable",
+    "signature": "not_applicable",
+    "receiver_name": "verified",
+    "capture_date": "verified",
+    "branch_pickup": "not_applicable",
+    "document_integrity": "verified",
+    "case_request:PROOF_OF_FULFILLMENT": "missing"
+  },
+  "expected_risk": []
+}

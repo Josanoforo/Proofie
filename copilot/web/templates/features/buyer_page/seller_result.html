@@ -1,0 +1,9 @@
+{% extends "_base.html" %}
+{% block title %}Buyer page proposal - Proofie{% endblock %}
+{% block content %}
+<h1>Buyer page link created</h1>
+<p>The link is a proposal. Copy it only after reviewing the page. Proofie has not sent it to the buyer or to PayPal.</p>
+<p><a href="{{ buyer_url }}">Open buyer page</a></p><p><code>{{ buyer_url }}</code></p>
+{% if error %}<p role="status">{{ error }}</p>{% endif %}
+<p><a href="/disputes/{{ dispute_id }}">Return to this case</a></p>
+{% endblock %}

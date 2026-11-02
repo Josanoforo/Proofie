@@ -1,0 +1,70 @@
+{% extends "_base.html" %}
+{% from "_components.html" import tag, button, post_button, breadcrumbs, limitation_text %}
+{% block title %}{{ page_name }}: {{ dispute_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), (page_name, None)]) }}{% endblock %}
+{% block content %}{% set rc3_reviewing = feature_enabled("outcome") and read.stage == "CHARGEBACK" and read.status == "UNDER_REVIEW" %}{% if feature_enabled("outcome") %}{% with rc3_norm = read %}{% include "features/outcome/_review_notice.html" %}{% endwith %}{% endif %}
+<h1>{{ page_name }}: <span class="h1-id" translate="no">{{ dispute_id }}</span></h1>
+<h2>What PayPal recorded as the outcome</h2>
+<p data-state="outcome-sentence" data-decided="{{ 'yes' if read.decided else 'no' }}">{{ tag('info',view.sentence) }}</p>
+{% if read.status %}
+<table data-state="outcome-fields" class="stack">
+  <caption class="visually-hidden">What PayPal recorded</caption>
+  <tr><th scope="row">Stage</th><td>{{ stage_label(read.stage) }}</td></tr>
+  <tr><th scope="row">Status</th><td>{{ tag(state_kind(read.status),state_label(read.status)) }}</td></tr>
+  <tr><th scope="row">Amount refunded</th><td class="num">{{ read.refunded_text or "Not returned by PayPal" }}</td></tr>
+  <tr><th scope="row">Seller response due</th><td>{% if not read.seller_response_due_date %}Not returned by PayPal{% elif (read.seller_response_due_date|when_text) == "Not available" %}No verified deadline available{% else %}{{ read.seller_response_due_date|when }}{% endif %}</td></tr>
+</table>
+<details><summary>Technical details</summary><p>Stage {{ read.stage or "not returned" }}; status {{ read.status }}; outcome {{ read.outcome_code or "none" }}; links {{ read.links|join(", ") or "none" }}.</p></details>
+{% endif %}
+{% if view.appeal_sentence %}<p data-state="appeal-sentence">{{ view.appeal_sentence }}</p>{% endif %}
+{% if read.limitations %}<ul class="outcome-limitations" data-state="limitations">{% for lim in read.limitations %}<li>{{ limitation_text(lim) }}</li>{% endfor %}</ul>{% endif %}
+{% include "features/outcome/_sent.html" %}
+{% if not buyer_closed %}{% include "features/outcome/_gaps.html" %}{% endif %}
+{% if feature_enabled("appeal_workspace") %}
+<section class="panel" id="appeal-workspace" data-state="integrated-appeal-workspace">
+<h2>Evidence change review for this outcome</h2>
+{% if appeal_workspace_error %}<p role="alert">{{ appeal_workspace_error }}</p>
+{% elif appeal_workspace %}
+{% include "features/appeal_workspace/_recovery.html" %}
+<h3>Recorded outcome facts</h3><dl><dt>Status</dt><dd>{{ appeal_workspace.recorded_outcome.status }}</dd><dt>Outcome code</dt><dd>{{ appeal_workspace.recorded_outcome.code }}</dd><dt>Source</dt><dd>{{ appeal_workspace.recorded_outcome.source }}</dd></dl>
+<h3>Seller interpretation</h3><p>{{ appeal_workspace.interpretation }}</p>
+<h3>The package as it was sent</h3>
+{% if appeal_workspace.original_package %}<p>Confirmed package v{{ appeal_workspace.original_package.version }} (ID {{ appeal_workspace.original_package.id }}). Package fingerprint <code>{{ appeal_workspace.original_snapshot_sha256 }}</code>. Attachment hashes come from the package record; current source bytes are assessed separately.</p>
+{% else %}<p data-state="appeal-original-unknown">The evidence that was originally sent is unknown: {{ appeal_workspace.unavailable_sources[0].status if appeal_workspace.unavailable_sources else 'no confirmed package was matched' }}.</p>{% endif %}
+{% if appeal_workspace.proposed_evidence %}<h3>Current case evidence and exact content delta</h3><table><caption class="visually-hidden">Current case evidence compared with the package as it was sent</caption><thead><tr><th>Document</th><th>Content SHA-256</th><th>Comparison</th><th>Source</th></tr></thead><tbody>{% for row in appeal_workspace.proposed_evidence %}{% set source = appeal_workspace.sources|selectattr('source_id','equalto',row.source_id)|first %}<tr><td>{{ row.name }}</td><td><code>{{ row.sha256 }}</code></td><td>{{ row.delta }}{% if row.same_content_as %}; matches original {{ row.same_content_as }}{% endif %}</td><td>{{ source.label if source else row.source_id }} — {{ source.status if source else 'source status unavailable' }}</td></tr>{% endfor %}</tbody></table>{% else %}<p>No current case documents with readable original bytes are available for comparison.</p>{% endif %}
+{% if appeal_workspace.unavailable_sources %}<h3>Sources unavailable for comparison</h3><ul>{% for row in appeal_workspace.unavailable_sources %}<li>{{ row.name }} — {{ row.status }}</li>{% endfor %}</ul>{% endif %}
+<h3>Recorded action and status</h3><p>{{ appeal_workspace.reason }}</p><p>{% if appeal_workspace.appeal_preview_allowed %}A local comparison preview is available for review. This does not determine appeal eligibility and does not prepare or send an appeal.{% else %}No appeal proposal is available from the current recorded outcome/action facts.{% endif %}</p>
+<p><small>{{ appeal_workspace.source_label }}. A hash comparison shows byte identity only; it does not prove authenticity or relevance.</small></p>
+{% endif %}
+</section>
+{% endif %}
+<h2>Appeal</h2>
+{% if result %}
+<p data-state="appeal-result" data-status="{{ result.status }}">{{ tag(state_kind(result.status),result_text) }}</p>
+{% endif %}
+{% if not appeal_enabled %}
+<p class="notice" data-state="appeal-off">The appeal call is switched off in this installation. If PayPal offers an appeal link, use it in PayPal.</p>
+{% elif view.appeal_allowed %}
+{% if preview %}{% include "features/outcome/_appeal_preview.html" %}{% endif %}
+{% if packages %}
+<form method="post" action="/disputes/{{ dispute_id }}/outcome/appeal/preview" data-state="appeal-form" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="field">
+    <label for="appeal-package">Package to appeal with</label>
+    <select id="appeal-package" name="package_id" required>{% for p in packages %}<option value="{{ p.id }}">v{{ p.version }} ({{ p.created_at|when_text }})</option>{% endfor %}</select>
+  </div>
+  <p class="actions">{{ button("Review the appeal", kind="secondary") }}</p>
+</form>
+{% else %}<p>No package exists for this dispute yet.</p>{% endif %}
+{% else %}
+<p data-state="appeal-unavailable">PayPal does not offer an appeal now.</p>
+{% endif %}
+{% if appeal_enabled and view.appeals %}
+<h3>Appeal attempts</h3>
+<table data-state="appeal-history" class="stack">
+  <caption class="visually-hidden">Appeal attempts</caption>
+  <thead><tr><th scope="col">When</th><th scope="col">Result</th></tr></thead>
+  {% for a in view.appeals %}<tr><td data-label="When">{{ a.created_at|when }}</td><td data-label="Result">{{ tag(state_kind(a.status),state_label(a.status)) }}<details><summary>Technical details</summary><p>{{ a.status }} <code>{{ a.request_sha256 }}</code></p></details></td></tr>{% endfor %}
+</table>
+{% endif %}
+{% endblock %}

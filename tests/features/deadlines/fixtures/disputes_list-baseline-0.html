@@ -1,0 +1,50 @@
+{% extends "_base.html" %}
+{% from "_components.html" import banner, checked_bar %}
+{% block title %}Disputes{% endblock %}
+{# Refresh by itself every 10 s, only while a draft is being prepared. No script. #}
+{% block head_extra %}{% if rows | selectattr("auto_prep") | selectattr("auto_prep.status", "equalto", "preparing") | list %}<meta http-equiv="refresh" content="10">{% endif %}{% endblock %}
+{% block content %}
+<h1>Disputes</h1>
+{% if account_cliff %}{% include "features/account_cliff/_line.html" %}{% endif %}
+{{ checked_bar(checked_at, "/disputes", "Refresh from PayPal") }}
+
+{% if rows|length == 0 %}
+{% call banner("info", "empty", "No disputes need your attention right now") %}
+  <p>PayPal returned no disputes for this account when it was checked at {{ checked_at }}. Nothing was changed.</p>
+  <p data-state="empty-guide">New here? Proofie reads the disputes of your own PayPal sandbox account. To try it, create an "item not received" dispute by hand in the sandbox: the step-by-step guide is in the repository, <code>docs/JUDGE-RUN.md</code>, step 3. A new dispute can take a few minutes to appear here.</p>
+  <p class="actions"><a class="btn" href="/disputes">Check PayPal again</a></p>
+{% endcall %}
+{% else %}
+{% set preparing = rows | selectattr("auto_prep") | selectattr("auto_prep.status", "equalto", "preparing") | list %}
+{% if preparing %}
+{% call banner("info", "preparing", "Preparing draft(s) in the background") %}
+  <p>{{ preparing|length }} draft(s) are being prepared. Nothing is approved or sent automatically; the draft only appears when it is ready.</p>
+  <p class="actions"><a href="/disputes">Reload to see progress</a></p>
+{% endcall %}
+{% endif %}
+<table class="stack" data-table="inbox">
+<thead><tr><th>Dispute</th><th>Reason</th><th>Status</th><th>Amount</th><th>Due</th><th>Draft</th></tr></thead>
+<tbody>
+{% for row in rows %}
+<tr data-dispute="{{ row.norm.dispute_id }}">
+  <td data-label="Dispute"><a class="mono-id" href="/disputes/{{ row.norm.dispute_id }}">{{ row.norm.dispute_id }}</a></td>
+  <td data-label="Reason">{{ row.reason_text }}</td>
+  <td data-label="Status"><span class="chip">{{ row.status_text }}</span></td>
+  <td data-label="Amount">{{ row.norm.amount_display or "—" }} {{ row.norm.currency or "" }}</td>
+  <td data-label="Due">{{ row.deadline_text }}</td>
+  <td data-label="Draft" data-draft-state="{{ row.auto_prep.status if row.auto_prep else 'none' }}">
+    {% if not row.auto_prep %}{% if row.norm.status == "WAITING_FOR_SELLER_RESPONSE" %}No draft yet. Open the dispute to start.{% else %}Nothing to do now: PayPal is not waiting for you.{% endif %}
+    {% elif row.auto_prep.status == "preparing" %}Preparing… <a href="/disputes">Reload to see progress</a>
+    {% elif row.auto_prep.status == "ready" and row.auto_prep.has_claims %}<a href="/disputes/{{ row.norm.dispute_id }}/packages/{{ row.auto_prep.package_id }}">Draft ready — review</a>
+    {% elif row.auto_prep.status == "ready" %}<a href="/disputes/{{ row.norm.dispute_id }}/packages/{{ row.auto_prep.package_id }}">Draft started — add details</a>
+    {% elif row.auto_prep.status == "needs_documents" %}Needs documents: {{ row.auto_prep.detail }} <a href="/disputes/{{ row.norm.dispute_id }}#documents">Upload a document</a>
+    {% else %}Could not prepare automatically — <a href="/disputes/{{ row.norm.dispute_id }}#package">start manually</a>
+    {% endif %}
+  </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<p class="checked-at">Everything above was read from PayPal (read-only). {{ pages }} page(s) read.</p>
+{% endif %}
+{% endblock %}

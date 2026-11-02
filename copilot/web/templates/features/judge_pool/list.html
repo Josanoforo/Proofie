@@ -1,0 +1,18 @@
+{% extends "_base.html" %}
+{% block title %}Cases ready for you - Proofie{% endblock %}
+{% block content %}
+<h1>Cases ready for you</h1>
+{% if ready %}
+<p>Pick one case. It is yours for two hours. Everything happens in PayPal's sandbox with fictitious data.</p>
+{% else %}
+<p role="status" data-state="pool-empty">{{ empty }}</p>
+{% endif %}
+{% if rows %}
+<ul class="fix-list" data-state="pool-cases">
+{% for r in rows %}
+  <li>{% if r.pickable %}<a href="/judge/cases/{{ r.dispute_id }}">{{ r.dispute_id }}</a>{% else %}{{ r.dispute_id }}{% endif %} - {{ r.label }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+<p><a href="/disputes">All disputes</a></p>
+{% endblock %}

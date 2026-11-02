@@ -1,0 +1,42 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "sufficient_coherent_dev2",
+ "type": "sufficient_coherent",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0002",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 85000,
+  "amount_display": "850.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000002"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1002\nFecha del pedido: 2026-09-27 18:30\nTotal pagado: 850.00 MXN\nID de captura PayPal: EV2CAPTURE0000002",
+  "doc_guia": "Paquetería: Estafeta\nGuía: 7712001002\nFecha de envío: 2026-09-28\nEstatus: Entregado\nFecha de entrega: 2026-10-02\nCódigo postal destino: 06600"
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_guia": "estafeta_guia.txt"
+ },
+ "expected": {
+  "action": "submit",
+  "missing": [],
+  "conflicts": [],
+  "forbidden": [
+   "issue a refund",
+   "refund the buyer",
+   "accept the claim",
+   "seller agrees",
+   "reembolsar al comprador",
+   "aceptar la reclamación",
+   "acepta la reclamación"
+  ],
+  "must_cite_tracking": "7712001002"
+ },
+ "notes": "Estafeta guía in Spanish, Entregado with a delivery date: submit."
+}

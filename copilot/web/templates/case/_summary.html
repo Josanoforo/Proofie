@@ -1,0 +1,16 @@
+{% from "_components.html" import tip %}
+<section class="panel case-status" id="summary" data-state="summary">
+  <p class="b-kicker">Overview · Next step</p>
+  <h2>{% if norm.reason == 'MERCHANDISE_OR_SERVICE_NOT_RECEIVED' and summary.requested and not buyer_closed and not rc3_reviewing %}Respond to the shipping request{% else %}Case status and next step{% endif %}</h2>
+  {% if summary.requested %}<p class="case-status-request">PayPal is asking for: {{ summary.requested | join("; ") }}.</p>{% endif %}
+  <div class="case-status-grid">
+    <section data-state="status-missing"><h3>Missing</h3>
+      {% if summary.missing %}<ul data-state="missing">{% for m in summary.missing %}<li>{{ m.text }} <a href="{{ m.href }}">{{ m.action }}</a></li>{% endfor %}</ul>
+      {% else %}<p data-state="missing-none">Nothing obvious is missing at this level.</p>{% endif %}
+    </section>
+    <section data-state="status-mismatch"><h3>Field check</h3>
+      <p data-state="mismatch-unchecked">{{ summary.mismatch_note }}</p>
+    </section>
+
+  </div>
+</section>

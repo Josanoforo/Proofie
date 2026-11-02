@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "irrelevant_docs_dev1",
+ "type": "irrelevant_docs",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0021",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 3000,
+  "amount_display": "30.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000021"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1021\nOrder date: 2026-09-27 10:00\nTotal paid: 30.00 USD\nPayPal capture id: EV2CAPTURE0000021",
+  "doc_news": "Spring newsletter\nNew colours in the mug collection. Free gift wrapping this month."
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_news": "newsletter.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "tracking",
+    "any_of": [
+     "tracking",
+     "guía",
+     "guia",
+     "waybill"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "A newsletter says nothing about shipping."
+}

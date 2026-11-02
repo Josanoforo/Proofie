@@ -1,0 +1,1 @@
+"""Offline judge walkthrough entrypoint."""

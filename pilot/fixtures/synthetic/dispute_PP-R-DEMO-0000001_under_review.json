@@ -1,0 +1,100 @@
+{
+  "_source": "DEMO DATA - hand-made synthetic fixture with the same JSON shape as the real PayPal sandbox response it replaces in the tests; every identifier is invented.",
+  "body": {
+    "dispute_id": "PP-R-DEMO-0000001",
+    "create_time": "2026-10-05T02:13:17.163Z",
+    "update_time": "2026-10-05T02:14:23.670Z",
+    "disputed_transactions": [
+      {
+        "buyer_transaction_id": "DEMOTXN0000000002",
+        "seller_transaction_id": "DEMOTXN0000000001",
+        "create_time": "2026-10-05T00:04:39.000Z",
+        "transaction_status": "COMPLETED",
+        "gross_amount": {
+          "currency_code": "USD",
+          "value": "25.00"
+        },
+        "buyer": {
+          "email": "[email]",
+          "payer_id": "[redacted]",
+          "name": "[redacted]"
+        },
+        "seller": {
+          "email": "[email]",
+          "merchant_id": "DEMOMERCH0001",
+          "name": "[redacted]"
+        },
+        "items": [
+          {
+            "item_name": "DEMO DATA - pilot item",
+            "item_description": "DEMO DATA - pilot item",
+            "item_quantity": "1",
+            "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+            "item_type": "PRODUCT"
+          }
+        ],
+        "seller_protection_eligible": false
+      }
+    ],
+    "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+    "status": "UNDER_REVIEW",
+    "dispute_amount": {
+      "currency_code": "USD",
+      "value": "25.00"
+    },
+    "dispute_state": "UNDER_PAYPAL_REVIEW",
+    "dispute_life_cycle_stage": "INQUIRY",
+    "dispute_channel": "INTERNAL",
+    "messages": [
+      {
+        "posted_by": "BUYER",
+        "time_posted": "2026-10-05T02:13:17.163Z",
+        "content": "DEMO DATA - synthetic buyer message",
+        "documents": [
+          {
+            "name": "[redacted]",
+            "url": "https://api-m.sandbox.paypal.com/v2/content/documents/DIS-DEMO-0001-0000-0000-0000-000000000000/files/1/download"
+          }
+        ]
+      }
+    ],
+    "extensions": {
+      "merchant_contacted": false,
+      "buyer_contacted_time": "2026-10-05T02:13:16.127Z"
+    },
+    "evidences": [
+      {
+        "evidence_type": "CREATE",
+        "documents": [
+          {
+            "name": "[redacted]",
+            "url": "https://api-m.sandbox.paypal.com/v2/content/documents/DIS-DEMO-0001-0000-0000-0000-000000000000/files/1/download"
+          }
+        ],
+        "notes": "DEMO DATA - synthetic evidence note",
+        "source": "SUBMITTED_BY_BUYER",
+        "date": "2026-10-05T02:13:17.163Z",
+        "dispute_life_cycle_stage": "INQUIRY"
+      }
+    ],
+    "offer": {
+      "buyer_requested_amount": {
+        "currency_code": "USD",
+        "value": "25.00"
+      }
+    },
+    "refund_details": {
+      "allowed_refund_amount": {
+        "currency_code": "USD",
+        "value": "25.00"
+      }
+    },
+    "links": [
+      {
+        "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-DEMO-0000001",
+        "rel": "self",
+        "method": "GET"
+      }
+    ]
+  }
+}

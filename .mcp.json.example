@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "proofie": {
+      "command": ".venv\\Scripts\\python.exe",
+      "args": ["-m", "copilot.mcp_server"],
+      "env": {
+        "COPILOT_MCP_ALLOW_SEND": "false"
+      }
+    }
+  }
+}

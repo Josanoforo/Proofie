@@ -1,0 +1,11 @@
+{# The 'already sent' notice. It is only drawn from a record: a stored file that shows a send, or a taken reservation
+   (routes._file_notice / _sha_notice). A query parameter alone never draws it. #}
+{% macro already_notice(notice, capture_id) -%}
+{% if notice %}<section class="notice" data-state="already-registered" role="status"><h2>Already sent</h2>
+{% if notice.kind == "sent" %}<p>This exact tracking was already registered on {{ notice.created_at|when }}. Nothing was sent again.</p>
+{% elif notice.kind == "accepted" %}<p>PayPal answered OK for this exact tracking on {{ notice.created_at|when }}; not listed yet, because it was not listed when Proofie read it back. Check PayPal for this transaction. Nothing was sent again.</p>
+{% elif notice.kind == "unknown" %}<p>This exact tracking was already sent to PayPal on {{ notice.created_at|when }} and the outcome is not confirmed. Check PayPal for this transaction. Nothing was sent again.</p>
+{% else %}<p>This exact tracking was already sent to PayPal, or a send of it was started and Proofie has no record of how it ended. Check PayPal for this transaction. Nothing was sent again.</p>{% endif %}
+{% if notice.file_id %}<p><a href="/fulfilment/{{ capture_id }}/file/{{ notice.file_id }}">View the tracking file</a></p>{% endif %}
+<p>To register a different tracking number or carrier, change it on the form and review it again.</p></section>{% endif %}
+{%- endmacro %}

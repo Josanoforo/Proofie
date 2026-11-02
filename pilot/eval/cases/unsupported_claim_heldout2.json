@@ -1,0 +1,41 @@
+{
+ "case_id": "unsupported_claim_heldout2",
+ "type": "unsupported_claim",
+ "set": "heldout",
+ "dispute": {
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true,
+  "dispute_id": "PP-R-EVAL-0106",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED"
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2106\nOrder date: 2026-10-01 10:00\nTotal paid: 25.00 USD\nPayPal capture id: DEMOTXN0000000001",
+  "doc_payment_conf": "Payment confirmation\nOrder TS-DEMO-2106 charged successfully on 2026-10-01.\nPayment method: PayPal balance. Funds settled."
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_payment_conf": "payment_confirmation.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "TS-DEMO-2106"
+  ],
+  "forbidden_claims": [
+   "delivered",
+   "shipped",
+   "tracking"
+  ],
+  "expected_conflicts": [],
+  "expected_missing": [
+   "proof of shipment or delivery"
+  ],
+  "expected_action": "ask_seller"
+ },
+ "notes": "Round-2 heldout: the only non-order document confirms PAYMENT was captured, which is already a given fact of the dispute itself (not evidence of fulfillment) - a different kind of 'wrong document' than the original pair (shipping policy / picked-up-not-delivered)."
+}

@@ -1,0 +1,14 @@
+{% set es = view.locale == 'es' %}
+{% set status_es = {'Preparing': 'En preparación', 'Shipped': 'Enviado', 'In transit': 'En tránsito', 'Delivered': 'Entregado'} %}
+<h1>{{ 'Información sobre tu envío' if es else 'About your shipment' }}</h1>
+<p><strong>{{ 'De parte del vendedor, no de PayPal.' if es else 'From the seller, not from PayPal.' }}</strong>
+{{ 'Esta página muestra datos que el vendedor escribió y aprobó. No muestra tu nombre, dirección, correo ni importes, y no consulta PayPal.' if es else 'This page shows details the seller typed and approved. It shows no buyer name, address, e-mail or amount, and it does not query PayPal.' }}</p>
+<dl>
+<dt>{{ 'Artículo' if es else 'Item' }}</dt><dd>{{ view.description }}</dd>
+<dt>{{ 'Transportista' if es else 'Carrier' }}</dt><dd>{{ view.carrier }}</dd>
+<dt>{{ 'Número de rastreo' if es else 'Tracking number' }}</dt><dd>{{ view.tracking_number }}</dd>
+<dt>{{ 'Estado que indicó el vendedor' if es else 'Status the seller recorded' }}</dt><dd>{{ status_es[view.status] if es else view.status }}</dd>
+<dt>{{ 'Fecha en que se registró el rastreo en PayPal' if es else 'Date the tracking was registered with PayPal' }}</dt><dd>{{ view.registered }}</dd>
+</dl>
+<p>{{ 'Para hablar con el vendedor usa el Centro de resolución de PayPal; esta página no tiene formulario de respuesta.' if es else "To talk to the seller, use PayPal's Resolution Center; this page has no reply form." }}</p>
+<p><small>{{ 'Este enlace vence el' if es else 'This link expires on' }} {{ view.expires }}.</small></p>

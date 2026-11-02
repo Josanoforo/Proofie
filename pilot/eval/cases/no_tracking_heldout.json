@@ -1,0 +1,40 @@
+{
+ "case_id": "no_tracking_heldout",
+ "type": "no_tracking",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EVAL-0006",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2006\nOrder date: 2026-09-20 08:00\nTotal paid: 25.00 USD\nPayPal capture id: DEMOTXN0000000001"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "TS-DEMO-2006"
+  ],
+  "forbidden_claims": [
+   "tracking",
+   "carrier",
+   "delivered"
+  ],
+  "expected_conflicts": [],
+  "expected_missing": [
+   "shipping",
+   "tracking"
+  ],
+  "expected_action": "ask_seller"
+ },
+ "notes": "Only the order confirmation exists, nothing about shipping at all (even sparser than the dev twin)."
+}

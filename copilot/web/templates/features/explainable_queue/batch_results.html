@@ -1,0 +1,16 @@
+{% extends "_base.html" %}
+{% block title %}Selected case preparation - Proofie{% endblock %}
+{% block content %}
+<section data-state="selected-preparation-results"><h1>Selected case preparation</h1>
+<p>Local preparation only. Nothing was approved or sent. Provider information is the earlier observation, not a fresh read.</p>
+{% if error %}<p role="alert">{{ error }}</p>{% else %}
+{% set state_words = {'ready': 'ready', 'needs_input': 'needs input', 'stale': 'stale', 'not_eligible': 'not eligible', 'human_review': 'human review', 'in_progress': 'in progress', 'cooldown': 'cooldown', 'unavailable': 'unavailable', 'error': 'error'} %}
+<ul>{% for row in batch.results %}<li data-case="{{ row.case_id }}" data-state="{{ row.state }}"><strong>{{ row.case_id }}</strong> — {{ state_words.get(row.state, 'not available') }}
+{% if row.observed_at %}<p>Observed at {{ row.observed_at }} · {{ row.provenance }}</p>{% endif %}
+{% for reason in row.reasons or [] %}<p>{{ reason }}</p>{% endfor %}
+{% for missing in row.missing or [] %}<p>Missing: {{ missing }}</p>{% endfor %}
+{% if row.package_id %}<p><a href="/disputes/{{ row.case_id }}/packages/{{ row.package_id }}">Review package{% if row.package_version %} v{{ row.package_version }}{% endif %}</a></p>{% endif %}</li>{% endfor %}</ul>
+{% if batch.unprocessed %}<p>Not processed: {{ batch.unprocessed|join(', ') }}. Select these again from the inbox.</p>{% endif %}
+{% if batch.results|selectattr('retryable')|list %}<form method="post" action="/features/explainable_queue/prepare-selected"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="observation_token" value="{{ observation_token }}">{% for row in batch.results if row.retryable %}<label><input type="checkbox" name="case_ids" value="{{ row.case_id }}"> Retry {{ row.case_id }} ({{ state_words.get(row.state, 'not available') }})</label>{% endfor %}<button type="submit" class="btn-secondary">Retry selected pending cases</button></form>{% endif %}
+{% endif %}<p><a href="/disputes">Back to inbox</a></p></section>
+{% endblock %}

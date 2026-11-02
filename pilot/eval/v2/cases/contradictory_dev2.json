@@ -1,0 +1,46 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "contradictory_dev2",
+ "type": "contradictory",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0017",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 70000,
+  "amount_display": "700.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000017"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1017\nFecha del pedido: 2026-09-28 10:00\nTotal pagado: 700.00 MXN\nID de captura PayPal: EV2CAPTURE0000017",
+  "doc_guia_a": "Paquetería: Estafeta\nGuía: 7712001017\nEstatus: Entregado\nFecha de entrega: 2026-10-01",
+  "doc_guia_b": "Comprobante de entrega Estafeta\nGuía: 7712001017\nEstatus: Entregado\nFecha de entrega: 2026-10-06"
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_guia_a": "estafeta_rastreo.txt",
+  "doc_guia_b": "estafeta_comprobante.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [],
+  "conflicts": [
+   {
+    "id": "delivery_date",
+    "any_of": [
+     "date",
+     "fecha",
+     "2026-10-01",
+     "2026-10-06"
+    ]
+   }
+  ],
+  "forbidden": [],
+  "must_cite_tracking": null
+ },
+ "notes": "Two Estafeta documents for the same guía give different delivery dates."
+}

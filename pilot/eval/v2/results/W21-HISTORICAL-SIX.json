@@ -1,0 +1,72 @@
+{
+ "code_sha": "9ce51d6bd36320101443472e81dfd546a4fd8fd2",
+ "historical_input_limit": "The historical case identifiers were sanitized after the original 2026-10-04 series; current case hashes do not attest the exact original input text (AI-USAGE 3.6). Raw documents and outputs are excluded.",
+ "measurement_date": "2026-10-20",
+ "model": "qwen3.5:9b",
+ "n": 6,
+ "passed": 6,
+ "runs": [
+  {
+   "case_id": "incomplete_heldout",
+   "case_sha256": "7b621aa083d92f9aec33a553a07b9377c2d1d4dc5a2c7852f480b33774b6dcc5",
+   "checks_failed": [],
+   "effective_next_step": "need_more_information",
+   "prompt_sha256": "5a9227c545aedd1d",
+   "raw_sha256": "09fcdbf52632c0a19f3c4a1f4b46ba725405ef4d98d443e859675ac5964cbedf",
+   "seed": 11,
+   "validation_ok": true
+  },
+  {
+   "case_id": "incomplete_heldout",
+   "case_sha256": "7b621aa083d92f9aec33a553a07b9377c2d1d4dc5a2c7852f480b33774b6dcc5",
+   "checks_failed": [],
+   "effective_next_step": "need_more_information",
+   "prompt_sha256": "5a9227c545aedd1d",
+   "raw_sha256": "360ea87f7f69e165f5c5ad64afaff919e7bfe48da030d21c4ff774ac45d10aad",
+   "seed": 22,
+   "validation_ok": true
+  },
+  {
+   "case_id": "incomplete_heldout",
+   "case_sha256": "7b621aa083d92f9aec33a553a07b9377c2d1d4dc5a2c7852f480b33774b6dcc5",
+   "checks_failed": [],
+   "effective_next_step": "need_more_information",
+   "prompt_sha256": "5a9227c545aedd1d",
+   "raw_sha256": "c874fc5f976595b1949c837b942a0dd8418de5b92e6d9f9464b780781940d17a",
+   "seed": 33,
+   "validation_ok": true
+  },
+  {
+   "case_id": "contradictory_heldout",
+   "case_sha256": "0f940ad8e0a4bd90988c6246cf7bd2d9d28e5f53cc6f942a6566ba34d2947695",
+   "checks_failed": [],
+   "effective_next_step": "need_more_information",
+   "prompt_sha256": "d1c17f2e8d1f4d23",
+   "raw_sha256": "b69f40ec6c0582f5b69ad6ce865947590d6ca31cffbbe5502217a09d7e5151d0",
+   "seed": 22,
+   "validation_ok": true
+  },
+  {
+   "case_id": "contradictory_heldout",
+   "case_sha256": "0f940ad8e0a4bd90988c6246cf7bd2d9d28e5f53cc6f942a6566ba34d2947695",
+   "checks_failed": [],
+   "effective_next_step": "need_more_information",
+   "prompt_sha256": "d1c17f2e8d1f4d23",
+   "raw_sha256": "6c7e9a3ddd713e3607c170048adf0e33a6ac8d893ad013662af84af65f9b3158",
+   "seed": 33,
+   "validation_ok": true
+  },
+  {
+   "case_id": "no_tracking_dev",
+   "case_sha256": "ce83f8c38c0780c49918ee9fe5ee3e9ddf3c963f715a98800364d7eb389f968d",
+   "checks_failed": [],
+   "effective_next_step": "need_more_information",
+   "prompt_sha256": "9502568cb6821a3c",
+   "raw_sha256": "46bd153cbee244725e3879e8b0a4f9181dcd4b6073015060d63c5a4dbd9d8d18",
+   "seed": 33,
+   "validation_ok": true
+  }
+ ],
+ "status": "selected former failures; separate diagnostic, not pooled with evaluation v2",
+ "temperature": 0.4
+}

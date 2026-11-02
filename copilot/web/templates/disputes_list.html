@@ -1,0 +1,76 @@
+{% extends "_base.html" %}
+{% from "_components.html" import banner, checked_bar, tag, link_button, mono_id, tip %}
+{% block title %}All disputes - Proofie{% endblock %}
+{% macro inbox_context(summary, inaction, checked_at) -%}
+{# Keep the due date in each case row as the single per-case source of truth. #}
+{% set summary_line = summary.text.split(" Soonest:")[0] if " Soonest:" in summary.text else summary.text %}
+<p class="inbox-summary" data-state="inbox-summary">{{ summary_line }}</p>
+<p class="inbox-inaction" data-state="inbox-inaction">{% call tip("What happens if you do nothing") %}{{ inaction[0] }}<a href="{{ inaction[3] }}">{{ inaction[1] }}</a>{{ inaction[2] }}{% endcall %}</p>
+{{ checked_bar(checked_at, "/disputes", "Refresh from PayPal") }}
+{%- endmacro %}
+{# no automatic reload while a draft is prepared (WCAG 2.2.2); the visible 'Reload to see progress' link below is the control. #}
+{% block content %}
+<h1>All disputes</h1>
+<p data-state="inbox-purpose">Prepare and review evidence; you decide whether to approve and send.</p>
+{%- if feature_enabled("inbox_watch") %}{% include "features/explainable_queue/_watch.html" %}{% endif %}
+{#- At most one attention block (the deadline banner) and the summary line sit above the table; the fee line and the files link sit below it. #}
+{%- if feature_enabled("deadlines") %}{% with refresh_url = "/disputes" %}{% include "features/deadlines/_banner.html" %}{% endwith %}{% endif %}
+{% if rows|length == 0 and pool_scope_note %}
+{% call banner("info", "empty", "No case is listed in this demo") %}
+  <p data-state="pool-scope-note">{{ pool_scope_note }}</p>
+  {%- if pool_scope_link %}<p class="actions">{{ link_button("/judge", "Open the judge cases") }}</p>{% endif %}
+{% endcall %}
+{% elif rows|length == 0 %}
+{{ checked_bar(checked_at, "/disputes", "Refresh from PayPal") }}
+{% call banner("info", "empty", "No disputes need your attention right now") %}
+  <p>PayPal returned no disputes for this account when it was checked at {{ checked_at|when }}. Nothing was changed.</p>
+  <details data-state="empty-guide-box"><summary>First time using Proofie?</summary>
+  <p data-state="empty-guide">New here? Proofie reads the disputes of your own PayPal sandbox account. To try it, create an "item not received" dispute by hand in the sandbox: the step-by-step guide is in the repository, <code>docs/JUDGE-RUN.md</code>, step 3. A new dispute can take a few minutes to appear here.</p></details>
+  <p class="actions">{{ link_button("/disputes", "Check PayPal again") }}</p>
+{% endcall %}
+{% else %}
+{% set preparing = rows | selectattr("auto_prep") | selectattr("auto_prep.status", "equalto", "preparing") | list %}
+{%- if preparing %}
+<p class="action-note" data-state="preparing">{{ preparing|length }} {{ 'draft is' if preparing|length == 1 else 'drafts are' }} being prepared. Nothing is approved or sent automatically; the draft only appears when it is ready. <a href="/disputes">Reload to see progress</a></p>
+{%- endif %}
+<table class="stack" data-table="inbox">
+<caption>{{ sort_caption }}</caption>
+<thead><tr><th scope="col">Dispute</th><th scope="col">Status</th><th scope="col">Respond by</th><th scope="col">Amount</th><th scope="col">Next step</th></tr></thead>
+<tbody>
+{% for row in rows %}
+{%- set did = row.norm.dispute_id %}
+<tr data-dispute="{{ did }}">
+  <td data-label="Dispute"><a href="/disputes/{{ did }}">{{ mono_id(did) }}</a><br><span class="row-reason">{{ row.reason_text }}</span>{% if feature_enabled("judge_as_buyer") %}{% include "features/judge_as_buyer/_queue_marker.html" %}{% endif %}</td>
+  <td data-label="Status">{% set under_review = feature_enabled("outcome") and row.norm and row.norm.stage == "CHARGEBACK" and row.norm.status == "UNDER_REVIEW" %}{% if not under_review %}{{ tag(row.status.kind, row.status.label) }}{% endif %}{% if feature_enabled("outcome") %}{% with rc3_norm = row.norm %}{% include "features/outcome/_review_notice.html" %}{% endwith %}{% endif %}</td>
+  <td data-label="Respond by">
+    {%- if row.due %}{{ row.due.iso|when }}<br>
+    {%- if row.urgency in ("soon", "passed") %}{{ tag("due", row.due.remaining) }}{% else %}<span class="row-remaining">{{ row.due.remaining }}</span>{% endif %}
+    {%- elif row.waiting %}No verified deadline available
+    {%- else %}{{ row.due_note }}{% endif %}</td>
+  <td data-label="Amount">{{ row.norm.amount_display or "—" }} {{ row.norm.currency or "" }}</td>
+  <td data-label="Next step" data-draft-state="{{ row.auto_prep.status if row.auto_prep else 'none' }}">
+    {%- if row.next_step.label %}{{ link_button(row.next_step.href, row.next_step.label, kind="primary" if row.primary else "secondary", hidden="for " ~ did) }}{% endif %}
+    {%- if row.next_step.text %}<p class="row-note">{{ row.next_step.text }}</p>{% endif %}
+    {%- for line in row.next_step.lines %}<p class="row-note">{{ line }}</p>{% endfor %}
+    {%- if feature_enabled("explainable_queue") and row.queue_explanation and row.waiting %}
+    <details class="row-note" data-state="queue-explanation"><summary>Why this case is here: {{ row.queue_explanation.priority_reason }}</summary>
+      <p>{{ row.queue_explanation.status_label }}; amount: {{ row.queue_explanation.amount_text or "not available" }}.</p>
+      <p>Respond by: {{ row.queue_explanation.deadline_text or "not available" }}. Next step from this inbox: {{ row.queue_explanation.next_action }}.</p>
+      <p>What Proofie is missing: {{ row.queue_explanation.missing|join(" ") or "nothing noted" }}</p>
+      <small>{{ row.queue_explanation.trust }}</small>
+    </details>{%- endif %}
+    {%- if row.walk %}<p class="row-note" data-state="walk-mark" data-walk="{{ row.walk.state }}">{{ row.walk.text }}</p>{% endif %}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<div class="inbox-context">{{ inbox_context(summary, inaction, checked_at) }}</div>
+<p class="checked-at">Everything above was read from PayPal (read-only). {{ pages }} {{ 'page' if pages == 1 else 'pages' }} read.</p>
+{% endif %}
+{% if feature_enabled("explainable_queue") %}{% include "features/explainable_queue/_exposure_context.html" %}{% endif -%}
+{% if account_cliff %}{% include "features/account_cliff/_line.html" %}{% endif %}
+{%- if feature_enabled("fulfilment") %}
+<p class="actions"><a href="/fulfilment">Tracking at the sale: files</a></p>{%- endif %}
+{%- if replay_case is defined and replay_case() %}
+<p class="actions" data-state="replay-link"><a href="/replay/{{ replay_case() }}">See the legacy synthetic replay example (not a recording of a model run)</a>.</p>{%- endif %}
+{% endblock %}

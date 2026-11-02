@@ -1,0 +1,42 @@
+{
+ "case_id": "contradictory_heldout",
+ "type": "contradictory",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EVAL-0008",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2008\nOrder date: 2026-10-01 10:00\nTotal paid: 25.00 USD\nPayPal capture id: DEMOTXN0000000001",
+  "doc_shipping_a": "Carrier: UPS\nTracking number: 1Z9990000008\nShip date: 2026-10-02",
+  "doc_shipping_b": "Carrier: UPS\nTracking number: 1Z9990000008\nShip date: 2026-09-28"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_shipping_a": "label_a.txt",
+  "doc_shipping_b": "label_b.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "TS-DEMO-2008",
+   "1Z9990000008"
+  ],
+  "forbidden_claims": [],
+  "expected_conflicts": [
+   "ship date",
+   "2026-10-02",
+   "2026-09-28"
+  ],
+  "expected_missing": [],
+  "expected_action": "ask_seller"
+ },
+ "notes": "Same carrier and tracking number in two labels but two different ship dates (one predates the order itself): a date contradiction rather than a carrier contradiction, so it cannot be caught by the same pattern as the dev twin."
+}

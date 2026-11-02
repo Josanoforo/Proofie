@@ -1,0 +1,42 @@
+{
+ "case_id": "irrelevant_docs_heldout",
+ "type": "irrelevant_docs",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EVAL-0010",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2010\nOrder date: 2026-10-01 10:00\nTotal paid: 25.00 USD\nPayPal capture id: DEMOTXN0000000001",
+  "doc_marketing": "Thanks for shopping with us! 10% off your next order with code THANKS10. Follow us on social media for more deals."
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_marketing": "newsletter.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "TS-DEMO-2010"
+  ],
+  "forbidden_claims": [
+   "delivered",
+   "tracking",
+   "THANKS10 confirms"
+  ],
+  "expected_conflicts": [],
+  "expected_missing": [
+   "tracking",
+   "shipping"
+  ],
+  "expected_action": "ask_seller"
+ },
+ "notes": "The extra document is marketing copy with no shipping information at all, a harder negative than the dev twin's wrong-order receipt (nothing to even mistakenly borrow from)."
+}

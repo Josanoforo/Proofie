@@ -1,0 +1,18 @@
+{% extends "_base.html" %}
+{% from "_components.html" import tag, breadcrumbs, mono_id %}
+{% block title %}What PayPal last showed - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('What PayPal last showed', None)]) }}{% endblock %}
+{% block content %}
+<h1>What PayPal last showed</h1>
+<p>This page shows locally verified reads. Open a dispute and check PayPal for a fresh decision. Nothing is sent automatically.</p>
+{% if unknown_count > 0 %}<p data-state="unknown-count">{{ unknown_count }} {{ 'case is' if unknown_count == 1 else 'cases are' }} not confirmed by PayPal yet. Open each dispute and refresh from PayPal.</p>{% endif %}
+{% if rows %}
+<table class="stack"><caption class="visually-hidden">The last status PayPal showed for each dispute, and when Proofie read it.</caption><thead><tr><th scope="col">Dispute</th><th scope="col">Status read from PayPal</th><th scope="col">Last checked</th><th scope="col">Review</th><th scope="col">Record</th></tr></thead><tbody>
+{% for row in rows %}<tr><td data-label="Dispute"><a href="/disputes/{{ row.dispute_id }}">{{ mono_id(row.dispute_id) }}</a></td><td data-label="Status read from PayPal">{{ tag(row.status_view.kind, row.status_view.label) }}</td><td data-label="Last checked">{{ row.checked_at|when }}</td><td data-label="Review">{% if row.human_reviewed == 0 %}<span data-observation="{{ row.observation or '' }}">Not confirmed yet — check the dispute in PayPal again</span>{% elif row.review_version %}Under-review window remains open until a changed version is read{% else %}No pending local review{% endif %}</td><td data-label="Record"><details data-state="event-record"><summary>Technical details</summary><dl>
+<dt>Raw status</dt><dd>{{ row.status }}</dd><dt>Version</dt><dd>{{ row.version }}</dd>
+<dt>Source</dt><dd>{{ row.source }}</dd><dt>Raw read time</dt><dd>{{ row.checked_at }}</dd>
+</dl></details></td></tr>{% endfor %}
+</tbody></table>
+{% else %}<p>No verified observations have been recorded here yet.</p>{% endif %}
+<details><summary>Technical details</summary><p data-state="event-log-facts">{{ log_facts }}</p><p>Reads from PayPal are limited to {{ limit }} per minute. The app cannot tell how long PayPal keeps its event log.</p><dl>{% for key,value in counters.items() %}<dt>{{ key }}</dt><dd>{{ value }}</dd>{% endfor %}</dl></details>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "_base.html" %}
+{% from "_components.html" import link_button, post_button, breadcrumbs, tag, banner_mark %}
+{% block title %}{{ title }}: {{ dispute_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('Evidence package v' ~ package.version if package else 'Evidence package', '/disputes/' ~ dispute_id ~ '/packages/' ~ package_id), ('Send result', None)]) }}{% endblock %}
+{% block content %}
+{% set package_url = '/disputes/' ~ dispute_id ~ '/packages/' ~ package_id %}
+{% set check_url = package_url ~ '/check' %}
+{% set success = state in ('confirmed', 'recovered') %}
+{% set can_check = retry_check or state in ('result-uncertain', 'partial', 'send-in-progress', 'earlier-version-pending', 'settling') %}
+<h1>{{ title }}</h1>
+<p class="step-note">{{ step_caption(4) }}</p>
+<div class="banner banner-{{ kind }}" data-state="{{ state }}" role="{{ 'alert' if kind == 'error' else 'status' }}">
+  {% if status_label and status_label != title %}<p class="banner-title"><strong>{{ tag(status_kind, status_label) }}</strong></p>{% else %}{{ banner_mark(kind, title if kind == 'warn' else None) }}{% endif %}
+  <p>{{ message }}</p>
+  {% if state == 'rejected' %}<p data-state="refusal-reason">{{ technical|send_refusal_reason }}</p>{% endif %}
+  {% if success %}
+  {% if confirmed_at %}<p data-state="readback-confirmed">Confirmed by reading the dispute back from PayPal at {{ confirmed_at|when }}. This is the time Proofie recorded.</p>
+  {% else %}<p data-state="readback-time-missing">The local read-back timestamp is not available.</p>{% endif %}
+  {% if readback %}<div class="readback-record" data-state="readback-record"><p><strong>What PayPal's record lists</strong></p>
+  <p>Evidence type: {{ readback.evidence_label }}.{% if readback.paypal_date %} PayPal dates it {{ readback.paypal_date|when }}.{% endif %}</p>
+  {% if readback.documents_present %}<p>Documents PayPal lists with it:</p><ul>{% for name in readback.documents_present %}<li>{{ name }}</li>{% endfor %}</ul>
+  {% else %}<p>PayPal lists no document with it.</p>{% endif %}</div>
+  {% else %}<p data-state="readback-record-missing">This send was recorded before Proofie kept the list of documents PayPal showed. Open the dispute to see PayPal's current record.</p>{% endif %}
+  {% if package %}<p>Package v{{ package.version }}.</p>{% endif %}
+  <p class="what-next"><strong>What happens next:</strong> PayPal reviews your evidence. Follow PayPal's status on the dispute page.</p>
+  <div class="actions actions--forward">{{ link_button('/disputes/' ~ dispute_id, "View the dispute and PayPal's answer") }}</div>
+  {% else %}
+  {% if last_read is not none or retry_check %}<p data-state="last-read">{% if last_read %}Last checked with PayPal at {{ last_read|when }}.{% else %}No successful PayPal read of this dispute yet in this session.{% endif %}</p>{% endif %}
+  <div class="actions actions--forward">
+  {% if can_check %}{{ post_button(check_url, 'Try again' if retry_check else 'Check again', csrf_token, kind='primary', sending='Checking PayPal…') }}
+  {% else %}{{ link_button(package_url ~ '#next-step', 'Open the evidence package') }}{% endif %}
+  </div>
+  {% if can_check %}<p class="action-note">{{ READS_ONLY_NOTE }}</p>{% endif %}
+  {% endif %}
+</div>
+{% if note %}<p class="notice" data-state="changed-after-sending">{{ note }}</p>{% endif %}
+{% if success %}<div class="actions">{{ post_button(check_url, 'Check again', csrf_token, kind='secondary', sending='Checking PayPal…') }}</div>
+<p class="action-note">{{ READS_ONLY_NOTE }}</p>{% endif %}
+{% if technical %}<details><summary>Technical details</summary><pre>{{ technical }}</pre></details>{% endif %}
+{% endblock %}

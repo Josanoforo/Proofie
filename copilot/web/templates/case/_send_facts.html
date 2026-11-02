@@ -1,0 +1,18 @@
+{% from "_components.html" import tip, tag, disclosure_button %}
+{% set not_sent = not summary.sent and not summary.confirmed %}
+<section class="panel" id="send-facts" data-state="send-facts">{% if not_sent %}<h2 class="visually-hidden">What was sent and what PayPal confirmed</h2>
+  <p data-safety="read-back" data-state="read-back-chip">{{ tag("na", "Read-back: not sent yet") }} {% call tip("What was sent") %}Nothing has been sent to PayPal from this app yet. Nothing is sent until you review, approve and send a package.{% endcall %}</p>
+  <div class="disc" data-disc="closed" data-state="send-sources">{% call disclosure_button("send-sources-body") %}Sources{% endcall %}
+  <div class="disc-body" id="send-sources-body">
+  <p class="source-line" data-state="source-line">From PayPal, read {{ checked_at|when }}.</p>
+  {% include "_rule_source.html" %}
+  <p data-state="resolution-center">{{ rc_sentence[0] }}{{ resolution_center_link(rc_sentence[1]) }}{{ rc_sentence[2] }}</p>
+  </div></div>
+  {% else %}<h2>What was sent and what PayPal confirmed</h2>
+  <p class="source-line" data-state="source-line">From PayPal, read {{ checked_at|when }}.</p>
+  {% include "_rule_source.html" %}
+  <p data-state="resolution-center">{{ rc_sentence[0] }}{{ resolution_center_link(rc_sentence[1]) }}{{ rc_sentence[2] }}</p>
+  {% if summary.sent %}<ul data-safety="read-back">{% for s in summary.sent %}<li data-sent="{{ s.state }}">{{ s.text }}</li>{% endfor %}</ul>
+  {% else %}<p data-safety="read-back">Nothing has been sent to PayPal from this app yet. Nothing is sent until you review, approve and send a package.</p>{% endif %}{% endif %}
+  {% if summary.confirmed %}<ul>{% for a in summary.confirmed %}<li>Your send on {{ a.at|when }} is confirmed. {% call tip("What a confirmation covers") %}A confirmation covers only the content sent then.{% endcall %}</li>{% endfor %}</ul>{% endif %}
+</section>

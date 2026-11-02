@@ -1,0 +1,139 @@
+{% extends "case_base.html" %}
+{% from "_components.html" import banner, tag, link_button, tip, stepper %}
+{% macro step_h(n, text) %}<h3 class="step-heading"><span class="step-no" aria-hidden="true">{{ n }}</span>{{ text }}</h3>{% endmacro %}
+{% macro task_state(key, what, blocked_action=None) %}
+{%- set row = tasks|selectattr("key", "equalto", key)|first %}
+{%- if row %}
+<section class="panel" data-state="task-state-{{ key }}" data-status="{{ row.status }}">
+<h2 class="visually-hidden">{{ what }}</h2>
+{%- if row.blocked %}
+<p class="task-blocked">{{ "Not available." if row.label == "Not available" else "Cannot start yet." }} {% if row.blocker[1] %}{{ row.blocker[0] }} {{ row.blocker[1] }}.{% else %}{{ row.blocker[0] }}{% endif %}</p>
+{%- if row.blocker[1] %}
+<p class="actions"><a class="btn btn-primary" href="{{ row.blocker[2] }}">{{ (blocked_action or row.blocker[1])|capitalize }}</a></p>
+{%- endif %}
+{%- else %}
+<p>{{ tag(row.kind, row.label) }}{% if row.mark %} <span class="task-mark">{{ row.mark }}</span>{% endif %}</p>
+<p class="actions">{{ link_button(row.href, caller(), kind="primary") }}</p>
+{%- endif %}
+</section>
+{%- endif %}
+{%- endmacro %}
+{% block case_body %}
+{% set pkg_url = ("/disputes/" ~ norm.dispute_id ~ "/packages/" ~ latest_package.id) if latest_package else None %}
+{% if view == "prepare" %}
+<p class="field-hint" data-safety="nothing-sent">Preparing a package sends nothing to PayPal.</p>
+{{ step_h(1, "Review existing files" if documents else "Add a document") }}
+{% include "case/_documents.html" %}
+{% if feature_enabled("local_autopilot") %}{% include "features/local_autopilot/_assistance.html" %}{% endif %}
+{% if summary.unverifiable %}<section class="panel" data-state="cannot-read"><h2>Files Proofie could not read</h2>
+<ul data-state="unverifiable">{% for u in summary.unverifiable %}<li>{{ u.text }} <a href="{{ u.href }}">{{ u.action }}</a></li>{% endfor %}</ul></section>{% endif %}
+{{ step_h(2, "Enter the shipment details") }}
+<section class="panel" id="shipment" data-state="shipment-details-entry"><h2>Shipment details</h2>
+{% if pkg_url %}<p><a href="{{ pkg_url }}#shipment-details">Type or check the shipment details in package v{{ latest_package.version }}</a> {% call tip("Why the details are typed in the package") %}The carrier, the tracking number and the dates are part of the evidence package.{% endcall %}</p>
+{% else %}<p>You type the shipment details in the evidence package. Start a package below first.</p>{% endif %}
+{% if feature_enabled("ship_moment_capture") and capture %}{% set capture_id = capture %}{% include "features/ship_moment_capture/_entry.html" %}{% endif %}
+</section>
+{{ step_h(3, "Start or open the evidence package") }}
+{% include "case/_package.html" %}
+<details class="more-ways" data-state="more-ways"><summary>More ways to strengthen the case: the sale checklist, a note to the buyer and statements from other people</summary>
+{% include "case/_sale_readiness.html" %}
+{% if feature_enabled("buyer_note") and norm.stage == "INQUIRY" %}{% include "features/buyer_note/_seller_entry.html" %}{% endif %}
+{% if feature_enabled("third_party_statement") %}<section class="panel" id="third-party" data-state="third-party-entry"><h2>Statements from other people</h2>{% include "features/third_party_statement/_entry.html" %}</section>{% endif %}
+</details>
+
+{% elif view == "review" %}
+{% if not latest_package %}
+<section class="panel" data-state="review-no-package"><h2>No evidence package yet</h2><p>Statements are written inside an evidence package. <a href="{{ ws_url('prepare') }}#package">Start one in Prepare</a>.</p></section>
+{% else %}
+<div class="review-workspace" data-state="review-workspace">
+<div class="review-main">
+{% if review_cards and review_cards.claims %}
+<section class="panel" data-state="review-sources"><header class="b-review-heading"><div><p class="b-kicker">{{ claims_count }} {{ 'statement' if claims_count == 1 else 'statements' }} · Package v{{ latest_package.version }}</p><h2>{{ 'Compare the claim with its source' if claims_count == 1 else 'Compare the claims with their sources' }}</h2></div><p class="b-review-draft">{{ tag(latest_package.status_view.kind, latest_package.status_view.label) }}</p></header>
+{% set claims = review_cards.claims %}{% set safe_text = review_cards.safe_text %}{% set document_names = review_cards.document_names %}
+{% include "features/claims/_claim_cards.html" %}
+</section>
+{% endif %}
+<aside class="review-rail" aria-label="Package review status">
+<section class="review-summary" data-state="review-summary">
+<h3 class="visually-hidden">Check the package</h3>
+<p class="visually-hidden" data-state="review-count">{{ claims_count }} {{ "statement" if claims_count == 1 else "statements" }} in package v{{ latest_package.version }}.</p>
+<p data-state="mismatch-unchecked" class="b-field-check{% if has_conflict %} task-blocked{% endif %}"><strong>Field check</strong> {{ summary.mismatch_note }}</p>
+{% if latest_package.checks_line and claims_count %}
+<details class="review-checks-summary" data-state="review-checks-summary"><summary>See the checks</summary><p>{{ latest_package.checks_line }}</p><p><a href="{{ pkg_url }}#checks">Open all checks</a></p></details>
+{% else %}<p><a href="{{ pkg_url }}#checks">See the checks</a></p>{% endif %}
+<p class="action-note" data-safety="nothing-sent">Reading and checking sends nothing. {% call tip("How a check works") %}A person reviews every statement. A check compares your documents with PayPal's data; it does not prove a document is genuine.{% endcall %}</p>
+{% if feature_enabled("triage") %}<p><a href="/disputes/{{ norm.dispute_id }}/triage">What the evidence supports</a></p>{% endif %}
+<p data-state="full-package-link"><a href="{{ pkg_url }}#package-edit-sections">Full package details</a></p>
+</section>
+</aside>
+{% if review_cards and review_cards.claims %}<p class="field-hint" data-state="review-recording">Reading here isn't recorded; confirm in Approval.</p>{% endif %}
+<p class="actions review-next">{{ link_button(pkg_url ~ "#statements", "Open statements in the package", kind="primary") }}</p>
+</div>
+{% include "case/_sending_status.html" %}
+</div>
+{% endif %}
+
+{% elif view == "approve" %}
+{% set approve_row = tasks|selectattr("key", "equalto", "approve")|first %}
+{% if approve_preview and (approve_preview.claims or not (approve_row and approve_row.blocked)) %}
+<section class="panel" data-state="approve-preview"><h2 class="visually-hidden">Exactly what will be sent: package v{{ approve_preview.version }}</h2>
+<p data-state="send-recipient">To PayPal · dispute {{ norm.dispute_id }} · package v{{ approve_preview.version }}.</p>
+<p>Statements ({{ approve_preview.claims|length }}): <a href="{{ pkg_url }}#statements">Change<span class="visually-hidden"> the statements</span></a></p>
+<ol data-state="approve-preview-statements">{% for text in approve_preview.claims %}<li>{{ text }}</li>{% else %}<li>No statements yet.</li>{% endfor %}</ol>
+<ul data-state="approve-preview-facts">
+<li>Tracking: {% if approve_preview.sendable %}<span translate="no">{{ approve_preview.tracking }}</span>{% if approve_preview.carrier %} ({{ carrier_display_name(approve_preview.carrier) }}){% endif %}{% else %}none yet, so this cannot be sent{% endif %} <a href="{{ pkg_url }}#field-tracking_number">Change<span class="visually-hidden"> the tracking number</span></a></li>
+<li>Attachments: {% if approve_preview.attachments %}{% for name in approve_preview.attachments %}<span translate="no">{{ name }}</span>{% if not loop.last %}, {% endif %}{% endfor %}{% else %}none{% endif %} <a href="{{ pkg_url }}#attachments">Change<span class="visually-hidden"> the attachments</span></a></li>
+</ul>
+</section>
+{% endif %}
+{% call task_state("approve", "Approval for the exact package") %}{% if approve_preview %}Open package approval review{% else %}Open the package approval review{% endif %}{% endcall %}
+<p class="action-note" data-safety="nothing-sent">Approving does not send anything. {% call tip("What approving means") %}If you change the package afterwards, the approval no longer counts and you approve again. Nothing is sent until you approve and send.{% endcall %}</p>
+{% if pkg_url %}<p data-state="full-package-link"><a href="{{ pkg_url }}">Full package details</a></p>{% endif %}
+
+{% elif view == "send" %}
+{% call task_state("send", "Sending to PayPal", "Open approval review") %}Open the package to send{% endcall %}
+<p class="action-note">If the answer is unclear, check by reading; do not send twice. {% call tip("How sending works") %}Sending is its own step. Afterwards Proofie reads PayPal again and shows what PayPal confirmed.{% endcall %}</p>
+{% include "case/_send_facts.html" %}
+{% if pkg_url %}<p data-state="full-package-link"><a href="{{ pkg_url }}">Full package details</a></p>{% endif %}
+
+{% elif view == "records" %}
+{% include "case/_queue_explanation.html" %}
+<section class="panel" data-state="case-records-links"><h2>What Proofie recorded</h2>
+<p data-state="decision">PayPal's decision: {% if decided %}recorded{% else %}none yet{% endif %}.{% if feature_enabled("outcome") %} <a href="/disputes/{{ norm.dispute_id }}/outcome">{{ "Read PayPal's decision" if decided else "See what was sent and what PayPal recorded" }}</a>{% endif %}</p>
+{% set strip = stage_strip(norm.stage) %}
+{%- if strip %}<ol aria-label="{{ STAGE_STRIP_LABEL }}" class="stage-strip" data-state="stage-strip">{% for s in strip %}<li{% if s.current %} aria-current="step"{% endif %}>{{ s.name }}{% if s.current %} ({{ STAGE_CURRENT_WORDS }}){% endif %}</li>{% endfor %}</ol>{%- endif %}
+<ul class="optional-list">
+{% if feature_enabled("case_history") %}<li><a href="/disputes/{{ norm.dispute_id }}/history">Case history</a>. Your record of this case: local work, send attempts, PayPal's answers and later reads.</li>{% endif %}
+{% if feature_enabled("ledger") %}<li><a href="/disputes/{{ norm.dispute_id }}/ledger">What this app recorded</a></li>{% endif %}
+</ul></section>
+{% if feature_enabled("timeline") and paypal_timeline is not none %}{% include "features/timeline/_timeline.html" %}{% endif %}
+{% include "case/_audit_timeline.html" %}
+
+{% elif view == "other" %}
+{% include "case/_other_responses.html" %}
+
+{% elif view == "sale" %}
+<section class="panel" data-state="sale-records"><h2>The sale behind this case</h2>
+{% if capture %}
+<p>Transaction <span translate="no">{{ capture }}</span>.</p>
+<ul class="optional-list">
+{% if feature_enabled("fulfilment") %}<li><a href="/fulfilment/{{ capture }}?from_dispute={{ norm.dispute_id }}">Open the sale checklist and tracking</a></li>{% endif %}
+{% if feature_enabled("sale_readiness") %}<li><a href="{{ ws_url('prepare') }}#sale-readiness">Is the sale ready? (in Prepare)</a></li>{% endif %}
+{% if feature_enabled("sale_lesson") and decided %}<li><a href="/disputes/{{ norm.dispute_id }}/sale-lesson?capture_id={{ capture }}">Record a seller lesson for the next sale</a></li>{% endif %}
+{% if feature_enabled("accounting_line") and decided %}<li><a href="/disputes/{{ norm.dispute_id }}/accounting-line">Prepare an accounting line</a></li>{% endif %}
+</ul>
+{% else %}
+<p>PayPal's record for this case does not name a sale Proofie can open.{% if feature_enabled("fulfilment") %} You can still <a href="/fulfilment">look up a sale by its transaction number</a>.{% endif %}</p>
+{% endif %}
+</section>
+
+{% elif view == "hackathon" %}
+<section class="panel" data-state="hackathon-intro"><h2>For people judging Proofie</h2>
+<p>These pages show how Proofie was built and checked. They are not part of a seller's work and do not change PayPal.</p>
+<ul class="optional-list" data-state="judge-pages">
+{% for page in judge_pages %}<li><a href="{{ page.href }}">{{ page.title }}</a>. {{ page.description }}</li>{% else %}<li>No review page is switched on.</li>{% endfor %}
+</ul></section>
+{% include "case/_mcp_notes.html" %}
+{% include "case/_local_autopilot.html" %}
+{% endif %}
+{% endblock %}

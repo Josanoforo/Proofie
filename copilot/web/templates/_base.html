@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Proofie{% endblock %}</title>
+<link rel="stylesheet" href="/static/app.css">
+{% block head_extra %}{% endblock %}
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site-header">
+  <a class="brand" href="/disputes" translate="no"><span class="brand-mark" aria-hidden="true"></span>Proofie</a>
+  {%- block nav %}
+  {%- set current_path = request.url.path if (request is defined and request.scope is defined) else '' %}
+  {%- set case_context = request.query_params.get('case_id', '') if (request is defined and request.query_params is defined) else '' %}
+  {%- if current_path.startswith('/disputes/') %}{%- set case_context = current_path.split('/')[2] %}{%- endif %}
+  {%- if not (case_context and valid_dispute_id is defined and valid_dispute_id(case_context)) %}{%- set case_context = '' %}{%- endif %}
+  {%- set journey_href = '/features/judge_walkthrough' ~ ('?case_id=' ~ case_context if case_context else '') %}
+  {%- set hub_href = '/features/local_demo_hub' ~ ('?case_id=' ~ case_context if case_context else '') %}
+  {%- set nav_links = [('/disputes', 'All disputes')] + ([('/fulfilment', 'Tracking at the sale')] if feature_enabled('fulfilment') else []) + ([(journey_href, 'Local integrated walkthrough')] if feature_enabled('judge_walkthrough') else []) + ([(hub_href, 'Case-flow evidence hub')] if feature_enabled('local_demo_hub') else []) %}
+  <div class="site-menu" data-state="site-menu">
+  <div class="disc-body" id="site-menu-body">
+  <nav class="site-nav" aria-label="Main"><ul>
+  {%- for href, label in nav_links %}
+    <li><a href="{{ href }}"{% if current_path == href %} aria-current="page"{% elif current_path.startswith(href ~ '/') or (href == '/fulfilment' and current_path.startswith('/delivery-facts/')) %} aria-current="true"{% endif %}>{{ label }}</a></li>
+  {%- endfor %}
+  </ul></nav>
+  </div></div>
+  {%- endblock %}
+  <span class="env-tag" data-safety="assistant-only">PayPal sandbox &middot; assistant only, you review everything</span>
+</header>
+{% block breadcrumb %}{% endblock %}
+<main id="main" tabindex="-1">
+{% block content %}{% endblock %}
+</main>
+<footer class="site-footer" data-state="footer">Independent project. Not affiliated with or endorsed by PayPal.
+{%- if hosted_demo() %}
+  <p class="hosted-demo-note" data-state="hosted-demo">{{ (request.app.state.hosted_demo_sentence if request is defined and request.scope is defined and "app" in request.scope and request.app.state.hosted_demo_sentence else hosted_demo_sentence)|note_lines }}</p>
+{%- endif %}
+</footer>
+<div id="inflight-status" class="visually-hidden" role="status" aria-live="polite"></div>
+</body>
+</html>

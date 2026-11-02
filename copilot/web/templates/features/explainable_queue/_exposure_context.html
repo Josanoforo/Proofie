@@ -1,0 +1,33 @@
+{% if exposure_context %}
+<section class="panel" data-state="dispute-exposure-context">
+  <h2>Disputed amounts in this snapshot</h2>
+  <p>{{ exposure_context.denominator_label }} · As of {{ exposure_context.observed_at }}.</p>
+  <p data-state="exposure-completeness">{{ exposure_context.completeness_label }}.</p>
+  {% if exposure_context.currencies %}<ul>{% for row in exposure_context.currencies %}<li>{{ row.amount_text }} across {{ row.known_cases }} case{{ '' if row.known_cases == 1 else 's' }}</li>{% endfor %}</ul>{% else %}<p>No complete disputed amounts were available for this snapshot.</p>{% endif %}
+  <details data-state="daily-work-plan"><summary>Daily plan, scope, sources and progress</summary>
+    {% set daily_plan = exposure_context.daily_plan %}
+    <h3>Today's work from the current records</h3>
+    {% if feature_enabled('selected_preparation') and feature_enabled('local_preparation') and feature_enabled('local_autopilot') %}{% include 'features/explainable_queue/_batch.html' %}{% endif %}
+    <p>{{ daily_plan.task_count }} cases waiting for your next step: {{ daily_plan.overdue_count }} past due, {{ daily_plan.due_soon_count }} due within 72 hours, and {{ daily_plan.blocked_count }} waiting on PayPal or the buyer. {{ daily_plan.closed_count }} {{ 'case is' if daily_plan.closed_count == 1 else 'cases are' }} resolved or buyer-closed in this snapshot.</p>
+    <p>Current local records: {{ daily_plan.progress.cases_with_documents }} {{ 'case' if daily_plan.progress.cases_with_documents == 1 else 'cases' }} with documents, {{ daily_plan.progress.cases_with_package }} {{ 'case' if daily_plan.progress.cases_with_package == 1 else 'cases' }} with an evidence package, and {{ daily_plan.progress.cases_with_claims }} {{ 'case' if daily_plan.progress.cases_with_claims == 1 else 'cases' }} with statements in the current package. Refreshed from records at {{ daily_plan.observed_at }}.</p>
+    {% for group in daily_plan.groups %}
+    <h4>{{ group.label }} ({{ group.count }})</h4>
+    <ul>
+      {% for task in group["items"] %}
+      <li>
+        <p><strong>{{ task.case_id }}</strong> — {{ task.status_label }}{% if task.deadline_text %}; {{ task.deadline_text }}{% endif %}.</p>
+        {% if task.action_href and task.action_label %}<p><a href="{{ task.action_href }}">{{ task.action_label }}</a></p>{% elif task.action_text %}<p>{{ task.action_text }}</p>{% endif %}
+        {% if task.missing %}<p class="row-note">Missing from local records: {{ task.missing|join(" ") }}</p>{% endif %}
+        <small>Records for this case: {{ task.record_counts.documents }} {{ 'document' if task.record_counts.documents == 1 else 'documents' }}, {{ task.record_counts.packages }} {{ 'package' if task.record_counts.packages == 1 else 'packages' }}, {{ task.record_counts.claims }} {{ 'statement' if task.record_counts.claims == 1 else 'statements' }}.</small>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endfor %}
+    <p>{{ daily_plan.source }} {{ daily_plan.scope }} {{ daily_plan.duplicate_rows }} duplicate rows and {{ daily_plan.unidentified_rows }} rows without a case ID were excluded from the plan.</p>
+    <p>{{ exposure_context.period_label }} {{ exposure_context.scope }}</p>
+    <p>{{ exposure_context.incomplete_count }} cases with missing or invalid amount or currency; {{ exposure_context.undated_count }} without a usable response deadline.</p>
+    <p>{{ exposure_context.duplicate_rows }} duplicate rows and {{ exposure_context.unidentified_rows }} rows without a case ID excluded.</p>
+    <p>{{ exposure_context.source }}</p>
+  </details>
+</section>
+{% endif %}

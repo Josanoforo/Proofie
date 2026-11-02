@@ -1,0 +1,41 @@
+{
+ "case_id": "incomplete_heldout",
+ "type": "incomplete",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EVAL-0004",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2004\nOrder date: 2026-09-28 12:00\nTotal paid: 25.00 USD\nPayPal capture id: DEMOTXN0000000001",
+  "doc_chat": "[2026-09-29 09:00] Seller: We shipped your order yesterday.\n[2026-09-29 09:05] Buyer: ok thanks"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_chat": "buyer_chat.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "TS-DEMO-2004"
+  ],
+  "forbidden_claims": [
+   "tracking number",
+   "DEMO",
+   "delivered"
+  ],
+  "expected_conflicts": [],
+  "expected_missing": [
+   "carrier and tracking number"
+  ],
+  "expected_action": "ask_seller"
+ },
+ "notes": "Only a chat claiming 'we shipped' with no carrier/tracking document at all: the model must not invent a tracking number and must flag it as missing."
+}

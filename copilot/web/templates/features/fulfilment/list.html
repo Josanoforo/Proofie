@@ -1,0 +1,30 @@
+{% extends "_base.html" %}
+{% from "_components.html" import tag, breadcrumbs, button %}
+{% from "_form_fields.html" import field %}
+{% block title %}Tracking at the sale: files - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('Tracking at the sale', None)]) }}{% endblock %}
+{% block content %}
+<h1>Tracking at the sale: files</h1>
+<p>{% if register_enabled %}Add the tracking number of a sale in PayPal before any dispute exists, and keep the file Proofie prepared. You see the exact request first, and approving it sends it.{% else %}Prepare the tracking of a sale before any dispute exists and keep the file Proofie prepares. In this release Proofie saves the file and its checks; it does not register the tracking with PayPal.{% endif %}</p>
+{% if not register_enabled %}
+<p class="notice" data-state="register-off">Registration with PayPal is switched off in this installation: files are saved without registering the tracking.</p>
+{% endif %}
+<form method="get" action="/fulfilment/open" data-state="open-form" novalidate>
+  {{ field('capture_id', 'Transaction ID', '', hint='The 17-character transaction ID from the payment details in PayPal. Not the order ID or the invoice number.', mark='Required', autocomplete='off', spellcheck='false', autocapitalize='off', width='w20') }}
+  <div class="actions">{{ button('Open the sale', large=True) }}</div>
+</form>
+<h2>Files</h2>
+{% if files %}
+<table class="fulfilment-files stack">
+  <caption>Your tracking files, newest first</caption>
+  <thead><tr><th scope="col">Transaction</th><th scope="col">Prepared</th><th scope="col">Status</th></tr></thead>
+  <tbody>
+  {% for f in files %}
+  <tr data-file="{{ f.row.capture_id }}"><td data-label="Transaction"><a href="/fulfilment/{{ f.row.capture_id }}/file/{{ f.row.id }}">View tracking file: <span translate="no">{{ f.row.capture_id }}</span></a></td><td data-label="Prepared">{{ f.row.created_at|when }}</td><td data-label="Status" data-status="{{ f.status }}">{% set view = tracking_status(f.status) %}{{ tag(view.kind, view.label) }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p data-state="no-files">No file has been prepared yet.</p>
+{% endif %}
+{% endblock %}

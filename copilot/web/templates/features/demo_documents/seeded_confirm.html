@@ -1,0 +1,18 @@
+{% extends "_base.html" %}
+{% block title %}Use the demo documents and shipment details · Proofie{% endblock %}
+{% block content %}
+<h1>Use the demo documents and shipment details</h1>
+<p class="notice" data-state="seeded-demo-label"><strong>{{ label }}.</strong> The five documents are synthetic, and PayPal receives nothing from this click.</p>
+<p>This sale was made by the Proofie sandbox seed. The files are generated, labelled synthetic and are not real carrier records. The shipment details below are proposed from the first file.</p>
+<table data-state="seeded-demo-proposal">
+<caption>Proposed shipment details (sale date {{ sale_date }})</caption>
+<thead><tr><th scope="col">Field</th><th scope="col">Proposed value</th></tr></thead>
+<tbody>{% for name, value in rows %}<tr><th scope="row">{{ name }}</th><td>{{ value }}</td></tr>{% endfor %}</tbody>
+</table>
+<p>Anything you already typed stays as you typed it. You still review every statement and approve the package yourself.</p>
+<form method="post" action="/disputes/{{ dispute_id }}/seeded-demo">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <button class="btn btn-primary" type="submit">Attach the demo documents and fill in the details</button>
+</form>
+<p><a href="/disputes/{{ dispute_id }}">Cancel and return to the case</a></p>
+{% endblock %}

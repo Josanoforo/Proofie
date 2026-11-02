@@ -1,0 +1,186 @@
+# Blueprint of the optional hosted demo: Render free plan, no disk, one worker, automatic deploys off. Data is cleared on restart, redeploy or idle sleep.
+# Creating a service from it needs the owner's approval.
+services:
+  - type: web
+    name: proofie-sandbox-demo
+    runtime: python
+    buildCommand: pip install --require-hashes -r requirements.lock.linux.hashes.txt
+    startCommand: python -m uvicorn copilot.hosted_ephemeral:create_app --factory --host 0.0.0.0 --port "$PORT" --proxy-headers --forwarded-allow-ips="*" --workers 1
+    healthCheckPath: /healthz
+    autoDeployTrigger: "off"
+    numInstances: 1
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.10"
+      - key: COPILOT_HOSTED_DEMO
+        value: "true"
+      - key: COPILOT_ACCESS_CODE
+        sync: false
+      - key: COPILOT_DATA_DIR
+        value: /tmp/proofie-demo
+      - key: COPILOT_EPHEMERAL_ROOT
+        value: /tmp/proofie-demo
+      - key: PROOFIE_EVIDENCE_DIR
+        value: /tmp/proofie-demo/evidence
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: COPILOT_WEBHOOK_ID
+        sync: false
+      - key: COPILOT_FEATURE_ACCOUNT_CLIFF
+        value: "true"
+      - key: COPILOT_FEATURE_ACCOUNT_CLIFF_PATH
+        value: "true"
+      - key: COPILOT_FEATURE_ACTIVE_APPROVAL
+        value: "true"
+      - key: COPILOT_FEATURE_SELLER_SHORTCUTS
+        value: "true"
+      - key: COPILOT_FEATURE_CARRIER_REQUIRED
+        value: "true"
+      - key: COPILOT_FEATURE_CLAIMS
+        value: "true"
+      - key: COPILOT_FEATURE_DEADLINES
+        value: "true"
+      - key: COPILOT_FEATURE_EVENTS
+        value: "true"
+      - key: COPILOT_FEATURE_FULFILMENT
+        value: "true"
+      - key: COPILOT_FEATURE_LEDGER
+        value: "true"
+      - key: COPILOT_FEATURE_OUTCOME
+        value: "true"
+      - key: COPILOT_FEATURE_PACKAGE_PRINT
+        value: "true"
+      - key: COPILOT_FEATURE_RESOLUTION
+        value: "true"
+      - key: COPILOT_FEATURE_TRIAGE
+        value: "true"
+      - key: COPILOT_FEATURE_CONFORMANCE
+        value: "true"
+      - key: COPILOT_FEATURE_DELIVERY_FACTS
+        value: "true"
+      - key: COPILOT_FEATURE_DRAFT
+        value: "true"
+      - key: COPILOT_FEATURE_WEBHOOKS
+        value: "true"
+      - key: COPILOT_FEATURE_FULFILMENT_REGISTER
+        value: "true"
+      - key: COPILOT_FEATURE_RESOLUTION_WRITES
+        value: "true"
+      - key: COPILOT_FEATURE_OUTCOME_APPEAL
+        value: "true"
+      - key: COPILOT_FEATURE_WEBHOOKS_VERIFY
+        value: "true"
+      - key: COPILOT_FEATURE_TIMELINE
+        value: "true"
+      - key: COPILOT_FEATURE_CLAUSES
+        value: "true"
+      - key: COPILOT_FEATURE_BILINGUAL
+        value: "true"
+      - key: COPILOT_FEATURE_REPLAY
+        value: "true"
+      - key: COPILOT_FEATURE_APPEAL_WORKSPACE
+        value: "true"
+      - key: COPILOT_FEATURE_EVALUATION_WORKBENCH
+        value: "true"
+      - key: COPILOT_FEATURE_EVIDENCE_DOSSIER
+        value: "true"
+      - key: COPILOT_FEATURE_EXPLAINABLE_QUEUE
+        value: "true"
+      - key: COPILOT_FEATURE_JUDGE_WALKTHROUGH
+        value: "true"
+      - key: COPILOT_FEATURE_LOCAL_AUTOPILOT
+        value: "true"
+      - key: COPILOT_FEATURE_LOCAL_DEMO_HUB
+        value: "true"
+      - key: COPILOT_FEATURE_MCP_LOCAL_CONTRACTS
+        value: "true"
+      - key: COPILOT_FEATURE_NEGOTIATION_DRAFTS
+        value: "true"
+      - key: COPILOT_FEATURE_SALE_READINESS
+        value: "true"
+      # Final-cut flags, hosted verdict ON for all 24: internal/release/RENDER-FLAGS-FINAL-CUT.md
+      - key: COPILOT_FEATURE_JUDGE_AS_BUYER
+        value: "true"
+      - key: COPILOT_FEATURE_BUYER_NOTE
+        value: "true"
+      - key: COPILOT_FEATURE_SHIP_MOMENT_CAPTURE
+        value: "true"
+      - key: COPILOT_FEATURE_CARRIER_DIRECTORY
+        value: "true"
+      - key: COPILOT_FEATURE_SALE_LESSON
+        value: "true"
+      - key: COPILOT_FEATURE_CALL_SCRIPT
+        value: "true"
+      - key: COPILOT_FEATURE_READ_ALOUD_REVIEW
+        value: "true"
+      - key: COPILOT_FEATURE_SECOND_OPINION
+        value: "true"
+      - key: COPILOT_FEATURE_ACCOUNTING_LINE
+        value: "true"
+      - key: COPILOT_FEATURE_OFFLINE_MARKET_MODE
+        value: "true"
+      - key: COPILOT_FEATURE_DECLARED_LIMITS
+        value: "true"
+      - key: COPILOT_FEATURE_PRESENTATION_MODE
+        value: "true"
+      - key: COPILOT_FEATURE_TWO_CLOCKS
+        value: "true"
+      - key: COPILOT_FEATURE_DO_NOTHING_PATH
+        value: "true"
+      - key: COPILOT_FEATURE_PACKAGE_INSERT
+        value: "true"
+      - key: COPILOT_FEATURE_SHIP_NOTICE
+        value: "true"
+      - key: COPILOT_FEATURE_STATUS_LINK
+        value: "true"
+      - key: COPILOT_STATUS_LINK_KEY
+        sync: false
+      - key: COPILOT_FEATURE_FIRST_DISPUTE_GUIDE
+        value: "true"
+      - key: COPILOT_FEATURE_THIRD_PARTY_STATEMENT
+        value: "true"
+      - key: COPILOT_FEATURE_TRADE_PROFILES
+        value: "true"
+      - key: COPILOT_FEATURE_LESSONS_EXCHANGE
+        value: "true"
+      - key: COPILOT_FEATURE_SEASON_PREP
+        value: "true"
+      - key: COPILOT_FEATURE_LOST_PACKAGE_PATHS
+        value: "true"
+      - key: COPILOT_FEATURE_TRANSIT_DELIVERED_GUIDE
+        value: "true"
+      - key: COPILOT_FEATURE_CASE_HISTORY
+        value: "true"
+      - key: COPILOT_FEATURE_LOCAL_PREPARATION
+        value: "true"
+      - key: COPILOT_FEATURE_SELECTED_PREPARATION
+        value: "true"
+      - key: COPILOT_FEATURE_GAP_RESOLUTION
+        value: "true"
+      - key: COPILOT_FEATURE_CASE_REENTRY
+        value: "true"
+      - key: COPILOT_FEATURE_CLOSURE_SUMMARY
+        value: "true"
+      - key: COPILOT_FEATURE_INCIDENT_PROPOSALS
+        value: "true"
+      - key: COPILOT_FEATURE_ATTENTION_MODEL
+        value: "true"
+      - key: COPILOT_FEATURE_DEMO_DOCUMENTS
+        value: "true"
+      - key: COPILOT_FEATURE_REARM_NOTE_IGNORED
+        value: "true"
+      - key: COPILOT_FEATURE_ACCEPT_CLAIM
+        value: "true"
+      - key: COPILOT_FEATURE_DEMO_DOCUMENTS_SEEDED
+        value: "true"
+      - key: COPILOT_FEATURE_INBOX_WATCH
+        value: "true"
+      - key: COPILOT_FEATURE_JUDGE_POOL
+        value: "true"
+      - key: COPILOT_JUDGE_POOL
+        sync: false
+      - key: COPILOT_FEATURE_RESOLUTION_STATUS_MESSAGE
+        value: "true"

@@ -1,0 +1,40 @@
+{
+ "case_id": "sufficient_coherent_heldout",
+ "type": "sufficient_coherent",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EVAL-0002",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2002\nOrder date: 2026-10-02 09:30\nTotal paid: 25.00 USD\nShipping service: DHL Express\nPayPal capture id: DEMOTXN0000000001",
+  "doc_shipping": "Carrier: DHL\nTracking number: 1234567890\n2026-10-04 16:40  Delivered. Signed for"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_shipping": "shipping_tracking.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "1234567890",
+   "2026-10-04",
+   "TS-DEMO-2002"
+  ],
+  "forbidden_claims": [
+   "accept the claim",
+   "refund"
+  ],
+  "expected_conflicts": [],
+  "expected_missing": [],
+  "expected_action": "submit"
+ },
+ "notes": "Same shape as the dev twin but a different carrier/short digit-only tracking number (exercises the widened digit-only tracking grounding), held out from prompt tuning."
+}

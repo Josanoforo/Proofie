@@ -1,0 +1,42 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "sufficient_coherent_heldout1",
+ "type": "sufficient_coherent",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0003",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 4190,
+  "amount_display": "41.90",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000003"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1003\nOrder date: 2026-10-02 09:12\nTotal paid: 41.90 USD\nPayPal capture id: EV2CAPTURE0000003",
+  "doc_shipping": "UPS shipment details\nTracking No.: 1ZEV20000000003\nShipped: 2026-10-03\n2026-10-06 15:42  Delivered - left at front door\nShip to postal code: 30301"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_shipping": "ups_tracking.txt"
+ },
+ "expected": {
+  "action": "submit",
+  "missing": [],
+  "conflicts": [],
+  "forbidden": [
+   "issue a refund",
+   "refund the buyer",
+   "accept the claim",
+   "seller agrees",
+   "reembolsar al comprador",
+   "aceptar la reclamación",
+   "acepta la reclamación"
+  ],
+  "must_cite_tracking": "1ZEV20000000003"
+ },
+ "notes": "UPS delivered to the door with a date."
+}

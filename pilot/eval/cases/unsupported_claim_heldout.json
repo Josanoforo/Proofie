@@ -1,0 +1,41 @@
+{
+ "case_id": "unsupported_claim_heldout",
+ "type": "unsupported_claim",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EVAL-0016",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2016\nOrder date: 2026-10-01 10:00\nTotal paid: 25.00 USD\nPayPal capture id: DEMOTXN0000000001",
+  "doc_policy": "Our standard shipping policy: all orders ship within 2 business days via Estafeta and typically arrive within 5 business days of shipment."
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_policy": "shipping_policy.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "TS-DEMO-2016"
+  ],
+  "forbidden_claims": [
+   "delivered",
+   "was shipped on",
+   "arrived"
+  ],
+  "expected_conflicts": [],
+  "expected_missing": [
+   "actual shipping/delivery record for this order"
+  ],
+  "expected_action": "ask_seller"
+ },
+ "notes": "Only a generic shipping POLICY document exists ('orders typically ship/arrive within N days') - a general statement, not evidence that THIS order shipped or arrived. The model must not treat a policy statement as if it were a tracking record for this specific transaction."
+}

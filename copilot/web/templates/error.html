@@ -1,0 +1,51 @@
+{% extends "_base.html" %}
+{% from "_components.html" import tag, link_button, post_button, button, breadcrumbs, banner_mark %}
+{% from "_form_fields.html" import field %}
+{% block title %}{{ title }}{% endblock %}
+{% block breadcrumb %}{% if conflict_form %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ conflict_form.dispute_id, '/disputes/' ~ conflict_form.dispute_id), ('Evidence package', '/disputes/' ~ conflict_form.dispute_id ~ '/packages/' ~ conflict_form.package_id), (title[7:] if title.startswith('Error: ') else title, None)]) }}{% elif dispute_id is defined and dispute_id and state != 'not-found' %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), (title[7:] if title.startswith('Error: ') else title, None)]) }}{% else %}{{ breadcrumbs([('All disputes', '/disputes'), (title[7:] if title.startswith('Error: ') else title, None)]) }}{% endif %}{% endblock %}
+{% block content %}
+{% set heading = title[7:] if title.startswith('Error: ') else title %}
+{% set banner_title = 'Check the dispute' if state == 'not-found' else heading %}
+{# The shared banner macro always draws a title; here the title is left out when it only repeats the h1 (the data-state stays). #}
+{% macro alert(kind, state, title) %}
+<div class="banner banner-{{ kind }}" data-state="{{ state }}" role="{{ 'alert' if kind == 'error' else 'status' }}">
+  {%- if title %}
+  <p class="banner-title"><strong>{{ tag({'ok':'ok','warn':'warn','error':'bad'}.get(kind,'info'), title) }}</strong></p>
+  {%- else %}
+  {{ banner_mark(kind) }}
+  {%- endif %}
+  {{ caller() }}
+</div>
+{% endmacro %}
+<h1>{{ heading }}</h1>
+{% call alert(kind, state, None if banner_title == heading else banner_title) %}
+  <p>{{ message }}</p>
+  {% if items %}<ul>{% for i in items %}<li>{{ i }}</li>{% endfor %}</ul>{% endif %}
+  {% if offline_links %}<p>These pages work without PayPal credentials:</p><ul data-state="offline-links">{% for l in offline_links %}<li><a href="{{ l.href }}">{{ l.label }}</a></li>{% endfor %}</ul>{% endif %}
+  {% if conflict_form %}
+  {% set package_url = '/disputes/' ~ conflict_form.dispute_id ~ '/packages/' ~ conflict_form.package_id %}
+  <p>A document does not agree with your package. Choose one way to fix it.</p>
+  <h2>1. Fix the details</h2>
+  <ul class="fix-list">
+    <li><a href="{{ package_url }}#statements">Edit statements</a></li>
+    <li><a href="{{ package_url }}#shipment-details">Edit shipment details</a></li>
+  </ul>
+  {% if conflict_form.documents %}
+  <h2>2. Leave a file out of the checks</h2>
+  {% for d in conflict_form.documents %}
+  {{ post_button('/disputes/' ~ conflict_form.dispute_id ~ '/documents/' ~ d.id ~ '/exclude', 'Leave ' ~ d.filename ~ ' out of the checks', conflict_form.csrf_token, kind='link', fields=(('return_to', 'package:' ~ conflict_form.package_id),)) }}
+  {% endfor %}
+  <p class="action-note">If this file is attached to your response, it is still sent. Remove it from the response on the package page.</p>
+  {% endif %}
+  <h2>3. Approve with a note</h2>
+  <form method="post" action="{{ package_url }}/approve" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ conflict_form.csrf_token }}">
+    {{ field('conflict_note', 'Note for PayPal about the difference', hint='This note is added to your statements and sent to PayPal with your evidence. Approving does not send anything.', mark='Required', textarea=True, rows=4) }}
+    <div class="actions">{{ button('Approve with this note', kind='secondary', large=True) }}</div>
+  </form>
+  {% endif %}
+  {% if show_last_read is not defined or show_last_read %}<p data-state="last-read">{% if last_read %}Last successful PayPal read in this session: {{ last_read|when }}. What you saw then may be out of date.{% else %}No successful PayPal read yet in this session, so there is nothing to show.{% endif %}</p>{% endif %}
+  {% if retry_url %}<p class="actions">{{ link_button(retry_url, 'Try again') }}</p>
+  {% elif back_url and back_url != '/disputes' %}<p class="actions">{{ link_button(back_url, 'Back to the previous page' if back_label == 'Back' else (back_label or 'Go back')) }}</p>{% endif %}
+{% endcall %}
+{% endblock %}

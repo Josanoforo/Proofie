@@ -1,0 +1,10 @@
+{% if feature_enabled("mcp_local_contracts") %}
+<section class="panel" id="local-mcp-notes" data-state="mcp-local-case-notes">
+  <h2>Local MCP preparation notes</h2>
+  <p>Notes are local preparation artifacts for this case. They do not change PayPal or represent provider state.</p>
+  {% if mcp_local_notes_error %}<p role="alert">{{ mcp_local_notes_error }}</p>
+  {% elif mcp_local_notes %}<ol>{% for item in mcp_local_notes %}<li><time>{{ item.created_at }}</time> — {{ item.note }} <strong>{{ item.status }}</strong></li>{% endfor %}</ol>
+  {% else %}<p>No local MCP notes are prepared for this case.</p>{% endif %}
+  <p><a href="/features/mcp_local_contracts">Local MCP tool catalog</a></p>
+</section>
+{% endif %}

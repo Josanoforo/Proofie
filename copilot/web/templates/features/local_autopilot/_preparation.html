@@ -1,0 +1,19 @@
+{% if feature_enabled('local_preparation') %}
+<section id="local-preparation" data-state="local-preparation">
+<h3>Prepare from this recorded case</h3>
+<p>This uses the case observation shown here and existing records. A person reviews the result; nothing is sent or approved.</p>
+{% if preparation_observation_token is defined and preparation_observation_token %}
+<form method="post" action="/disputes/{{ norm.dispute_id }}/local-preparation">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="observation_token" value="{{ preparation_observation_token }}">
+<button type="submit" class="btn-secondary">Prepare locally for review</button></form>
+{% else %}<p>Preparation is unavailable from this page until its case observation can be carried safely. Continue manually.</p>{% endif %}
+{% set local_result = request.query_params.get('local_preparation') %}
+{% if local_result == 'needs_input' %}<p role="status">Add a case document or enter a shipment detail, then review the case.</p>
+{% elif local_result == 'stale' %}<p role="status">Case data or a package changed. Reopen and review before preparing.</p>
+{% elif local_result == 'human_review' %}<p role="status">An existing human package needs your review; no replacement was prepared.</p>
+{% elif local_result in ('unavailable', 'cooldown') %}<p role="status">Local preparation is unavailable right now; continue manually.</p>
+{% elif local_result == 'in_progress' %}<p role="status">Preparation is already in progress; return to check its recorded status.</p>
+{% elif local_result == 'not_eligible' %}<p role="status">Continue this case manually.</p>
+{% elif local_result == 'ready' %}<p role="status">Check the recorded preparation status and review the package; nothing was approved or sent.</p>{% endif %}
+</section>
+{% endif %}

@@ -1,0 +1,31 @@
+{% from "_components.html" import tag, button, post_button, done_banner %}
+<section id="package" aria-labelledby="package-title"><h2 id="package-title">Evidence package</h2>
+{% if feature_enabled("demo_documents") and hosted and latest_package %}{% include "features/demo_documents/_entry.html" %}{% endif %}
+{% if feature_enabled("demo_documents_seeded") and not hosted and norm.can_provide_evidence and not rc3_reviewing and not buyer_closed %}<p data-state="seeded-demo-entry"><a href="/disputes/{{ norm.dispute_id }}/seeded-demo">Seeded demo case: use the demo documents and shipment details</a> (DEMO DATA, you confirm first).</p>{% endif %}
+{% if rc3_reviewing or buyer_closed %}<p>{{ tag('na','New packages are not available') }} {% if buyer_closed %}The buyer closed this case.{% else %}PayPal is reviewing this claim.{% endif %} Existing packages remain readable below. <a href="{{ ws_url('overview') }}#summary">Review the case status</a>.</p>{% endif %}
+{% if norm.can_provide_evidence and not rc3_reviewing and not buyer_closed %}
+<p class="hint" data-state="package-hint">{% if hosted %}The AI assistant is off in this demo. You type the shipment facts and statements yourself. Nothing is sent.{% else %}The local AI model writes first statements from your documents. You check every one. Nothing is sent.{% endif %}</p>
+{% endif %}
+{% if can_new_version %}
+<details data-state="new-version"><summary>Prepare a new package version</summary>
+  <p>Package v{{ latest_package.version }} stays as it is. A new version must be reviewed and approved again before anything is sent.</p>
+  {% if pending_new_version %}<p>Sending stays blocked until PayPal confirms the earlier attempt, or you mark it as not received on the package page.</p>{% endif %}
+  {{ post_button("/disputes/" ~ norm.dispute_id ~ "/packages", "Start package v" ~ next_version, csrf_token, kind="secondary", sending="Preparing…") }}
+</details>
+{% endif %}
+{% if packages|length > 0 %}
+<table class="stack">
+<caption class="visually-hidden">Evidence packages for this dispute</caption>
+<thead><tr><th scope="col">Version</th><th scope="col">Source</th><th scope="col">Status</th></tr></thead>
+<tbody>
+{% for p in packages %}
+<tr>
+  <td data-label="Version"><a href="/disputes/{{ norm.dispute_id }}/packages/{{ p.id }}">Open package v{{ p.version }}</a></td>
+  <td data-label="Source">{{ p.source_words }}</td>
+  <td data-label="Status">{{ tag(p.status_view.kind, p.status_view.label) }}{% if p.checks_line %}<p class="hint">{{ p.checks_line }}</p>{% endif %}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+</section>

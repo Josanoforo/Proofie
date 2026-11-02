@@ -1,0 +1,26 @@
+{% extends "_base.html" %}
+{% from "_components.html" import button %}
+{% from "_form_fields.html" import error_summary, field %}
+{% block title %}{% if access_error %}Error: {% endif %}Open the demo · Proofie{% endblock %}
+{% block nav %}{% endblock %}
+{% block content %}
+{{ error_summary({'code': access_error} if access_error else {}) }}
+<h1>Open the demo</h1>
+
+<form method="post" action="/access" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="next" value="{{ next }}">
+  {{ field('code', 'Access code', '', hint='The code you were given to open this demo.', mark='Required', error=access_error or None, type='password', autocomplete='current-password', width='w20') }}
+  <div class="actions">{{ button('Open the demo', kind='primary') }}</div>
+</form>
+
+<section class="hosted-about" data-state="hosted-about" aria-labelledby="hosted-about-title">
+<h2 id="hosted-about-title">What this copy is</h2>
+<ul>
+<li data-state="about-manual">The AI assistant is switched off here, so this copy runs in manual mode: you type the shipment facts yourself.</li>
+<li data-state="about-account">Everyone who opens this demo uses one shared PayPal sandbox account, so you see the same disputes and uploads as other visitors.</li>
+<li data-state="about-restart">{{ restart_line }}</li>
+<li data-state="about-local">Running Proofie on your own computer adds the local assistant, an AI model on that computer that proposes a draft for you to review, and the MCP server, which lets your own AI assistant read a dispute and prepare a draft. Approval stays with you on the review page.</li>
+</ul>
+</section>
+{% endblock %}

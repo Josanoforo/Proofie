@@ -1,0 +1,30 @@
+{% if feature_enabled('case_reentry') and case_reentry_view and case_reentry_view.available %}
+<section class="panel" data-state="case-reentry-checkpoint" aria-labelledby="case-reentry-title">
+  <h2 id="case-reentry-title">Pick up this case</h2>
+  {% if case_reentry_view.latest_saved_work %}
+  <div data-state="case-reentry-saved-work">
+    <h3>Most recent saved work</h3>
+    <p>{{ case_reentry_view.latest_saved_work.label }}{% if case_reentry_view.latest_saved_work.attribution %} — {{ case_reentry_view.latest_saved_work.attribution }}{% endif %}.</p>
+    <p>Recorded at {{ case_reentry_view.latest_saved_work.ts|when }}. Source: {{ case_reentry_view.latest_saved_work.source }}.</p>
+    {% if case_reentry_view.latest_saved_work.href %}<p><a href="{{ case_reentry_view.latest_saved_work.href }}">Return to this exact package version</a></p>{% endif %}
+  </div>
+  {% else %}<p data-state="case-reentry-no-saved-work">No dated saved work is available in the supplied case records.</p>{% endif %}
+
+  <div data-state="case-reentry-next-task">
+    <h3>Next step</h3>
+    {% if case_reentry_view.next_task %}
+      <p>{{ case_reentry_view.next_task.title }}{% if case_reentry_view.next_task.label %}: {{ case_reentry_view.next_task.label }}{% endif %}</p>
+      {% if case_reentry_view.next_task.href %}<p><a href="{{ case_reentry_view.next_task.href }}">Continue this step</a></p>
+      {% else %}<p><a href="/disputes/{{ case_reentry_view.case_id }}/workspace/prepare">Open this case workspace</a></p>{% endif %}
+    {% else %}<p>No current task row was supplied. <a href="/disputes/{{ case_reentry_view.case_id }}/workspace/prepare">Continue in the case workspace</a>.</p>{% endif %}
+  </div>
+
+  {% if case_reentry_view.packages %}
+  <details data-state="case-reentry-versions"><summary>Saved package versions</summary>
+    <ol>{% for package in case_reentry_view.packages %}<li><a href="{{ package.href }}">Package v{{ package.version }}</a> — {{ package.approval_note }}{% if package.created_at %} Saved at {{ package.created_at|when }}.{% endif %}</li>{% endfor %}</ol>
+  </details>
+  {% endif %}
+  <p><a href="{{ case_reentry_view.history_href }}">Review this case's saved history</a></p>
+  <details><summary>About saved work and drafts</summary><ul data-state="case-reentry-limits">{% for limitation in case_reentry_view.limitations %}<li>{{ limitation }}</li>{% endfor %}</ul></details>
+</section>
+{% endif %}

@@ -1,0 +1,44 @@
+{
+ "case_id": "unsupported_claim_dev",
+ "type": "unsupported_claim",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EVAL-0015",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2015\nOrder date: 2026-10-01 10:00\nTotal paid: 25.00 USD\nPayPal capture id: DEMOTXN0000000001",
+  "doc_shipping": "Carrier: Estafeta\nTracking number: DEMO9100000015\n2026-10-03  Label created. Picked up by carrier."
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_shipping": "shipping_tracking.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "DEMO9100000015",
+   "TS-DEMO-2015",
+   "label created",
+   "picked up"
+  ],
+  "forbidden_claims": [
+   "delivered",
+   "signed for",
+   "received by the buyer"
+  ],
+  "expected_conflicts": [],
+  "expected_missing": [
+   "proof of delivery"
+  ],
+  "expected_action": "ask_seller"
+ },
+ "notes": "The shipping document proves a label was created and the carrier picked up the package - it does NOT say the package was delivered. The dispute reason is 'not received', so this document does not support the specific claim needed (delivery); the model must not promote 'picked up' to 'delivered'."
+}

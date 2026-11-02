@@ -1,0 +1,21 @@
+{% from "_components.html" import tag %}
+{%- set basis_words = {'case_request': "PayPal's request", 'published_policy': 'published policy', 'app_quality_rule': "Proofie's own quality rule", 'seller_statement': 'your statement', 'buyer_statement': "the buyer's statement", 'model_interpretation': 'AI reading (local model)', 'none': 'Not available'} %}
+{%- set field_words = {'tracking_number': 'Tracking number', 'carrier': 'Carrier', 'delivery_status': 'Delivery status', 'delivery_date': 'Delivery date', 'ship_date': 'Ship date', 'postal_code': 'Postal code', 'city': 'City', 'state': 'State', 'street': 'Street', 'delivery_type': 'Delivery type', 'extracted_text': 'Text read from the document', 'dispute_id': 'Dispute', 'amount_cents': 'Amount', 'currency': 'Currency', 'reason': 'Reason', 'status': 'Status', 'unknown': 'Not available'} %}
+<ol class="claim-list">
+{% for c in claims %}
+<li class="claim-card" data-verdict="{{ c.verdict }}" data-claim-basis="{{ c.claim_basis }}" data-basis="{{ c.bases|join(' ') }}">
+<p class="claim-sentence">{{ safe_text(c.text) }}</p>
+<p class="claim-verdict">{{ tag({'verified':'ok','unverifiable':'warn','seller_statement':'info','conflict':'bad'}.get(c.verdict,'todo'), {'verified': 'Matches the source', 'unverifiable': 'Cannot be verified', 'seller_statement': 'Your own statement', 'conflict': 'Does not match the source'}.get(c.verdict, 'Not available')) }}</p>
+{% set basis_labels = namespace(words=[]) %}
+{% for basis in ([c.claim_basis] + (c.bases|list)) %}{% set word = basis_words.get(basis, 'Not available') %}{% if word not in basis_labels.words %}{% set basis_labels.words = basis_labels.words + [word] %}{% endif %}{% endfor %}
+<p class="claim-basis" data-basis="{{ c.bases|join(' ') }}">{% if c.claim_basis == "seller_statement" and not c.sources %}Your own statement. No document is cited.{% else %}Why it is in the file: {{ basis_labels.words|join('; ') }}{% endif %}</p>
+{% if c.sources %}{% set statement_number = loop.index %}<div class="claim-source-stack" aria-label="Sources for this statement"><p class="b-label">Source for statement {{ statement_number }}</p>{% for s in c.sources %}<section class="claim-source-card" data-source-id="{{ safe_text(s.artifact_id) }}" aria-label="Source: {{ safe_text(document_names[s.artifact_id]) }}"><dl class="claim-source">
+<dt>Document</dt><dd class="claim-source-doc" data-source-id="{{ safe_text(s.artifact_id) }}">{{ safe_text(document_names[s.artifact_id]) }}</dd>
+<dt>Field read</dt><dd class="claim-source-field" data-field="{{ safe_text(s.field) }}">{{ safe_text(field_words.get(s.field, 'Not available')) }}</dd>
+<dt>Value read</dt><dd class="claim-source-value">{{ safe_text(s.value) if s.value is not none else 'No extracted value' }}</dd>
+{% if s.field == 'extracted_text' %}<dd class="field-hint">Document text; not a saved shipment-status field.</dd>{% endif %}
+{% if pkg_url is defined and pkg_url %}<dt class="visually-hidden">Source details</dt><dd><a class="b-source-details" href="{{ pkg_url }}/claims-review" aria-label="View source details for statement {{ statement_number }}, {{ safe_text(document_names[s.artifact_id]) }}">View source details</a></dd>{% endif %}
+<dt>Source record</dt><dd><details><summary>Technical details</summary><p>Artifact {{ safe_text(s.artifact_id) }}; field {{ safe_text(s.field) }}</p><p>Document fingerprint (SHA-256): <span class="claim-source-hash">{{ s.sha256 or 'No artifact available' }}</span></p></details></dd>
+</dl></section>{% endfor %}</div>{% else %}{% if c.claim_basis != "seller_statement" %}<p>No document is cited.</p>{% endif %}{% endif %}
+</li>{% endfor %}
+</ol>

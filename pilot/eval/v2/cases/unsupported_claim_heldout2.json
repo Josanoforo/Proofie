@@ -1,0 +1,46 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "unsupported_claim_heldout2",
+ "type": "unsupported_claim",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0039",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 89000,
+  "amount_display": "890.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000039"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1039\nFecha del pedido: 2026-10-02 09:00\nTotal pagado: 890.00 MXN\nID de captura PayPal: EV2CAPTURE0000039",
+  "doc_panel": "Panel de mi tienda (captura de pantalla)\nPedido TS-EV2-1039\nEstado: Entregado\nActualizado: 2026-10-05"
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_panel": "panel_tienda.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "carrier_proof",
+    "any_of": [
+     "tracking",
+     "carrier",
+     "paquetería",
+     "proof",
+     "guía",
+     "guia"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [],
+  "must_cite_tracking": null
+ },
+ "notes": "The seller's own shop panel says Entregado: not a carrier record."
+}

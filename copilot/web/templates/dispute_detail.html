@@ -1,0 +1,59 @@
+{% extends "case_base.html" %}
+{% from "_components.html" import banner, tag, next_step_panel, tip, disclosure_button, link_button %}
+{% block case_body %}
+<div class="overview-workspace" data-state="overview-workspace">
+<div class="overview-main">
+{% if late_confirmations %}
+{% call banner("ok", "late-confirmed", "An earlier attempt was confirmed after all") %}
+  <p>An earlier attempt you marked as not received was later confirmed by PayPal.</p>
+{% endcall %}
+{% endif %}
+{% if norm.reason != "MERCHANDISE_OR_SERVICE_NOT_RECEIVED" and not rc3_reviewing and not buyer_closed %}<p class="note-neutral" data-state="shipment-proof-only">{{ not_inr_sentence }}</p>{% endif %}
+
+{% include "case/_summary.html" %}
+{% if step.key == 'review' and latest_package and feature_enabled('claims') %}
+<section class="panel next-step" id="next-step" data-next-step="review" aria-labelledby="next-step-title"><h2 id="next-step-title">Possible next step</h2><p>Review the statements, then the package. Approving sends nothing.</p><p class="actions">{{ link_button(ws_url('review'), 'Review the statements', kind='primary') }}</p></section>
+{% else %}{% call next_step_panel(step, csrf_token) %}
+{% if step.data_state == 'evidence-listed' %}<p data-state="evidence-listed-link">If PayPal offers it, you can add to your evidence there: {{ resolution_center_link() }}</p>{% endif %}
+{% endcall %}{% endif %}
+
+<div class="disc" data-disc="closed" data-state="overview-more">{% call disclosure_button("overview-more-body") %}All tasks and case links{% endcall %}
+<div class="disc-body" id="overview-more-body">
+<section class="panel" id="tasks" aria-labelledby="tasks-title"><h2 id="tasks-title">Tasks in this case</h2>
+<table class="stack task-table">
+<caption class="visually-hidden">Tasks in this case and where each one stands</caption>
+<thead><tr><th scope="col">Task</th><th scope="col">State</th><th scope="col"><span class="visually-hidden">Open</span></th></tr></thead>
+<tbody>
+{% for task in tasks %}<tr class="task-row" data-task="{{ task.key }}" data-status="{{ task.status }}">
+  <td data-label="Task"><span class="task-name">{{ task.title }}</span>{% if task.mark %} <span class="task-mark">{{ task.mark }}</span>{% endif %}
+    {% if task.hint and not task.blocked %}{% call tip("About this task") %}{{ task.hint }}{% endcall %}{% endif %}
+    {% if task.blocked %}<p class="task-blocked">{{ "Not available." if task.label == "Not available" else "Cannot start yet." }} {% if task.blocker[1] %}{{ task.blocker[0] }} <a href="{{ task.blocker[2] }}">{{ task.blocker[1] }}</a>.{% else %}{{ task.blocker[0] }}{% endif %}</p>{% endif %}</td>
+  <td data-label="State" class="task-state">{{ tag(task.kind, task.label) }}</td>
+  <td data-label="Go to">{% if task.blocked %}<span class="task-na">Not yet</span>{% else %}<a class="task-link" href="{{ task.href }}">Open<span class="visually-hidden"> {{ task.title }}. {{ task.label }}</span></a>{% endif %}</td>
+</tr>{% endfor %}
+</tbody></table>
+</section>
+
+<section class="panel case-links" id="case-links" aria-labelledby="case-links-title" data-state="case-links"><h2 id="case-links-title">Case links</h2>
+<ul>
+{%- if latest_package %}<li><a href="/disputes/{{ norm.dispute_id }}/packages/{{ latest_package.id }}">Evidence package v{{ latest_package.version }}</a></li>{% endif %}
+{%- if capture %}<li><a href="{{ ws_url('sale') }}">Sale records</a> for transaction <span translate="no">{{ capture }}</span></li>{% endif %}
+<li><a href="{{ ws_url('records') }}">Case records: history, PayPal's timeline and why this case is in this state</a></li>
+<li>{{ resolution_center_link() }}</li>
+</ul>
+</section>
+</div></div>
+
+<details class="other-responses" id="other-responses" data-state="other-responses"><summary>Other possible responses</summary>
+<p class="field-hint" data-state="do-nothing">{{ do_nothing }}</p>
+<p><a class="btn-link" href="{{ ws_url('other') }}">See the other things you can do</a></p>
+</details>
+</div>
+<aside class="overview-context-rail" aria-label="Review and sending">
+  <p class="b-kicker">Human review</p>
+  <h2>Review and send are separate</h2>
+  <p>A person reviews the package before approving. Sending is a separate action.</p>
+</aside>
+{% include "case/_sending_status.html" %}
+</div>
+{% endblock %}

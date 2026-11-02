@@ -1,0 +1,9 @@
+{% extends "_base.html" %}
+{% block title %}Print package insert - Proofie{% endblock %}
+{% block content %}<div class="page package-insert" data-state="package-insert"><h1>For your package</h1>
+<section lang="en"><h2>English</h2><p>{{ result.en }}If you need help, contact {{ result.seller_contact }}.</p></section>
+<section lang="es"><h2>Español</h2><p>{{ result.es }}Si necesitas ayuda, contacta a {{ result.seller_contact }}.</p></section>
+<p>Item: {{ result.item_description }} · {{ result.carrier }} · Tracking {{ result.tracking_number }}</p>
+{% if result.profile %}<section data-state="trade-profile-reminders"><h2>{{ result.profile.label }} preparation reminders</h2><ul>{% for check in result.profile.checks %}<li>{{ check }}</li>{% endfor %}</ul></section>{% endif %}
+{% if result.seller_lessons %}<section data-state="seller-selected-lessons"><h2>Seller-selected preparation reminders</h2><ul>{% for lesson in result.seller_lessons %}<li>{{ lesson.text }} <small>{{ lesson.attribution }} · source case {{ lesson.source_dispute_id }}, sale {{ lesson.source_capture_id }} · recorded outcome {{ lesson.recorded_outcome }} · {{ lesson.created_at }}</small></li>{% endfor %}</ul><p>These reminders are not evidence or confirmed causes for this new sale.</p></section>{% endif %}
+{% if result.tracking_url %}<p>Public tracking: {{ result.tracking_url }}</p>{% else %}<p>No public tracking link is listed for this carrier.</p>{% endif %}<button class="btn btn-secondary" type="button" onclick="window.print()">Print this page</button><p><a href="/fulfilment/{{ capture_id }}">Return to tracking review</a></p></div>{% endblock %}

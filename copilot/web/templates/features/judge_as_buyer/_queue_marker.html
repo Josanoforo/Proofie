@@ -1,0 +1,1 @@
+{% set buyer_marker = judge_as_buyer_marker(row.norm) %}{% if buyer_marker %}<p class="row-note" data-state="judge-opened-by-buyer">Opened by you as buyer — seeded sandbox sale</p><p class="row-note" data-state="judge-buyer-elapsed">{{ buyer_marker.label }}</p>{% endif %}

@@ -1,0 +1,160 @@
+{# Shared components. Every alert carries a data-state (what the DOM
+   tests and the recovery journeys look for) and, where there is something to do, its action inside the same box.
+   kind: info | warn | error | ok - paired with a text title, never colour alone.
+   Controls: button, link_button and post_button are the only way to draw a control. A bare <button>, a kind-less
+   class="btn" or a hand-made disabled look is a contract violation (tests/local/_ux_lint.py scans for them). #}
+{% macro tag(state, label) -%}
+{% set icons = {'ok':'✓','warn':'!','bad':'✕','na':'—','info':'i','todo':'○','due':'◷'} %}
+<span class="tag tag--{{ state if state in icons else 'todo' }}"><span aria-hidden="true">{{ icons.get(state,'○') }}</span> {{ label }}</span>
+{%- endmacro %}
+
+{# The one place that draws the glyph of an error. field_error is the message next to a field: glyph, then the words
+   (the glyph is hidden from screen readers; the words carry the meaning). banner_mark is the glyph-only tag for a banner whose title
+   would only repeat the h1: its words stay for screen readers. #}
+{% macro field_error(id, text) -%}
+<p class="field-error" id="{{ id }}"><span aria-hidden="true">✕</span> {{ text }}</p>
+{%- endmacro %}
+
+{% macro banner_mark(kind, label=None) -%}
+{% set icons = {'ok':'✓','warn':'!','error':'✕','info':'i'} %}
+{% set words = {'ok':'Done','warn':'Warning','error':'Error','info':'Note'} %}
+{% set states = {'ok':'ok','warn':'warn','error':'bad','info':'info'} %}
+<p class="banner-title"><strong><span class="tag tag--{{ states.get(kind, 'info') }}"><span aria-hidden="true">{{ icons.get(kind, 'i') }}</span><span class="visually-hidden"> {{ label or words.get(kind, 'Note') }}</span></span></strong></p>
+{%- endmacro %}
+
+{% macro banner(kind, state, title) %}
+<div class="banner banner-{{ kind }}" data-state="{{ state }}" role="{{ 'alert' if kind == 'error' else 'status' }}">
+  <p class="banner-title"><strong>{{ tag({'ok':'ok','warn':'warn','error':'bad'}.get(kind,'info'), title) }}</strong></p>
+  {{ caller() }}
+</div>
+{% endmacro %}
+
+{# "PayPal was read at <time>. Disputes may have changed since." checked_at is the legacy label string or an ISO value. #}
+{% macro checked_bar(checked_at, refresh_url, refresh_label) %}
+<p class="checked-at" data-state="checked-at">PayPal was read at {{ checked_at|when }}. Disputes may have changed since.
+  <a href="{{ refresh_url }}">{{ refresh_label }}</a></p>
+{% endmacro %}
+
+{# One limitation: its plain sentence, and the HTTP status and issue code PayPal gave under Technical details. #}
+{% macro limitation_text(lim) -%}
+{{ lim.message }}{% if lim.technical %} <details class="limitation-technical"><summary>Technical details</summary><p>PayPal answered: {{ lim.technical }}.</p></details>{% endif %}
+{%- endmacro %}
+
+{# ----------------------------------------------------------------------------------------------- controls #}
+{% macro button(label, kind='primary', type='submit', large=False, name=None, value=None, hidden=None, sending=None, describedby=None, form=None, id=None, data_state=None) -%}
+<button type="{{ type }}" class="{% if kind == 'link' %}btn-link{% elif kind == 'primary' %}btn btn-primary btn-large{% else %}btn btn-secondary{% if large %} btn-large{% endif %}{% endif %}"
+{%- if id %} id="{{ id }}"{% endif %}{% if name %} name="{{ name }}"{% endif %}{% if value is not none %} value="{{ value }}"{% endif %}
+{%- if form %} form="{{ form }}"{% endif %}{% if describedby %} aria-describedby="{{ describedby }}"{% endif %}
+{%- if sending %} data-sending-text="{{ sending }}"{% endif %}{% if data_state %} data-state="{{ data_state }}"{% endif %}>{{ label }}{% if hidden %}<span class="visually-hidden"> {{ hidden }}</span>{% endif %}</button>
+{%- endmacro %}
+
+{% macro link_button(href, label, kind='primary', large=False, hidden=None, id=None, data_state=None) -%}
+<a class="{% if kind == 'link' %}btn-link{% elif kind == 'primary' %}btn btn-primary btn-large{% else %}btn btn-secondary{% if large %} btn-large{% endif %}{% endif %}" href="{{ href }}"
+{%- if id %} id="{{ id }}"{% endif %}{% if data_state %} data-state="{{ data_state }}"{% endif %}>{{ label }}{% if hidden %}<span class="visually-hidden"> {{ hidden }}</span>{% endif %}</a>
+{%- endmacro %}
+
+{% macro post_button(action, label, csrf_token, kind='secondary', large=False, sending=None, sends=False, hidden=None, fields=(), form_state=None, button_state=None) -%}
+<form method="post" action="{{ action }}" class="inline-form"{% if sends %} data-sends{% endif %}{% if form_state %} data-state="{{ form_state }}"{% endif %}>
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+{%- for field_name, field_value in fields %}
+<input type="hidden" name="{{ field_name }}" value="{{ field_value }}">
+{%- endfor %}
+{{ button(label, kind=kind, large=large, sending=sending, hidden=hidden, data_state=button_state) }}
+</form>
+{%- endmacro %}
+
+{# ------------------------------------------------------------------------------------------- navigation #}
+{# items = [(label, href), ..., (current label, None)]; the last item is the current page and never a link.
+   Below 640 px only the parent crumb shows, as a "‹ Parent" link (CSS). #}
+{% macro breadcrumbs(items) -%}
+<nav class="breadcrumbs" aria-label="Breadcrumb"><ol>
+{%- for label, href in items %}
+<li>{% if href and not loop.last %}<a href="{{ href }}">{{ label }}</a>{% else %}<span aria-current="page">{{ label }}</span>{% endif %}</li>
+{%- endfor %}
+</ol></nav>
+{%- endmacro %}
+
+{# ------------------------------------------------------------------------------------------ display only #}
+{% macro _render_action(action, csrf_token, label_override=None) -%}
+{%- if action.post -%}
+{{ post_button(action.post, action.label, csrf_token, kind=action.kind, large=action.large, sending=action.sending, sends=action.sends, hidden=action.hidden, fields=action.fields) }}
+{%- else -%}
+{{ link_button(action.href, label_override or action.label, kind=action.kind, large=action.large, hidden=action.hidden) }}
+{%- endif -%}
+{%- endmacro %}
+
+{# The page's one "what do I do now" panel: a next_step.NextStep. One per page. {% call next_step_panel(step, token) %} adds
+   extra markup (for example the legacy approve form) at the end of the panel. #}
+{% macro next_step_panel(step, csrf_token=None, primary_label=None) -%}
+<section class="panel next-step" id="next-step" data-next-step="{{ step.key }}"{% if step.data_state %} data-state="{{ step.data_state }}"{% endif %} aria-labelledby="next-step-title">
+<h2 id="next-step-title">{{ step.heading }}</h2>
+{%- if step.body %}
+<p>{{ step.body }}</p>
+{%- endif %}
+{%- if step.items %}
+<ul class="fix-list">{% for item in step.items %}<li>{{ item.text }} <a href="{{ item.href }}">{{ item.link }}</a></li>{% endfor %}</ul>
+{%- endif %}
+{%- if step.action or step.secondary %}
+<div class="actions actions--forward">
+{%- if step.action %}
+{{ _render_action(step.action, csrf_token, primary_label) }}
+{%- endif %}
+{%- for secondary in step.secondary %}
+{{ _render_action(secondary, csrf_token) }}
+{%- endfor %}
+</div>
+{%- endif %}
+{%- if step.note %}
+<p class="action-note"{% if step.note_state %} data-state="{{ step.note_state }}"{% endif %}>{{ step.note }}</p>
+{%- endif %}
+{%- if caller is defined %}
+{{ caller() }}
+{%- endif %}
+</section>
+{%- endmacro %}
+
+{# Text that PayPal will receive (or has received) exactly as written: the browser must not translate it. Use as a call
+   block with no padding: {% call exact_content() %}{{ text }}{% endcall %} - line breaks are shown as they are.
+   Pass sent=true for text that was already sent ("What was sent"); the note then reads in the past tense.
+   For a send PayPal did not confirm, say what Proofie did and nothing about PayPal: state='attempted' (the request
+   was sent, PayPal has not confirmed it) reads "as Proofie sent it"; state='refused' (PayPal refused it) reads "as Proofie
+   tried to send it". sent=true wins over state. #}
+{% macro exact_content(sent=false, state='') -%}
+<div class="exact-content" translate="no" data-exact-content>{{ caller()|trim }}</div>
+<p class="exact-note">Shown exactly as {{ 'PayPal received it' if sent else ('Proofie sent it' if state == 'attempted' else ('Proofie tried to send it' if state == 'refused' else 'PayPal will receive it')) }}. Your browser will not translate this part.</p>
+{%- endmacro %}
+
+{# One confirmation after an action. The text comes from presentation.done_message (facts read from stored rows).
+   Optional undo = presentation.done_undo(...) ({post, hidden, fields}) with the page's csrf_token draws one guarded
+   POST form, the visible word "Undo" plus visually-hidden context; without undo, or without a csrf_token, the markup is
+   exactly the plain banner. #}
+{% macro done_banner(key, text, undo=None, csrf_token=None) -%}
+<div class="banner banner-ok" data-state="done" data-done="{{ key }}" role="status"><p class="banner-title"><strong>✓ {{ text }}</strong></p>
+{%- if undo and csrf_token %}
+{{ post_button(undo.post, 'Undo', csrf_token, kind='link', hidden=undo.hidden, fields=undo.fields) }}
+{%- endif %}</div>
+{%- endmacro %}
+
+{% macro mono_id(value) -%}
+<span class="mono-id" translate="no">{{ value }}</span>
+{%- endmacro %}
+
+{# A toggletip: a small "i" button that opens its explanation on hover, keyboard focus and click or tap (app.js). Without
+   scripts the explanation stays in the page as plain text next to its label. Use it for text that explains; facts the
+   seller acts on, warnings and the primary button stay visible. #}
+{% macro tip(label="What this means") -%}
+<span class="tip" data-tip><button type="button" class="tip-btn btn-link" aria-expanded="false" aria-label="{{ label }}"><span aria-hidden="true">i</span></button><span class="tip-body">{{ caller() }}</span></span>
+{%- endmacro %}
+
+{# The numbered steps of one task: done steps ticked, the current step marked. `steps` is [{label, state}] with state
+   done | current | todo, built from data the page already has. #}
+{% macro stepper(steps, label="Steps in this task") -%}
+<ol class="stepper" aria-label="{{ label }}" data-state="task-stepper">
+{%- for s in steps %}
+<li class="step step--{{ s.state }}"{% if s.state == "current" %} aria-current="step"{% endif %}><span class="step-no" aria-hidden="true">{% if s.state == "done" %}&#10003;{% else %}{{ loop.index }}{% endif %}</span><span class="step-name">{{ s.label }}{% if s.state == "done" %}<span class="visually-hidden"> (done)</span>{% elif s.state == "current" %}<span class="visually-hidden"> (current step)</span>{% endif %}</span></li>
+{%- endfor %}
+</ol>
+{%- endmacro %}
+{% macro disclosure_button(controls) -%}
+<button type="button" class="disc-btn btn-link" aria-expanded="true" aria-controls="{{ controls }}">{{ caller() }}</button>
+{%- endmacro %}

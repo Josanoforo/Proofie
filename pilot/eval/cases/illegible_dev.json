@@ -1,0 +1,42 @@
+{
+ "case_id": "illegible_dev",
+ "type": "illegible",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EVAL-0011",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2011\nOrder date: 2026-10-01 10:00\nTotal paid: 25.00 USD\nPayPal capture id: DEMOTXN0000000001",
+  "doc_scan": "[EXTRACTION FAILED: scanned shipping label, 0 characters of text recovered by OCR]"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_scan": "shipping_label_scan.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "TS-DEMO-2011"
+  ],
+  "forbidden_claims": [
+   "tracking",
+   "carrier",
+   "delivered"
+  ],
+  "expected_conflicts": [],
+  "expected_missing": [
+   "legible shipping document",
+   "tracking"
+  ],
+  "expected_action": "ask_seller"
+ },
+ "notes": "Simulates a PDF/image whose text extraction failed (G15: real PDF/image ingestion into step4 is not built yet - C0 only installed pypdfium2/pillow; this case exercises the model's handling of an explicit extraction-failure marker, not actual OCR)."
+}

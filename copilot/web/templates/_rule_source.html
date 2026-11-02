@@ -1,0 +1,2 @@
+{% if policy_source %}<p data-state="policy-source">Checked against: <a href="{{ policy_source.url }}" rel="noopener">PayPal Seller Protection, {{ policy_source.country }}, updated {{ policy_source.updated }}</a> (PayPal website).</p>
+{% else %}<p data-state="policy-source-missing">The rule set for the installation's setting is not available; no policy check is confirmed.</p>{% endif %}

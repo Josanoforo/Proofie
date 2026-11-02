@@ -1,0 +1,10 @@
+#!/bin/sh
+# Local secret scanner. Runs tools/scan_staged.py with the project venv before every commit.
+# This is the versioned copy; git does not track .git/hooks itself, so a fresh clone installs it with:
+#   cp tools/pre-commit .git/hooks/pre-commit  (then chmod +x .git/hooks/pre-commit on Unix)
+#
+# To skip once (needs the owner's explicit approval): git commit --no-verify
+# To remove permanently: delete .git/hooks/pre-commit; nothing else depends on it.
+set -e
+root="$(git rev-parse --show-toplevel)"
+"$root/.venv/Scripts/python.exe" "$root/tools/scan_staged.py"

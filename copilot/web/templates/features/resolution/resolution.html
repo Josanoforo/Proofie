@@ -1,0 +1,135 @@
+{% extends "_base.html" %}
+{% from "_stage.html" import stage_words %}
+{% from "_components.html" import tag, banner, button, link_button, post_button, breadcrumbs, limitation_text %}
+{% from "_form_fields.html" import error_summary, field, required_note %}
+{% set offer_open = state.actions.offer and writes_enabled %}
+{% set message_open = state.actions.message and writes_enabled %}
+{% set primary_action = 'offer' if offer_open else ('message' if message_open else ('defend' if state.actions.defend else none)) %}
+{% set hub = '/disputes/' ~ dispute_id ~ '/resolution' %}
+{% set cur = state.norm.currency if state.norm else '' %}
+{% block title %}{% if errors or refusal %}Error: {% endif %}Resolution options and buyer messages: {{ dispute_id }} - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ dispute_id, '/disputes/' ~ dispute_id), ('Resolution options and buyer messages', None)]) }}{% endblock %}
+{% block content %}{% if feature_enabled("outcome") %}{% with rc3_norm = state.norm %}{% include "features/outcome/_review_notice.html" %}{% endwith %}{% endif %}
+{% if errors %}<div data-state="form-error">{{ error_summary(errors) }}</div>{% endif %}
+{% if refusal %}<div data-state="preview-refused" class="error-summary" role="alert" tabindex="-1"><h2><span aria-hidden="true">✕</span> Nothing was sent</h2><p>{{ refusal }}</p></div>{% endif %}
+<h1>Resolution options and buyer messages <span class="h1-id" translate="no">Dispute {{ dispute_id }}</span></h1>
+{% if norm and norm.seller_response_due_date and norm.deadline_parse_ok %}<p data-state="respond-by">Respond by {{ norm.seller_response_due_date|when }}.</p>{% endif %}
+
+{% if not writes_enabled %}
+<p class="notice" data-state="writes-off">In this release Proofie shows the order of actions PayPal allows and what each would cost. It does not send offers or messages. To defend, use your evidence file.</p>
+{% endif %}
+{% if state.pending %}
+<div class="notice" data-state="pending-settle">
+<p>PayPal answered OK; not listed yet. Proofie is waiting for PayPal to update the dispute.</p>
+{% if last_checked %}<p data-state="last-checked">Last checked with PayPal at {{ last_checked|when }}.</p>{% endif %}
+{% if writes_enabled %}<div class="actions">{{ post_button(hub ~ '/check', 'Check PayPal again', csrf_token, sending='Checking PayPal…') }}</div>
+<p class="action-note">{{ READS_ONLY_NOTE }}</p>{% endif %}
+</div>
+{% endif %}
+{% if checked_note %}<p class="notice" data-state="checked-note">{{ checked_note }}</p>{% endif %}
+{% if already %}{% include "features/resolution/_already_sent.html" %}{% endif %}
+{% if state.norm %}
+<p data-state="dispute-status">PayPal shows this dispute as: <span data-status="{{ state.norm.status }}">{% if feature_enabled("outcome") and state.buyer_closed %}{{ BUYER_CLOSED_LABEL }}{% else %}{{ {'OPEN': 'Open', 'UNDER_REVIEW': 'Under review', 'RESOLVED': 'Resolved', 'WAITING_FOR_SELLER_RESPONSE': 'Waiting for your response', 'WAITING_FOR_BUYER_RESPONSE': "Waiting for the buyer's response"}.get(state.norm.status, 'Not available') }}{% endif %}</span> {% if state.norm.stage %} (stage <span data-stage="{{ state.norm.stage }}">{{ stage_words(state.norm.stage) }}</span>){% endif %}.</p>
+<p class="resolution-next" data-state="next-step">{% if writes_enabled %}{{ state.next_step_text }}{% else %}PayPal's order: an offer must come first; a message closes the offer window.{% endif %}</p>
+{% if state.settling %}<p>{{ link_button(hub, 'Refresh', kind='link', data_state='refresh') }}</p>{% endif %}
+{% endif %}
+{% if negotiation_drafts_enabled and state.norm %}
+<section class="panel" id="local-negotiation-draft" data-state="negotiation-draft">
+<h2>Prepare a local buyer proposal</h2>
+<p>Uses what PayPal says now about this dispute and the actions it lists. Recipient and conditions are seller-supplied details. This creates a local draft only; it does not send or record an outcome.</p>
+{% if autopilot_handoff %}<aside class="notice" data-state="autopilot-draft-handoff"><strong>Current simulation imported for review.</strong> Action {{ autopilot_handoff.action }}; {{ autopilot_handoff.amount_cents }} cents {{ autopilot_handoff.currency }}; policy {{ autopilot_handoff.policy_version }} (<code>{{ autopilot_handoff.policy_sha256 }}</code>); state <code>{{ autopilot_handoff.state_sha256 }}</code>; evidence dossier <code>{{ autopilot_handoff.dossier_sha256 }}</code>. The amount is prefilled and editable. The resulting proposal records this source and remains local.</aside>{% endif %}
+{% if autopilot_handoff_error %}<p role="alert" data-state="autopilot-handoff-refused">{{ autopilot_handoff_error }}</p>{% endif %}
+<p>Recorded actions currently available: {% if draft_actions.offer %}offer{% endif %}{% if draft_actions.offer and draft_actions.message %}, {% endif %}{% if draft_actions.message %}message{% endif %}{% if not draft_actions.offer and not draft_actions.message %}none{% endif %}.</p>
+<form method="post" action="/disputes/{{ dispute_id }}/resolution/draft">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+{% if autopilot_handoff %}<input type="hidden" name="autopilot_logical_id" value="{{ autopilot_handoff.logical_id }}">{% endif %}
+<label for="draft-kind">Proposal type</label><select id="draft-kind" name="kind"><option value="followup"{% if form_values.get('draft_kind') == 'followup' %} selected{% endif %}>Follow-up</option><option value="information">Information</option><option value="return">Return</option><option value="replacement">Replacement</option><option value="partial_offer"{% if form_values.get('draft_kind') == 'partial_offer' %} selected{% endif %}>Partial offer</option></select>
+<label for="draft-locale">Draft language</label><select id="draft-locale" name="locale"><option value="en">English</option><option value="es">Spanish</option></select>
+<label for="draft-recipient">Exact buyer/contact label as recorded by seller</label><input id="draft-recipient" name="recipient" required>
+<label for="draft-amount">Partial offer amount ({{ state.norm.currency }})</label><input id="draft-amount" name="amount" inputmode="decimal" value="{{ form_values.get('draft_amount', '') }}">
+<label for="draft-conditions">Conditions</label><textarea id="draft-conditions" name="conditions" rows="3"></textarea>
+{{ button("Prepare local draft", kind="secondary") }}
+</form>
+{% if local_draft_error %}<p role="alert" data-state="draft-refused">{{ local_draft_error }}</p>{% endif %}
+{% if local_draft %}<section class="panel" data-state="local-draft-result"><h3>Local proposal v{{ local_draft.version }}</h3>{% if local_draft.source_simulation %}<p data-state="draft-simulation-provenance">Prepared from simulation <code>{{ local_draft.source_simulation.logical_id }}</code> ({{ local_draft.source_simulation.amount_cents }} cents {{ local_draft.source_simulation.currency }}; policy {{ local_draft.source_simulation.policy_version }}). The draft terms below may reflect seller edits.</p>{% endif %}
+<dl><dt>Type</dt><dd>{{ local_draft.kind }}</dd><dt>Recipient (seller-supplied)</dt><dd>{{ local_draft.recipient }}</dd><dt>Terms</dt><dd>{% if local_draft.amount_cents %}{{ local_draft.currency }} {{ local_draft.amount_cents }} cents; {% endif %}{{ local_draft.conditions }}</dd><dt>Action PayPal allows now</dt><dd>{{ local_draft.action }}</dd><dt>Fact source</dt><dd>{{ local_draft.facts_source }}</dd></dl>
+<blockquote>{{ local_draft.draft }}</blockquote><p>{{ local_draft.outcome }}</p>
+{% if writes_enabled %}<form method="post" action="{{ hub }}/preview#preview"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="action" value="{{ local_draft.action }}">{% if local_draft.action == 'offer' %}<input type="hidden" name="amount" value="{{ (local_draft.amount_cents // 100) }}.{{ '%02d'|format(local_draft.amount_cents % 100) }}"><input type="hidden" name="note" value="{{ local_draft.draft }}">{% else %}<input type="hidden" name="text" value="{{ local_draft.draft }}">{% endif %}{{ button("Continue to Proofie's existing review", kind="secondary") }}</form>{% else %}<p>Resolution writes are off. The local draft stays here and cannot enter a send flow.</p>{% endif %}</section>{% endif %}
+<h3>Same-case local proposal history</h3>{% if case_draft_history_error %}<p role="alert" data-state="draft-history-error">{{ case_draft_history_error }}</p>{% elif case_draft_history %}<table><thead><tr><th>Version</th><th>Type</th><th>Recipient</th><th>Terms</th><th>Draft</th><th>Status</th></tr></thead><tbody>{% for p in case_draft_history %}<tr><td>{{ p.version }}</td><td>{{ p.kind }}</td><td>{{ p.recipient }}</td><td>{% if p.amount_cents %}{{ p.currency }} {{ p.amount_cents }} cents; {% endif %}{{ p.conditions }}</td><td>{{ p.draft }}</td><td>Proposal only; no message or offer was sent</td></tr>{% endfor %}</tbody></table>{% else %}<p>No local proposals are saved for this case.</p>{% endif %}
+</section>
+{% endif %}
+{% if economics %}
+<section class="resolution-economics" data-state="economics" aria-labelledby="economics-title">
+<h2 id="economics-title">What each choice costs</h2>
+<ul>{% for line in economics.choices %}<li>{{ line }}</li>{% endfor %}</ul>
+<details><summary>Where these numbers come from</summary>
+<ul>{% for note in economics.notes %}<li>{{ note }}</li>{% endfor %}</ul></details>
+{% if feature_enabled("do_nothing_path") and state.norm %}{% include "features/do_nothing_path/_entry.html" %}{% endif %}
+</section>
+{% endif %}
+{%- if refund_pointer and not accept_claim_offer %}
+<p data-state="refund-pointer">Proofie cannot refund for you. To refund in full, use {{ resolution_center_link(RESOLUTION_CENTER_NAME) }}.</p>
+{%- endif %}
+{% if state.limitations %}
+<ul class="resolution-limitations" data-state="limitations">{% for lim in state.limitations %}<li>{{ limitation_text(lim) }}</li>{% endfor %}</ul>
+{% endif %}
+{% if state.norm %}
+{% if writes_enabled %}<h2>Actions, in this order</h2>
+<p>Each action is optional.{% if state.actions.offer %} Proofie has seen PayPal remove the refund option after a seller message, so make an offer first if you want one.{% endif %}</p>
+<div data-state="action-offer" data-enabled="{{ 'yes' if offer_open else 'no' }}">
+  <h3>1. Offer a refund (optional)</h3>
+  {% if offer_open %}
+  <p>Preparing an offer does not send it. You see the exact request first.</p>
+  <form method="post" action="{{ hub }}/preview#preview" id="offer-amount" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="action" value="offer">
+    {{ required_note(2, true) }}
+    {{ field('amount', 'Offer amount', form_values.get('amount', ''), hint='In ' ~ cur ~ ', up to ' ~ max_amount ~ ' ' ~ cur ~ ' (the disputed amount). For example 10.00', mark='Required', error=errors.get('amount'), inputmode='decimal', autocomplete='off', width='w10') }}
+    {{ field('note', 'Note to the buyer', form_values.get('note', ''), hint='The buyer reads this with your offer. Up to 2000 characters.', mark='Required', error=errors.get('note'), textarea=True, rows=4) }}
+    {% if offer_proposed %}<input type="hidden" name="proposed_from_record" value="1"><p class="field-hint" data-state="offer-proposed">Proposed from PayPal's record: the buyer's requested amount; you can change it. The note is a short sentence written by Proofie; change it too if you like. Nothing is sent until you review the exact request and send it.</p>{% endif %}
+    <div class="actions">{{ button('Review the offer', kind='primary') }}</div>
+    <p class="action-note">Nothing is sent yet. You see the exact text on the next page.</p>
+  </form>
+  {% elif state.settling %}<p>PayPal is updating this dispute. Options return when it finishes.</p>
+  {% elif state.history or (state.norm.status == 'WAITING_FOR_BUYER_RESPONSE') %}<p>Not offered by PayPal any more for this dispute.</p>
+  {% else %}<p>PayPal does not offer this option for this dispute now.</p>{% endif %}
+</div>
+<div data-state="action-message" data-enabled="{{ 'yes' if message_open else 'no' }}">
+  <h3>2. Send a message to the buyer (optional)</h3>
+  {% if latest_message %}<p data-state="message-sent-note">You sent a message at {{ latest_message.created_at|when }}.{% if latest_message.released %} PayPal does not list it.{% endif %} <a href="{{ hub }}/sent/{{ latest_message.id }}#sent">See what you sent.</a> If you write again, the buyer {% if latest_message.released %}may receive{% else %}receives{% endif %} a second message.</p>{% endif %}
+  {% if state.actions.offer %}<p>Sending a message ends the chance to make an offer on this dispute.</p>{% endif %}
+  {% if message_open %}
+  {% if feature_enabled('resolution_status_message') %}<p data-state="status-message-link">{{ link_button(hub ~ '/status-message', 'Start from my registered tracking', kind='link') }}</p>{% endif %}
+  <form method="post" action="{{ hub }}/preview#preview" id="message-text" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="action" value="message">
+    {{ field('text', 'Message to the buyer', form_values.get('text', state.template_text), hint='The buyer reads this in PayPal. Up to 2000 characters. Do not include links or email addresses.', mark='Required', error=errors.get('text'), textarea=True, rows=8) }}
+    <div class="actions">{{ button('Review the message', kind='primary' if primary_action == 'message' else 'secondary', large=True) }}</div>
+    <p class="action-note">Nothing is sent yet. You see the exact text on the next page.</p>
+  </form>
+  {% elif state.settling %}<p>PayPal is updating this dispute. Options return when it finishes.</p>
+  {% else %}<p>PayPal does not offer this option for this dispute now.</p>{% endif %}
+</div>
+{% else %}<span data-state="action-offer" data-enabled="no"></span><span data-state="action-message" data-enabled="no"></span>{% endif %}
+<div data-state="action-defend" data-enabled="{{ 'yes' if state.actions.defend else 'no' }}">
+  <h3>3. Defend with your evidence</h3>
+  {% if state.actions.defend %}<p>{{ link_button('/disputes/' ~ dispute_id, 'Defend with your evidence file', kind='primary' if primary_action == 'defend' else 'secondary', large=True, data_state='defend-link') }}</p>
+  {% elif state.settling %}<p>PayPal is updating this dispute. Options return when it finishes.</p>
+  {% else %}<p>PayPal does not offer this option for this dispute now.</p>{% endif %}
+</div>
+{% endif %}
+{%- if accept_claim_offer %}
+<div data-state="accept-claim-option">
+  <h3>Last option: accept the buyer's claim</h3>
+  <p>This refunds the buyer and closes the dispute. Proofie cannot undo it. Use it when you have decided not to defend or offer. PayPal shows this option for this dispute now.</p>
+  <form method="post" action="{{ hub }}/accept-claim/preview" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="actions">{{ button('Review accepting the claim', kind='secondary') }}</div>
+    <p class="action-note">Nothing is sent. You see the exact request and type a confirmation on the next page.</p>
+  </form>
+</div>
+{%- endif %}
+{%- if (feature_enabled('delivery_facts') and capture_ids) or (feature_enabled('fulfilment') and tracking_capture) %}
+<p data-state="delivery-facts-links">{% if feature_enabled('delivery_facts') and capture_ids %}{% if delivery_fact_ids %}{% for capture in delivery_fact_ids %}<a href="/delivery-facts/{{ capture }}">Local delivery facts for transaction {{ capture }}</a>{% if not loop.last %} &middot; {% endif %}{% endfor %}.{% else %}Local delivery facts: available after a local tracking file has been saved.{% endif %}{% endif %}{% if feature_enabled('fulfilment') and tracking_capture %} <a href="/fulfilment/{{ tracking_capture }}">Add tracking in PayPal</a>{% endif %}</p>{%- endif %}
+{% include "features/resolution/_history.html" %}
+{% endblock %}

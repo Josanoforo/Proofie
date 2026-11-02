@@ -1,0 +1,42 @@
+{
+ "case_id": "sufficient_coherent_dev",
+ "type": "sufficient_coherent",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EVAL-0001",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 2500,
+  "amount_display": "25.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "DEMOTXN0000000001"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-DEMO-2001\nOrder date: 2026-10-01 10:00\nTotal paid: 25.00 USD\nShipping service: Estafeta Terrestre\nPayPal capture id: DEMOTXN0000000001",
+  "doc_shipping": "Carrier: Estafeta\nTracking number: DEMO9100000001\n2026-10-03 11:15  Delivered. Signed for"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_shipping": "shipping_tracking.txt"
+ },
+ "expected": {
+  "allowed_facts": [
+   "DEMO9100000001",
+   "2026-10-03",
+   "TS-DEMO-2001",
+   "25.00"
+  ],
+  "forbidden_claims": [
+   "accept the claim",
+   "refund",
+   "10 days"
+  ],
+  "expected_conflicts": [],
+  "expected_missing": [],
+  "expected_action": "submit"
+ },
+ "notes": "One consistent order + shipping document, carrier/tracking literal and matching. Baseline positive case."
+}

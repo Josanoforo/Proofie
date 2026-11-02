@@ -1,0 +1,59 @@
+{# The Spanish version of each statement (COPILOT_FEATURE_BILINGUAL, MX rule set). Included by the package page under its
+   statements with the page's context: bilingual (copilot.features.bilingual.view, None when off), dispute_id, package,
+   csrf_token, sent_version, form_errors, form_values, request. Every Spanish text and field sits inside lang="es". #}
+{% from "_components.html" import tag, button, post_button, field_error %}
+{% if bilingual %}
+{% set es_errors = form_errors|default({}) %}
+{% set es_values = form_values|default({}) %}
+{% set es_path = '/disputes/' ~ dispute_id ~ '/packages/' ~ package.id %}
+{% set es_query = (request.query_params if request is defined and request else {}) %}
+{% set es_saved = es_query.get('es_saved') %}
+{% set es_model = es_query.get('es_model') %}
+{% set es_made = es_query.get('made', '') %}
+{% set es_refused = es_query.get('refused', '') %}
+{% set es_missing = bilingual.rows|selectattr('es_state', 'equalto', 'missing')|list|length %}
+<section class="bilingual" data-state="bilingual" aria-labelledby="statements-es">
+<h2 id="statements-es">Spanish version of your statements</h2>
+<p>For your own review in Spanish. PayPal receives the English statements only; the Spanish version stays in Proofie. Approving the package covers the English and the Spanish text.</p>
+{% if es_query.get('es_cleared') == '1' %}<p role="status" data-state="es-cleared">The Spanish text changed, so your approval was cleared. Approve the package again before sending.</p>{% endif %}
+{% if es_model == 'done' and es_made.isdigit() and es_refused.isdigit() %}<p role="status" data-state="es-model-done">The AI model wrote {{ es_made }} Spanish {{ 'version' if es_made == '1' else 'versions' }}. {% if es_refused != '0' %}{{ es_refused }} did not keep the numbers, dates or tracking codes of the English and {{ 'was' if es_refused == '1' else 'were' }} not kept: type {{ 'it' if es_refused == '1' else 'them' }} yourself. {% endif %}Check every word before you approve.</p>
+{% elif es_model == 'unavailable' %}<p role="status" data-state="es-model-unavailable">The AI model did not answer. Nothing changed. Type the Spanish versions yourself, or ask again in a minute.</p>
+{% elif es_model == 'off' %}<p role="status" data-state="es-model-off">The AI assistant is switched off in the hosted demo. Nothing changed.</p>{% endif %}
+{% if not sent_version and es_missing %}
+{% if hosted_demo is defined and hosted_demo() %}<p data-state="es-model-hosted">In the hosted demo the AI assistant is switched off: type each Spanish version yourself.</p>
+{% else %}<p class="field-hint">The AI model can draft the missing Spanish versions. It can be wrong: Proofie checks that the numbers, dates and tracking codes match the English, and you review every word.</p>
+{{ post_button(es_path ~ '/spanish/model', 'Ask the AI model for a Spanish draft', csrf_token, kind='secondary', sending='Asking the AI model…') }}{% endif %}
+{% endif %}
+{% if not bilingual.rows %}
+<p>No statements yet.</p>
+{% else %}
+<ul class="claims">
+{% for r in bilingual.rows %}
+{% set key = 'es-claim-' ~ r.claim_id %}
+<li class="claim-card" id="{{ key }}" data-es-state="{{ r.es_state }}">
+  <p class="claim-meta"><strong>Statement {{ r.position }}</strong>
+    {% if r.es_state == 'seller' %}{{ tag('ok', 'Written by you') }}
+    {% elif r.es_state == 'ai' %}{{ tag('warn', 'Written by the AI model: check every word') }}
+    {% else %}{{ tag('todo', 'No Spanish version yet') }}{% endif %}
+  </p>
+  <p>English, sent to PayPal: {{ r.en }}</p>
+  {% if r.es %}<p>Spanish: <span lang="es">{{ r.es }}</span></p>{% endif %}
+  {% if r.stale %}<p class="field-hint" data-state="es-stale">The English statement changed after this Spanish version was written. Check the Spanish text and save it again.</p>{% endif %}
+  {% if es_saved and es_saved == r.claim_id|string %}<p role="status" data-state="es-saved">Spanish version saved.</p>{% endif %}
+  {% if not sent_version %}
+  <form method="post" class="claim-edit" action="{{ es_path }}/claims/{{ r.claim_id }}/spanish" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="field">
+      <label for="field-{{ key }}">Spanish version of statement {{ r.position }} <strong class="field-mark">Required</strong></label>
+      {% if es_errors.get(key) %}{{ field_error('error-' ~ key, es_errors[key]) }}{% endif %}
+      <textarea id="field-{{ key }}" name="text" rows="3" lang="es" aria-required="true"{% if es_errors.get(key) %} aria-invalid="true" aria-describedby="error-{{ key }}"{% endif %}>{{ es_values.get(key, r.es or r.previous_es) }}</textarea>
+    </div>
+    {{ button('Save the Spanish version', kind='secondary', hidden='of statement ' ~ r.position) }}
+  </form>
+  {% endif %}
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+</section>
+{% endif %}

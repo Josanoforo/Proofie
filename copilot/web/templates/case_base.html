@@ -1,0 +1,38 @@
+{% extends "_base.html" %}
+{% from "_stage.html" import stage_words %}
+{% from "_components.html" import tag, checked_bar, breadcrumbs, disclosure_button %}
+{% block title %}{% if view == "overview" %}Dispute {{ norm.dispute_id }}: {{ reason_short }} - Proofie{% else %}{{ view_title }}: dispute {{ norm.dispute_id }} - Proofie{% endif %}{% endblock %}
+{% block breadcrumb %}{% if view == "overview" %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ norm.dispute_id, None)]) }}{% else %}{{ breadcrumbs([('All disputes', '/disputes'), ('Dispute ' ~ norm.dispute_id, ws_url('overview')), (view_title, None)]) }}{% endif %}{% endblock %}
+{% block content %}
+<div class="b-case-bar">
+<div class="b-case-title">
+<h1>{{ reason_short|capitalize }}{% if norm.amount_display %}: {{ norm.amount_display }} {{ norm.currency or "" }}{% endif %} <span class="h1-id" translate="no">Dispute {{ norm.dispute_id }}</span></h1>
+</div>
+<section class="case-strip" data-state="case-strip" aria-label="The case at a glance">
+<div class="case-line"><div><span class="b-label">Case status</span>{{ tag(status_view.kind, status_view.label) }}</div><div data-safety="due-date"><span class="b-label">Respond by</span>{% if due %}<time datetime="{{ due.iso }}">{{ due.when }}</time> {{ tag('due' if due.passed or due.hours_left < 72 else 'na', due.remaining) }}{% else %}No verified deadline available{% endif %}</div></div>
+<div class="case-facts disc" data-state="case-facts" data-disc="closed">{% call disclosure_button("case-facts-body") %}Case facts{% if checked_at %} <span class="case-facts-read">PayPal read {{ checked_at|when }}</span>{% endif %}{% endcall %}
+<div class="disc-body" id="case-facts-body">
+<dl class="facts">
+  {%- if norm.stage %}
+  <div><dt>Stage</dt><dd data-state="stage">{{ stage_words(norm.stage) }}</dd></div>
+  {%- endif %}
+  <div><dt>Reason</dt><dd>{{ reason_text }}</dd></div>
+  <div><dt>Amount</dt><dd>{{ norm.amount_display or "—" }} {{ norm.currency or "" }}</dd></div>
+  <div><dt>Respond by</dt><dd>{% if due %}<time datetime="{{ due.iso }}">{{ due.when }}</time> {{ tag('due' if due.passed or due.hours_left < 72 else 'na', due.remaining) }}{% if not due.passed %} <a class="due-calendar" href="/disputes/{{ norm.dispute_id }}/due.ics" data-state="due-calendar">{{ due_calendar_link }}</a>{% endif %}{% else %}No verified deadline available{% endif %}</dd></div>
+</dl>
+{% if has_check_again %}<p class="checked-at" data-state="checked-at">PayPal was read at {{ checked_at|when }}. Disputes may have changed since.</p>
+{% else %}{{ checked_bar(checked_at, ws_url(view), "Check again") }}{% endif %}
+</div></div>
+</section>
+{% set dispute_id = norm.dispute_id %}{% set current_case_view = view %}{% set current_package = latest_package %}
+<div class="case-navigation">
+{% include "_case_primary_nav.html" %}
+ </div>
+</div>
+<div class="case-workspace" data-view="{{ view }}">
+<div class="case-body" role="region" aria-labelledby="view-title" data-view-name="{{ view }}">
+<h2 class="visually-hidden" id="view-title">{{ view_title }}</h2>
+{% block case_body %}{% endblock %}
+</div>
+</div>
+{% endblock %}

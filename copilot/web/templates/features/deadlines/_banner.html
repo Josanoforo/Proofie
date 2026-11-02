@@ -1,0 +1,15 @@
+{% from "_components.html" import banner, link_button %}
+{# One amber attention block, on the inbox and on the PayPal due dates page. It lists the cases that wait for the seller
+   and are due in under 3 days or already past the due date PayPal gave. Rows need: waiting, urgency, due, norm. #}
+{% set watch = namespace(soon=[], passed=0) %}
+{% for row in rows %}{% if row.waiting and row.urgency in ("soon", "passed") %}{% set watch.soon = watch.soon + [row] %}{% if row.urgency == "passed" %}{% set watch.passed = watch.passed + 1 %}{% endif %}{% endif %}{% endfor %}
+{% if watch.soon %}
+{% call banner("warn", banner_state|default("deadline-inbox"), "Respond soon") %}
+<ul class="banner-list">
+{%- for row in watch.soon %}
+<li>{% if row.urgency == "passed" %}{{ row.norm.dispute_id }}: {{ row.due.remaining }}. At the last PayPal read ({{ checked_at|when }}), this case still waited for your response.{% else %}{{ row.norm.dispute_id }}: respond by {{ row.due.iso|when }} ({{ row.due.remaining|lower }}).{% endif %} {{ link_button("/disputes/" ~ row.norm.dispute_id, "Open dispute " ~ row.norm.dispute_id, kind="link") }}</li>
+{%- endfor %}
+</ul>
+<p class="actions">{{ link_button("/deadlines", "See all due dates", kind="link") }}{% if watch.passed %} {{ link_button(refresh_url|default("/deadlines"), "Refresh from PayPal", kind="link") }}{% endif %}</p>
+{% endcall %}
+{% endif %}

@@ -1,0 +1,33 @@
+{% from "_components.html" import tag %}
+<h2>What was sent</h2>
+<div data-state="sent-file">
+{% if file.packages %}
+{% for p in file.packages %}
+<h3 data-package="{{ p.id }}">Package v{{ p.version }} ({{ p.created_at|when_text }})</h3>
+<details><summary>Technical details</summary><p>Approval sha256: {% if p.approval_sha256 %}<code>{{ p.approval_sha256 }}</code>{% else %}none{% endif %}</p></details>
+<ul data-state="claims">{% for c in p.claims %}<li>{{ c.text }}{% if c.edited %} (edited by you){% endif %}</li>{% else %}<li>No statements.</li>{% endfor %}</ul>
+<ul data-state="attachments">{% for a in p.attachments %}<li>{{ a.filename }} ({{ a.size_bytes }} bytes)<details><summary>Technical details</summary><p><code>{{ a.sha256 }}</code></p></details></li>{% else %}<li>No attachments.</li>{% endfor %}</ul>
+{% endfor %}
+{% else %}
+<p data-state="no-packages">No package was created for this dispute.</p>
+{% endif %}
+<h3>Send attempts</h3>
+{% if file.send_attempts %}
+<table data-state="send-attempts" class="stack">
+  <caption class="visually-hidden">Send attempts</caption>
+  <thead><tr><th scope="col">When</th><th scope="col">Result</th></tr></thead>
+  {% for a in file.send_attempts %}<tr data-state-value="{{ a.state }}"><td data-label="When">{{ a.ts|when }}</td><td data-label="Result">{{ tag(state_kind(a.state),state_label(a.state)) }}<details><summary>Technical details</summary><p>HTTP {{ a.http_status or "Not available" }} · state {{ a.state }}</p><p><code>{{ a.package_sha256 }}</code></p></details></td></tr>{% endfor %}
+</table>
+{% else %}<p data-state="no-attempts">Nothing was sent to PayPal.</p>{% endif %}
+<h3>Tracker registered before the dispute</h3>
+{% if file.tracker %}
+<p data-state="tracker">{{ file.tracker.tracking_number }} ({{ tracking_status(file.tracker.status).label }}, prepared {{ file.tracker.created_at|when_text }})</p><details><summary>Technical details</summary><p><code>{{ file.tracker.file_sha256 }}</code></p><p>{{ file.tracker.status }}</p></details>
+{% else %}<p data-state="no-tracker">No tracker was registered before the dispute.</p>{% endif %}
+<h3>Offers and messages</h3>
+{% if file.resolution_actions %}
+<ul data-state="resolution-actions">{% for r in file.resolution_actions %}{% set message_view = message_status(r) %}<li>{{ r.created_at|when }}: {{ action_label(r.action) }} {{ tag(message_view.kind, message_view.label) }}{% if r.released %} PayPal does not list this message. It can be prepared again.{% endif %}<details><summary>Technical details</summary><p>{{ r.action }} · {{ r.status }} <code>{{ r.request_sha256 }}</code></p></details></li>{% endfor %}</ul>
+{% else %}<p data-state="no-resolution-actions">No offer or message was recorded for this dispute.</p>{% endif %}
+<h3>Audit</h3>
+{% if file.audit %}<ul data-state="audit">{% for e in file.audit %}<li>{{ e.ts|when }}: {{ action_label(e.action) }}<details><summary>Technical details</summary><p>{{ e.actor }} · {{ e.action }}</p></details></li>{% endfor %}</ul>{% else %}<p>No audit lines.</p>{% endif %}
+{% for n in file.notes %}<p class="notice">{{ n }}</p>{% endfor %}
+</div>

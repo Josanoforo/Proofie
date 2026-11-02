@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "irrelevant_docs_heldout1",
+ "type": "irrelevant_docs",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0023",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 5500,
+  "amount_display": "55.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000023"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1023\nOrder date: 2026-09-30 18:00\nTotal paid: 55.00 USD\nPayPal capture id: EV2CAPTURE0000023",
+  "doc_warranty": "Warranty card\nThis product is covered for 12 months against manufacturing defects."
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_warranty": "warranty.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "tracking",
+    "any_of": [
+     "tracking",
+     "guía",
+     "guia",
+     "waybill"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "A warranty card."
+}

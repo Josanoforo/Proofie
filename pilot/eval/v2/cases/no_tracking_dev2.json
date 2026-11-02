@@ -1,0 +1,47 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "no_tracking_dev2",
+ "type": "no_tracking",
+ "set": "dev",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0012",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 7500,
+  "amount_display": "75.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000012"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1012\nOrder date: 2026-10-01 07:30\nTotal paid: 75.00 USD\nPayPal capture id: EV2CAPTURE0000012"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "tracking",
+    "any_of": [
+     "tracking",
+     "guía",
+     "guia",
+     "waybill"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "Only the order confirmation."
+}

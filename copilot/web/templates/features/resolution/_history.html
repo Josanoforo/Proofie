@@ -1,0 +1,30 @@
+{# What this app recorded. Rows come from the stored actions plus, for a send that started and whose end
+   was never recorded, one "Sending started - not confirmed yet" row so the trace survives. The result comes from
+   status.message_status. Fingerprint and full text sit in each row's details. #}
+{% from "_components.html" import tag, exact_content %}
+<h2 id="recorded">What this app recorded</h2>
+{% if state.history %}
+<p>Proofie keeps what you sent and what PayPal showed afterwards.</p>
+{% if last_checked %}<p data-state="last-checked">Last checked with PayPal at {{ last_checked|when }}.</p>{% endif %}
+{% if checked_note %}<p class="notice" data-state="checked-note">{{ checked_note }}</p>{% endif %}
+<table class="resolution-history stack" data-state="history">
+  <caption>Offers and messages sent from Proofie, newest last</caption>
+  <thead><tr><th scope="col">When (Mexico City time)</th><th scope="col">Action</th><th scope="col">Result</th><th scope="col">Details</th></tr></thead>
+  <tbody>
+  {% for h in state.history %}
+  {% set view = message_status(h) if h.status != 'sending_started' else None %}
+  <tr data-action="{{ h.action }}" data-status="{{ h.status }}">
+    <td data-label="When (Mexico City time)">{{ h.created_at|when(zone=False) }}</td>
+    <td data-label="Action">{{ {'offer': 'Offer', 'message': 'Message'}.get(h.action, 'Not available') }}</td>
+    <td data-label="Result">{% if view %}{{ tag(view.kind, view.label) }}{% else %}{{ tag('warn', 'Sending started - not confirmed yet') }}{% endif %}{% if h.limitation_text %}<br>{% if h.status == 'sent_unconfirmed' and h.limitation_text.startswith('PayPal could not send') and '(error ' in h.limitation_text %}PayPal answered error {{ h.limitation_text.split('(error ')[1].split(')')[0] }}; whether it has the {{ 'offer' if h.action == 'offer' else 'message' }} is not known.{% elif h.status == 'sent_unconfirmed' and 'did not answer in time' in h.limitation_text %}PayPal did not answer in time; whether it has the {{ 'offer' if h.action == 'offer' else 'message' }} is not known.{% else %}{{ h.limitation_text }}{% endif %}{% endif %}{% if h.released %}<br>PayPal does not list this message. It can be prepared again.{% endif %}</td>
+    <td data-label="Details"><details><summary>Technical details</summary>
+      {% if h.id %}<p><a href="/disputes/{{ dispute_id }}/resolution/sent/{{ h.id }}#sent">{% if h.status in ('failed', 'refused_422') %}See what Proofie tried to send{% else %}See what you sent{% endif %}</a></p>{% endif %}
+      <p>Fingerprint of the approved request (sha256): <code>{{ h.request_sha256 }}</code></p>
+      {% if h.shown_text %}{% call exact_content(sent=h.status in ('sent_pending_settle', 'sent_confirmed'), state='refused' if h.status in ('failed', 'refused_422', 'sending_started') else 'attempted') %}{{ h.shown_text }}{% endcall %}{% endif %}</details></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p data-state="no-history">Nothing has been sent from this app yet.</p>
+{% endif %}

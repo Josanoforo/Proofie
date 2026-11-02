@@ -1,0 +1,18 @@
+{% extends "_base.html" %}
+{% from "_components.html" import button %}
+{% block title %}Preview of the buyer page - Proofie{% endblock %}
+{% block content %}
+<div class="page" data-state="status-link-preview">
+<h1>This is exactly what the buyer will see</h1>
+<section aria-label="Buyer page preview" data-state="status-link-preview-body">
+{% include "features/status_link/_view.html" %}
+</section>
+<form method="post" action="/status-link/approve">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<input type="hidden" name="sha" value="{{ sha }}">
+{% for name, value in fields.items() %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
+{{ button("Approve and create the link", kind="primary") }}
+</form>
+<p><a href="/status-link">Change something</a></p>
+</div>
+{% endblock %}

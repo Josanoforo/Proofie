@@ -1,0 +1,5 @@
+{# PayPal's stage in the seller's words. A value PayPal defines reads its name; the legacy CLAIM value reads 'Claim'; a value that is
+   present but not one PayPal defines reads 'Stage not recognized'. Pages show no stage at all when PayPal gave none. #}
+{% macro stage_words(value) -%}
+{%- if stage_strip(value) or value == 'CLAIM' %}{{ stage_name(value) }}{% else %}Stage not recognized{% endif -%}
+{%- endmacro %}

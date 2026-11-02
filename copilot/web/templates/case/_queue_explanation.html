@@ -1,0 +1,13 @@
+{% if feature_enabled("explainable_queue") and queue_explanation %}
+<section class="panel" id="queue-explanation" data-state="case-queue-explanation">
+  <h2>Why this case is in this state</h2>
+  <p>{{ queue_explanation.priority_reason }}</p>
+  <details data-state="queue-explanation-details"><summary>What Proofie is missing and the verified event notes</summary>
+  <h3>What Proofie is missing</h3>
+  {% if queue_explanation.missing %}<ul>{% for missing in queue_explanation.missing %}<li>{{ missing }}</li>{% endfor %}</ul>{% else %}<p>Nothing is missing from the documents and evidence package Proofie has stored.</p>{% endif %}
+  <h3>Verified event notes</h3>
+  {% if queue_explanation.timeline %}<ol>{% for event in queue_explanation.timeline %}<li>{{ event.observed_at|when }} — {{ event.change }} ({{ event.source }}){% if event.late %}; older than the current case snapshot and does not replace its status{% endif %}</li>{% endfor %}</ol>{% else %}<p>No verified stored webhook notes are available for this case.</p>{% endif %}
+  <p><small>{{ queue_explanation.trust }}</small></p>
+  </details>
+</section>
+{% endif %}

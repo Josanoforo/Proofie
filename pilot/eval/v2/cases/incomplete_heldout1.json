@@ -1,0 +1,49 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "incomplete_heldout1",
+ "type": "incomplete",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0008",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 54000,
+  "amount_display": "540.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000008"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1008\nFecha del pedido: 2026-10-03 19:00\nTotal pagado: 540.00 MXN\nID de captura PayPal: EV2CAPTURE0000008",
+  "doc_guia": "Paquetería: Estafeta\nGuía: 7712001008\nFecha de envío: 2026-10-04\nEstatus: En tránsito\nÚltimo movimiento: 2026-10-05 Centro de distribución"
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_guia": "estafeta_guia.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "delivery_confirmation",
+    "any_of": [
+     "deliver",
+     "entrega",
+     "signed",
+     "firma"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "Estafeta in transit, no delivery scan."
+}

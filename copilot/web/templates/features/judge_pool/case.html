@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% from "_components.html" import post_button %}
+{% block title %}Start this case - Proofie{% endblock %}
+{% block content %}
+<h1>Start this case</h1>
+<p>Case <code>{{ dispute_id }}</code> waits for the buyer. To answer it, PayPal needs to move it to the chargeback stage, where it asks you for evidence.</p>
+<h2>What will be sent</h2>
+<p data-state="exact-request">PayPal's own <strong>escalate</strong> action on this case, to the PayPal sandbox, with this note: <em>{{ note }}</em> The request fingerprint is <code>{{ fingerprint }}</code>.</p>
+<p>This changes the case at PayPal. It is sent once.</p>
+{{ post_button('/judge/cases/' ~ dispute_id ~ '/start', 'Start this case', csrf_token, kind='primary', large=True, sends=True) }}
+<p><a href="/judge">Back to the cases</a></p>
+{% endblock %}

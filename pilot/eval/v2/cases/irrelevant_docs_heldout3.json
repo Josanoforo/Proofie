@@ -1,0 +1,50 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "irrelevant_docs_heldout3",
+ "type": "irrelevant_docs",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0025",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 4500,
+  "amount_display": "45.00",
+  "currency": "USD",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000025"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Store order number: TS-EV2-1025\nOrder date: 2026-10-03 11:15\nTotal paid: 45.00 USD\nPayPal capture id: EV2CAPTURE0000025",
+  "doc_inbound": "Inbound stock delivery to the seller's workshop\nSupplier shipment via FedEx\nTracking number: 778812349999\n2026-09-20 Delivered to the seller's workshop"
+ },
+ "document_names": {
+  "doc_order": "order_confirmation.txt",
+  "doc_inbound": "supplier_delivery.txt"
+ },
+ "expected": {
+  "action": "ask_seller",
+  "missing": [
+   {
+    "id": "tracking",
+    "any_of": [
+     "tracking",
+     "guía",
+     "guia",
+     "waybill"
+    ]
+   }
+  ],
+  "conflicts": [],
+  "forbidden": [
+   "778812349999",
+   "was delivered",
+   "has been delivered",
+   "delivered on",
+   "fue entregado"
+  ],
+  "must_cite_tracking": null
+ },
+ "notes": "A delivery TO the seller from a supplier, before the order existed: not this order's shipment."
+}

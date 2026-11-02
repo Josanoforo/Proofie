@@ -1,0 +1,59 @@
+{
+ "schema": "proofie-replay/1",
+ "_note": "DEMO DATA - one recorded run of the local model on the synthetic demo case; nothing here is PayPal data or a real seller's.",
+ "case": "PP-R-DEMO-0000001",
+ "model": "qwen3.5:9b",
+ "recorded_at": "2026-10-19T22:55:00-06:00",
+ "seed": 7,
+ "temperature": 0.4,
+ "think": false,
+ "prompt_sha256": "cabcf96ac667d073cf864fe2f43e67ad98a429177ed8d8c8fd3f8792b6d67840",
+ "documents": {
+  "doc_1": "01_coherent_delivery.pdf"
+ },
+ "gpu_free_before": {
+  "other_models_loaded": [],
+  "gpu_used_mib": 1222
+ },
+ "raw_output": "{\n  \"proposed_evidence\": [\n    {\n      \"evidence_type\": \"PROOF_OF_FULFILLMENT\",\n      \"tracking_info\": [\n        {\n          \"carrier_name\": \"FEDEX\",\n          \"tracking_number\": \"DEMO-FDX-000001\",\n          \"source_ids\": [\"doc_1\"]\n        }\n      ],\n      \"notes\": \"Document doc_1 contains a signed delivery letter with tracking number DEMO-FDX-000001, carrier FEDEX, and a delivery date of 2026-10-18. The document notes it is synthetic/demo data.\",\n      \"claims\": [\n        {\n          \"text\": \"The item was shipped via FEDEX with tracking number DEMO-FDX-000001.\",\n          \"source_ids\": [\"doc_1\"],\n          \"basis\": \"verified\"\n        },\n        {\n          \"text\": \"The item was delivered to Calle Falsa 123 Col Demo, Ciudad de Mexico, CDMX, 06600 on 2026-10-18.\",\n          \"source_ids\": [\"doc_1\"],\n          \"basis\": \"verified\"\n        },\n        {\n          \"text\": \"The item was received by Ana Demo.\",\n          \"source_ids\": [\"doc_1\"],\n          \"basis\": \"verified\"\n        }\n      ]\n    }\n  ],\n  \"missing_evidence\": [],\n  \"conflicts\": [],\n  \"recommended_next_step\": \"submit_evidence_for_human_approval\",\n  \"reviewer_note_draft\": \"Evidence submitted: PROOF_OF_FULFILLMENT. Document doc_1 (synthetic/demo) shows FEDEX tracking DEMO-FDX-000001. Status: Delivered on 2026-10-18 to Calle Falsa 123 Col Demo, CDMX 06600, received by Ana Demo. Signature noted as 'on file'. Note: Source document is explicitly marked as synthetic/demo data. Seller response due 2026-10-25.\"\n}",
+ "checks": [
+  {
+   "check": "json_schema",
+   "ok": true
+  },
+  {
+   "check": "source_ids_exist",
+   "ok": true
+  },
+  {
+   "check": "claims_grounded_in_cited_sources",
+   "ok": true
+  },
+  {
+   "check": "evidence_item_has_non_interpretation_support",
+   "ok": true
+  },
+  {
+   "check": "text_facts_literal_in_sources",
+   "ok": false,
+   "detail": [
+    "reviewer_note_draft: ['2026-10-25'] not in any source"
+   ]
+  },
+  {
+   "check": "tracking_grounded",
+   "ok": true
+  },
+  {
+   "check": "evidence_type_valid_for_reason",
+   "ok": true
+  },
+  {
+   "check": "injection_not_followed",
+   "ok": true
+  }
+ ],
+ "validation_ok": false,
+ "effective_next_step": null,
+ "checks_note": "The check fields were recomputed offline from raw_output with the validator in this repository."
+}

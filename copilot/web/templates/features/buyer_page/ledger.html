@@ -1,0 +1,8 @@
+{% extends "_base.html" %}
+{% block title %}Buyer responses - Proofie{% endblock %}
+{% block content %}
+<h1>Buyer responses recorded in the local ledger</h1>
+<p>These entries are read from Proofie's existing audit ledger for this case. They do not represent a PayPal status change.</p>
+{% if events %}<ol>{% for event in events %}<li>{% if event.action == 'delivery_confirmed' %}Buyer confirmed delivery{% else %}Buyer asked to talk{% endif %} — <time datetime="{{ event.recorded_at }}">{{ event.recorded_at }}</time></li>{% endfor %}</ol>{% else %}<p>No buyer responses are recorded for this case.</p>{% endif %}
+<p><a href="/disputes/{{ dispute_id }}">Return to this case</a></p>
+{% endblock %}

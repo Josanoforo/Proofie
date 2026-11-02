@@ -1,0 +1,5 @@
+{% extends "_base.html" %}
+{% from "_components.html" import breadcrumbs %}
+{% block title %}Reviewer note saved - Proofie{% endblock %}
+{% block breadcrumb %}{{ breadcrumbs([('Read-only package review', None)]) }}{% endblock %}
+{% block content %}<h1>Note saved</h1><p>The note was added to the seller's local review-notes file. It did not edit or approve the package, and nothing was sent.</p><blockquote>{{ record.note }}</blockquote>{% endblock %}

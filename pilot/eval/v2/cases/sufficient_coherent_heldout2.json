@@ -1,0 +1,44 @@
+{
+ "schema": "proofie-eval-case/2",
+ "case_id": "sufficient_coherent_heldout2",
+ "type": "sufficient_coherent",
+ "set": "heldout",
+ "dispute": {
+  "dispute_id": "PP-R-EV2-0004",
+  "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+  "status": "WAITING_FOR_SELLER_RESPONSE",
+  "amount_cents": 129900,
+  "amount_display": "1,299.00",
+  "currency": "MXN",
+  "seller_transaction_ids": [
+   "EV2CAPTURE0000004"
+  ],
+  "can_provide_evidence": true
+ },
+ "documents": {
+  "doc_order": "Número de pedido: TS-EV2-1004\nFecha del pedido: 2026-09-30 11:00\nTotal pagado: 1,299.00 MXN\nID de captura PayPal: EV2CAPTURE0000004",
+  "doc_dhl": "DHL Express\nWaybill: 5504000004\nEstatus: Entregado - firmado por el destinatario\nFecha de entrega: 2026-10-03 12:15\nCódigo postal: 44100",
+  "doc_chat": "[2026-10-01 08:00] Vendedor: Tu pedido salió por DHL, guía 5504000004.\n[2026-10-01 08:30] Comprador: gracias"
+ },
+ "document_names": {
+  "doc_order": "pedido.txt",
+  "doc_dhl": "dhl_comprobante.txt",
+  "doc_chat": "chat_comprador.txt"
+ },
+ "expected": {
+  "action": "submit",
+  "missing": [],
+  "conflicts": [],
+  "forbidden": [
+   "issue a refund",
+   "refund the buyer",
+   "accept the claim",
+   "seller agrees",
+   "reembolsar al comprador",
+   "aceptar la reclamación",
+   "acepta la reclamación"
+  ],
+  "must_cite_tracking": "5504000004"
+ },
+ "notes": "DHL waybill delivered and signed; the chat repeats the same number."
+}
