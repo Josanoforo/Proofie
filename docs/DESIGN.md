@@ -1,11 +1,11 @@
 # Proofie: visual design
 
-Status: **implemented** in `copilot/web/static/app.css` (palette C and the review fixes). The contrast ratios below
+Status: **implemented** in `copilot/web/static/app.css` (the Proofie brand palette of 2026-11-02 and the review fixes; brand kit in `docs/brand/`). The contrast ratios below
 are recomputed from that stylesheet on every test run by `tests/local/test_design_contrast.py` (WCAG 2.x relative luminance); the same
 test checks that this document lists the exact hex values the CSS ships, that green/red/orange are used only where section 2 allows,
 and that a secondary button stays secondary inside every banner. Layout and colour in a real browser are checked by `demo/ui_check.py`.
 Everything here is original to this project: no stylesheet, palette or component was copied from another project or from PayPal's
-brand, and no PayPal logo or exact PayPal brand colour is used (palette C was chosen by the owner; see `docs/DECISIONS.md` D-2026-10-05-03).
+brand, and no PayPal logo or exact PayPal brand colour is used (the brand - seller and buyer brackets around a check, ink, seller coral and buyer teal - was chosen by the owner on 2026-11-02; it replaces palette C of D-2026-10-05-03).
 Plain CSS only: no framework, no build step, no CDN, no web fonts (the app runs on the seller's own machine).
 Every page carries, in the footer of the shared base template, the visible note **"Independent project. Not affiliated with or endorsed by PayPal."**
 
@@ -19,7 +19,7 @@ and what PayPal itself confirmed. Consequences:
 - Nothing decorative moves. No animation except the browser's own focus ring; no auto-playing anything.
 - The word "sandbox" stays visible in the header: this build never touches live PayPal.
 
-## 2. Colour tokens (palette C: own navy and blue, product orange)
+## 2. Colour tokens (brand palette: ink, seller coral, buyer teal)
 Defined once as CSS custom properties on `:root` (light), overridden under `@media (prefers-color-scheme: dark)` and again under
 `:root[data-theme="dark"]` / `[data-theme="light"]` so a person (or a test) can force a mode. Components use the tokens only, never a hex.
 
@@ -28,20 +28,20 @@ Defined once as CSS custom properties on `:root` (light), overridden under `@med
 | `--bg` | `#f5f4f0` | `#121518` | page background |
 | `--surface` | `#ffffff` | `#1b1f24` | cards, tables, inputs |
 | `--surface-2` | `#ebe9e3` | `#252a31` | table header, excluded-document rows, code blocks |
-| `--text` | `#1b1f23` | `#e8ebee` | body text |
-| `--text-muted` | `#4a5159` | `#aab2bb` | secondary text, captions, "PayPal was read at" line, footer |
+| `--text` | `#102a43` | `#e8ebee` | body text (brand ink) |
+| `--text-muted` | `#486581` | `#aab2bb` | secondary text, captions, "PayPal was read at" line, footer |
 | `--border` | `#7a818a` | `#77818c` | outlines of controls (3:1 against every surface) |
 | `--border-soft` | `#d5d2ca` | `#343b44` | decorative dividers only (never the only boundary of a control) |
-| `--accent` | `#1558b0` | `#8ab8f5` | primary button fill |
-| `--accent-text` | `#1558b0` | `#8ab8f5` | links and the label of a secondary button (text on a surface) |
-| `--on-accent` | `#ffffff` | `#08162e` | label on the primary button |
-| `--focus` | `#0b4aa8` | `#8ab8ff` | focus ring on the page |
-| `--header-bg` | `#0b2f6b` | `#0d2554` | navy page header |
-| `--header-fg` / `--header-muted` | `#ffffff` / `#c9d7f0` | `#ffffff` / `#bccbe8` | header text / its secondary text |
+| `--accent` | `#102a43` | `#9fb3c8` | primary button fill (ink) |
+| `--accent-text` | `#0e6e67` | `#7dd3c8` | links and the label of a secondary button (text on a surface) |
+| `--on-accent` | `#ffffff` | `#0b1a2a` | label on the primary button |
+| `--focus` | `#0e6e67` | `#7dd3c8` | focus ring on the page |
+| `--header-bg` | `#102a43` | `#0b1a2a` | ink page header |
+| `--header-fg` / `--header-muted` | `#ffffff` / `#bcccdc` | `#ffffff` / `#b6c4d1` | header text / its secondary text |
 | `--header-focus` | `#ffffff` | `#ffffff` | focus ring inside the header |
-| `--brand` | `#e8590c` | `#f47a2a` | the 4 px rule under the header (nothing else) |
-| `--brand-mark` | `#f47a2a` | `#ff944d` | the small square before the product name (nothing else) |
-| `--info-bg` / `--info-fg` / `--info-edge` | `#e7effa` / `#0b2f6b` / `#1558b0` | `#14284d` / `#d3e3fb` / `#8ab8f5` | neutral notices; sent or saved but not yet read back from PayPal; a statement backed by a source |
+| `--brand` | `#e4572e` | `#f07a55` | seller coral: the seller's bracket of the mark and the left half of the 4 px header rule (nothing else) |
+| `--brand-mark` | `#12827a` | `#3db5a8` | buyer teal: the buyer's bracket of the mark and the right half of the header rule (nothing else) |
+| `--info-bg` / `--info-fg` / `--info-edge` | `#e6eef4` / `#102a43` / `#486581` | `#182a3a` / `#d9e2ec` / `#9fb3c8` | neutral notices; sent or saved but not yet read back from PayPal; a statement backed by a source |
 | `--ok-bg` / `--ok-fg` / `--ok-edge` | `#e4f2e8` / `#14532d` / `#1e7a3f` | `#16301f` / `#b7e4c4` / `#5cbf7d` | **only** verified and confirmed: a check that passes, "Evidence sent to PayPal" once the read-back confirms it, "recovered" |
 | `--warn-bg` / `--warn-fg` / `--warn-edge` | `#fcefd0` / `#6b4300` / `#9a6200` | `#3a2c0c` / `#f5d791` / `#d9a63a` | not known yet, or needs your review (uncertain, partial, cannot verify, not confirmed by PayPal) |
 | `--error-bg` / `--error-fg` / `--error-edge` | `#fae4e1` / `#8a1c14` / `#b3261e` | `#3b1916` / `#f6c3be` / `#ef7c72` | does not match, missing, blocked or refused: a mismatch or missing fact, a local block, a PayPal refusal, PayPal unreachable |
@@ -54,11 +54,11 @@ Defined once as CSS custom properties on `:root` (light), overridden under `@med
 - **Amber !** means "we do not know yet" or "this needs your review" (cannot verify, not confirmed by PayPal, uncertain, partial; PayPal answered but the read-back did not confirm); it is never used for a mismatch or a refusal.
 - **Grey —** is not applicable; **blue i** is sent or saved and not yet read back, or neutral information (a tracking file saved without registration is blue; registered and confirmed by the read-back is green; accepted by PayPal but not listed on the read-back is amber); a neutral tag ○ on the card fill is not started.
 - Every state carries an icon and a text label with its colour, so colour is never the only cue.
-- **Orange** appears only in the product mark and the header rule; never on a button, chip, banner or check row.
+- **Seller coral and buyer teal** (the brand colours) appear only in the product mark and the header rule; never on a button, chip, banner or check row, so a brand colour is never read as a state.
 
-Values changed from the first drafts, and why: the neutral family moved from teal to the same blue hue family as the accent (the old teal no longer
-matched the palette); dark-mode tones are derived from the same hues and lifted until they pass AA; nothing was changed from the starting values the owner's
-choice implied (`#0b2f6b`, `#1558b0`, `#e8590c`, `#f47a2a`) - all four reach their targets as given.
+Values changed on 2026-11-02, and why: the owner chose a brand for both sides of a dispute (`docs/brand/`): ink `#102a43` for text, header and the primary
+button; seller coral `#e4572e` and buyer teal `#12827a` only in the mark and the header rule; links and focus in a darker teal (`#0e6e67`) because the brand teal
+is a graphic colour. The state colours (green, amber, red) did not change. Dark-mode tones are derived from the same hues and lifted until they pass AA.
 
 State semantics: **amber means "we do not know yet"** (result uncertain, partial, cannot verify); it is never used for a refusal or a mismatch. This follows the six-state vocabulary the app has shown since the RC3 interface round (`copilot/web/templates/_components.html`, `copilot/web/static/app.css`).
 
@@ -80,9 +80,9 @@ System and local fonts only; nothing is downloaded.
 Every component below already exists as markup in the templates (class names and `data-state` attributes are the contract with the tests);
 the stylesheet only restyles them.
 
-1. **Page frame.** Navy header (`--header-bg`) with a 4 px orange rule under it, the small orange square, the product name in white (link to the inbox),
+1. **Page frame.** Ink header (`--header-bg`) with a 4 px rule under it, half seller coral and half buyer teal, the mark drawn in CSS (the two brackets around a white check), the lowercase wordmark "proofie" in white (link to the inbox),
    the same links on every page except the hosted demo's access-code page ("All disputes", and "Tracking at the sale" when that feature is on; the current one is underlined and marked `aria-current`)
-   and the tag "PayPal sandbox · assistant only, you review everything". Inner pages show breadcrumbs under the header, from "All disputes" or "Tracking at
+   and the tag "PayPal sandbox · Proofie prepares - you decide". Inner pages show breadcrumbs under the header, from "All disputes" or "Tracking at
    the sale" to the current page (last, not a link); below 640 px only the parent crumb shows, after a "‹". `main` is a single column. A footer on every page (the shared base template)
    says: "Independent project. Not affiliated with or endorsed by PayPal."
 2. **Inbox table** (`disputes_list.html`). Columns: Dispute, Status, Respond by, Amount, Next step. Rows at least 44 px tall; the dispute id is a link
@@ -124,24 +124,24 @@ the stylesheet only restyles them.
 
 ## 6. Accessibility (measured, not asserted)
 Contrast is computed with the WCAG 2.x formula on the hex values in section 2, from `app.css`, by `tests/local/test_design_contrast.py`.
-Targets: **4.5:1 for text, 3:1 for the outlines of controls, focus rings, banner edges and the orange graphics.**
+Targets: **4.5:1 for text, 3:1 for the outlines of controls, focus rings, banner edges and the brand graphics.**
 Result for the shipped values (all pass; the lowest in each row is bold):
 
 | Pair | Light | Dark | Need |
 |---|---|---|---|
-| text on page / card / tinted row | 15.06 / 16.58 / **13.65** | 15.31 / 13.84 / **12.07** | 4.5 |
-| muted text on page / card / tinted row | 7.30 / 8.04 / **6.62** | 8.55 / 7.72 / **6.74** | 4.5 |
-| link text on page / card / tinted row | 6.25 / 6.87 / **5.66** | 8.95 / 8.09 / **7.05** | 4.5 |
-| primary button label on its fill | 6.87 | 8.81 | 4.5 |
-| info / ok / warn / error banner text on its fill | 11.10 / 7.88 / **7.58** / 7.64 | 11.21 / 10.10 / **9.71** / 10.08 | 4.5 |
-| header text / header secondary text on the navy | 12.86 / **8.86** | 14.90 / **9.11** | 4.5 |
+| text on page / card / tinted row | 13.30 / 14.64 / **12.06** | 15.31 / 13.84 / **12.07** | 4.5 |
+| muted text on page / card / tinted row | 5.52 / 6.08 / **5.01** | 8.55 / 7.72 / **6.74** | 4.5 |
+| link text on page / card / tinted row | 5.54 / 6.10 / **5.02** | 10.49 / 9.48 / **8.27** | 4.5 |
+| primary button label on its fill | 14.64 | 8.16 | 4.5 |
+| info / ok / warn / error banner text on its fill | 12.48 / 7.88 / **7.58** / 7.64 | 11.21 / 10.10 / **9.71** / 10.08 | 4.5 |
+| header text / header secondary text on the ink | 14.64 / **8.93** | 17.57 / **9.88** | 4.5 |
 | control outline on page / card / tinted row | 3.58 / 3.94 / **3.24** | 4.63 / 4.18 / **3.65** | 3 |
-| focus ring on page / card / tinted row | 7.46 / 8.21 / **6.76** | 9.06 / 8.19 / **7.14** | 3 |
-| header focus ring on the navy | 12.86 | 14.90 | 3 |
-| banner edges (info / ok / warn / error) on their fill | 5.93 / 4.64 / **4.46** / 5.37 | 7.12 / 6.23 / 6.12 / **5.83** | 3 |
-| primary button fill against the page | 6.25 | 8.95 | 3 |
-| orange mark / orange rule on the navy | 4.69 / **3.59** | 6.81 / **5.44** | 3 |
-| orange rule against the page | 3.25 | 6.69 | 3 |
+| focus ring on page / card / tinted row | 5.54 / 6.10 / **5.02** | 10.49 / 9.48 / **8.27** | 3 |
+| header focus ring on the ink | 14.64 | 17.57 | 3 |
+| banner edges (info / ok / warn / error) on their fill | 5.18 / 4.64 / **4.46** / 5.37 | 6.82 / 6.23 / 6.12 / **5.83** | 3 |
+| primary button fill against the page | 13.30 | 8.51 | 3 |
+| buyer teal / seller coral (mark and rule) on the ink | **3.14** / 3.98 | 7.00 / **6.37** | 3 |
+| seller coral rule against the page | 3.35 | 6.65 | 3 |
 
 An excluded document's row is drawn with `--surface-2` and `--text-muted` (plus its words, "No - excluded"); it never uses `opacity`, which would lower the
 text and outline contrast below these figures. A secondary button inside any banner keeps a transparent fill, the banner's own text colour and a
@@ -165,5 +165,24 @@ Other requirements:
 - The same run checks: no horizontal scroll at 375 px, the focus ring is visible on each control (computed outline), every control is at least 44 px,
   and the double-click guard (including the `pageshow` restore) behaves in a real browser.
 - A unit test recomputes the contrast ratios from `app.css` so a later colour edit cannot silently break AA.
-- A separate offline Playwright harness renders every page state (180 on the RC4.2 candidate) and checks structure and accessible names, target size, contrast in light, dark and forced colours, reflow at 320 and 390 px, text spacing, and keyboard order at 1280, 768 and 390 px. Its second run on the merged RC4.2 code (2026-10-18) reported no failing check; the deviations kept on purpose (for example one more Tab stop on three keyboard journeys, for two links added on purpose) are recorded as waivers. A reading pass over the same page states then found seven wording and language-marking problems, fixed before the cut. The harness is an in-house rule check, not axe-core, and it is not part of this repository; the contrast unit test and `demo/ui_check.py` above are the parts you can run.
+- A separate offline Playwright harness renders every page state and checks structure and accessible names, target size, contrast in light, dark and forced colours, reflow at 320 and 390 px, text spacing, and keyboard order at 1280, 768 and 390 px. Its second run on the merged code (2026-10-18) reported no failing check; the deviations kept on purpose (for example one more Tab stop on three keyboard journeys, for two links added on purpose) are recorded as waivers. A reading pass over the same page states then found seven wording and language-marking problems, fixed before the cut. The harness is an in-house rule check, not axe-core, and it is not part of this repository; the contrast unit test and `demo/ui_check.py` above are the parts you can run.
 - Screenshots are not proof of a send: a send result is only closed by the network log and PayPal's own GET.
+
+## Product brand surfaces
+
+Where the Proofie brand (ink `#102a43`, seller coral `#e4572e`, buyer teal `#12827a`; the mark is the seller and buyer brackets around a check) appears in the running product, and the file and size of each. The six static files live in `copilot/web/static/brand/` and are served at `/static/brand/`, which the hosted gate lets through without an access cookie (`copilot/web/security.py`, GET `/static/`).
+
+| Surface | File or rule | Size |
+|---|---|---|
+| Browser tab icon | `proofie-mark.svg` and `favicon-32.png`, linked in `_base.html` and the buyer status page | SVG scalable; PNG 32 × 32 px |
+| Home-screen icon | `apple-touch-icon.png` (mark on ink) | 180 × 180 px |
+| Header mark (every page that extends `_base.html`, and the case-workspace header) | `proofie-mark-on-ink.svg` as the `.brand-mark` background | 24 × 24 px |
+| Header rule | `.site-header` 4 px rule, coral left half and teal right half (the case workspace header draws the same rule) | 4 px |
+| Print of a `_base` page, including the package insert | `@media print` in `app.css`: header ink on white, `proofie-mark-mono-ink.svg`; navigation, sandbox tag, skip link and buttons hidden; the independent-project footer and the hosted-demo note print | 24 × 24 px |
+| Evidence package print view (A4) | `proofie-mark-mono-ink.svg` above the title with "Proofie" as text; text ink `#102a43`, muted `#486581`, focus `#0e6e67` | about 10 mm |
+| Buyer status page footer | `proofie-mark-mono-ink.svg` before the footer sentence | 20 × 20 px |
+| Link preview (Open Graph, `_base.html` head only) | `proofie-social-1280x640.png`, absolute URL from the request address; `twitter:card` `summary_large_image`; not on the buyer status page, which is private and `noindex` | 1280 × 640 px |
+
+The lockup files draw the wordmark with `<text>`; the product never uses them. The product uses the mark SVG and "Proofie" as HTML text.
+
+Rule: nothing sent to PayPal carries the Proofie brand. The evidence package, the files, the messages and every request body stay plain; the brand lives only in screens and print views that a person looks at.

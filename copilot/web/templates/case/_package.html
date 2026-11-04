@@ -1,7 +1,7 @@
 {% from "_components.html" import tag, button, post_button, done_banner %}
 <section id="package" aria-labelledby="package-title"><h2 id="package-title">Evidence package</h2>
 {% if feature_enabled("demo_documents") and hosted and latest_package %}{% include "features/demo_documents/_entry.html" %}{% endif %}
-{% if feature_enabled("demo_documents_seeded") and not hosted and norm.can_provide_evidence and not rc3_reviewing and not buyer_closed %}<p data-state="seeded-demo-entry"><a href="/disputes/{{ norm.dispute_id }}/seeded-demo">Seeded demo case: use the demo documents and shipment details</a> (DEMO DATA, you confirm first).</p>{% endif %}
+{% if feature_enabled("demo_documents_seeded") and not hosted and norm.can_provide_evidence and not rc3_reviewing and not buyer_closed and seeded_case %}<p data-state="seeded-demo-entry"><a href="/disputes/{{ norm.dispute_id }}/seeded-demo">Seeded demo case: use the demo documents and shipment details</a> (DEMO DATA, you confirm first).</p>{% endif %}
 {% if rc3_reviewing or buyer_closed %}<p>{{ tag('na','New packages are not available') }} {% if buyer_closed %}The buyer closed this case.{% else %}PayPal is reviewing this claim.{% endif %} Existing packages remain readable below. <a href="{{ ws_url('overview') }}#summary">Review the case status</a>.</p>{% endif %}
 {% if norm.can_provide_evidence and not rc3_reviewing and not buyer_closed %}
 <p class="hint" data-state="package-hint">{% if hosted %}The AI assistant is off in this demo. You type the shipment facts and statements yourself. Nothing is sent.{% else %}The local AI model writes first statements from your documents. You check every one. Nothing is sent.{% endif %}</p>
@@ -11,6 +11,7 @@
   <p>Package v{{ latest_package.version }} stays as it is. A new version must be reviewed and approved again before anything is sent.</p>
   {% if pending_new_version %}<p>Sending stays blocked until PayPal confirms the earlier attempt, or you mark it as not received on the package page.</p>{% endif %}
   {{ post_button("/disputes/" ~ norm.dispute_id ~ "/packages", "Start package v" ~ next_version, csrf_token, kind="secondary", sending="Preparing…") }}
+  {% if not hosted %}<p class="field-hint" data-state="model-time-hint">This can take one to two minutes while the local model reads the files.</p>{% endif %}
 </details>
 {% endif %}
 {% if packages|length > 0 %}

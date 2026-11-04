@@ -91,6 +91,10 @@
 {%- if step.body %}
 <p>{{ step.body }}</p>
 {%- endif %}
+{%- if step.preview_text %}
+{% call exact_content() %}{{ step.preview_text }}{% endcall %}
+<dl class="send-rows">{% for label, value in step.preview %}<dt>{{ label }}</dt><dd>{{ value }}</dd>{% endfor %}</dl>
+{%- endif %}
 {%- if step.items %}
 <ul class="fix-list">{% for item in step.items %}<li>{{ item.text }} <a href="{{ item.href }}">{{ item.link }}</a></li>{% endfor %}</ul>
 {%- endif %}
@@ -103,6 +107,9 @@
 {{ _render_action(secondary, csrf_token) }}
 {%- endfor %}
 </div>
+{%- endif %}
+{%- if step.action_hint %}
+<p class="action-hint" data-state="edit-clears-approval">{{ step.action_hint }}</p>
 {%- endif %}
 {%- if step.note %}
 <p class="action-note"{% if step.note_state %} data-state="{{ step.note_state }}"{% endif %}>{{ step.note }}</p>

@@ -341,7 +341,7 @@ def test_flag_off_core_template_bytes_identical_and_on_only_active_entry(prepare
     # The template differs from that frozen fixture by an explicit, counted list of approved edits
     # (tests/local/_template_delta.py); applying exactly those edits must give the template in the tree, byte for byte.
     import _template_delta as delta
-    assert len(delta.edits()) == 103 and delta.apply(frozen) == delta.current_template()
+    assert len(delta.edits()) == 107 and delta.apply(frozen) == delta.current_template()
     assert any("The assistant's answer could not be checked" in e["new"] for e in delta.edits())
     env = routes_package.templates.env.overlay(loader=ChoiceLoader([
         DictLoader({"package_review.html": delta.apply(frozen)}), routes_package.templates.env.loader]))
@@ -371,7 +371,7 @@ def test_rc43_hooks_off_page_identical_to_the_46_edit_template(prepared_web, mon
     assert '{% include "features/clauses/_clause.html" ignore missing %}' in hooks["edit-pk3"]
     lines = (Path(__file__).parent/"fixtures/package_review-frozen-3.html").read_text(encoding="utf-8").split("\n")
     earlier = [e for e in delta.edits() if not e["id"].startswith("edit-pk")]
-    assert len(earlier) == 100     # 79 earlier edits plus the 19 NIVEL2-FIX entries of the O4 B composition plus the 2 seller-shortcuts proposals
+    assert len(earlier) == 104     # 79 earlier edits plus the 19 NIVEL2-FIX entries of the O4 B composition plus the 2 seller-shortcuts proposals plus the LINK-FIX F-04 anchors plus the 3 HERO send-panel entries
     for edit in reversed(earlier):
         old = edit["old"].split("\n") if edit["old"] != "" else []
         lines[edit["at"]:edit["at"] + len(old)] = edit["new"].split("\n") if edit["new"] != "" else []

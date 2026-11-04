@@ -65,11 +65,11 @@ OUT = config.data_dir() / "ui-captures" / "d2"
 VIEWPORTS = {"1280": {"width": 1280, "height": 900}, "375": {"width": 375, "height": 800}}
 SCHEMES = ("light", "dark")
 PAGE_BG = {"light": "rgb(245, 244, 240)", "dark": "rgb(18, 21, 24)"}
-HEADER_BG = {"light": "rgb(11, 47, 107)", "dark": "rgb(13, 37, 84)"}
-BRAND_RULE = {"light": "rgb(232, 89, 12)", "dark": "rgb(244, 122, 42)"}
+HEADER_BG = {"light": "rgb(16, 42, 67)", "dark": "rgb(11, 26, 42)"}
+BRAND_RULE = {"light": "rgb(228, 87, 46)", "dark": "rgb(240, 122, 85)"}    # seller coral, the left half of the rule
 FOOTER_TEXT = "Independent project. Not affiliated with or endorsed by PayPal."
 FOCUS = {"light": "rgb(11, 74, 168)", "dark": "rgb(138, 184, 255)"}
-HEADER_FOCUS = "rgb(255, 255, 255)"      # inside the navy header the ring is white (--header-focus)
+HEADER_FOCUS = "rgb(255, 255, 255)"      # inside the ink header the ring is white (--header-focus)
 
 
 class ScriptedClient:
@@ -151,7 +151,8 @@ JS_STYLE = """
   const header = document.querySelector('.site-header');
   out.header = {bg: rgb(header, 'backgroundColor'), color: rgb(header, 'color'), rule: rgb(header, 'borderBottomColor'),
                 ruleWidth: rgb(header, 'borderBottomWidth'),
-                mark: rgb(document.querySelector('.brand-mark'), 'backgroundColor')};
+                mark: (() => { const probe = document.createElement('span'); probe.style.color = 'var(--brand-mark)';
+                               document.body.appendChild(probe); const c = rgb(probe, 'color'); probe.remove(); return c; })()};
   const orange = new Set([out.header.rule, out.header.mark]);
   for (const el of document.querySelectorAll('body *')) {
     if (el.closest('.site-header')) continue;
@@ -164,7 +165,7 @@ JS_STYLE = """
   const footer = document.querySelector('footer.site-footer');
   out.footer = footer ? footer.innerText.trim() : null;
   const brand = document.querySelector('.brand');
-  out.brandText = brand ? brand.innerText.trim() : null;
+  out.brandText = brand ? brand.textContent.trim() : null;   // the wordmark is drawn lowercase by CSS; the name is "Proofie"
   return out;
 }
 """
@@ -196,11 +197,11 @@ def audit_page(page, label, scheme, failures, report):
             if bg != "rgba(0, 0, 0, 0)" or color != v["wrapColor"] or border != v["wrapColor"]:
                 failures.append(f"{label}: secondary {kind} in banner-{fam} is not secondary: {v}")
     if st["header"]["bg"] != HEADER_BG[scheme]:
-        failures.append(f"{label}: header background {st['header']['bg']} is not the {scheme} navy {HEADER_BG[scheme]}")
+        failures.append(f"{label}: header background {st['header']['bg']} is not the {scheme} ink {HEADER_BG[scheme]}")
     if st["header"]["rule"] != BRAND_RULE[scheme] or st["header"]["ruleWidth"] != "4px":
         failures.append(f"{label}: header rule is {st['header']['rule']} {st['header']['ruleWidth']}")
     if st["brandOutsideHeader"]:
-        failures.append(f"{label}: the orange appears outside the header: {st['brandOutsideHeader'][:3]}")
+        failures.append(f"{label}: a brand colour appears outside the header: {st['brandOutsideHeader'][:3]}")
     if st["brandText"] != "Proofie":
         failures.append(f"{label}: the header brand reads {st['brandText']!r}, not 'Proofie'")
     if st["footer"] != FOOTER_TEXT:

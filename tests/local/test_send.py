@@ -386,3 +386,18 @@ def test_files_ok_is_scoped_to_the_matched_entry_not_a_union_across_candidates()
     result = verify_after_with_attachments(body, ATT_REQ_INPUT, ["a.pdf"])
     assert result["content_ok"] is True
     assert result["files_ok"] is False and result["missing_files"] == ["a.pdf"]
+
+
+# ---- pick_tracking: a missing carrier is filled only from a source with the same tracking number (S03d) --------------
+def test_pick_tracking_fills_a_missing_carrier_from_the_form_with_the_same_number():
+    form = ExtractedDoc("manual", {"tracking_number": {"value": "T-1", "confidence": "read"},
+                                   "carrier": {"value": "FedEx", "confidence": "read"}}, False)
+    assert pick_tracking([form, _doc("3", "t-1 ")]) == ("t-1 ", "FedEx")           # compared trimmed, case-insensitive
+    assert pick_tracking([_doc("3", "T-1"), _doc("4", "T-1", "UPS"), form]) == ("T-1", "UPS")   # another document first
+
+
+def test_pick_tracking_never_pairs_a_number_with_the_carrier_of_a_different_number():
+    form = ExtractedDoc("manual", {"tracking_number": {"value": "T-1", "confidence": "read"},
+                                   "carrier": {"value": "FedEx", "confidence": "read"}}, False)
+    assert pick_tracking([form, _doc("3", "T-2")]) == ("T-2", None)
+    assert pick_tracking([_doc("3", "T-2"), _doc("4", "T-3", "UPS")]) == ("T-2", None)

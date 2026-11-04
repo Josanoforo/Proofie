@@ -33,23 +33,6 @@
   {% if tracking_current %}<p class="field-hint">The package has tracking {{ mono_id(tracking_current) }}{% if carrier_current %} ({{ carrier_display_name(carrier_current) }}){% endif %}; that does not mean it is registered in PayPal.</p>{% endif %}
 {% endcall %}
 {% endif %}
-{% set attached_file_count = file_rows|selectattr('attached')|list|length %}
-<section class="panel package-contents-index" data-state="package-contents-index" aria-labelledby="package-contents-title">
-  <table class="stack">
-    <caption class="visually-hidden">Current package sections and recorded content</caption>
-    <thead><tr><th scope="col">Section</th><th scope="col">Current package data</th><th scope="col">Open</th></tr></thead>
-    <tbody>
-      <tr><th scope="row" data-label="Section">Shipment</th><td data-label="Current package data">{% if tracking_current %}Saved tracking {{ mono_id(tracking_current) }}{% if carrier_current %}; carrier {{ carrier_display_name(carrier_current) }}{% endif %}{% else %}No tracking number saved in this package{% endif %}</td><td data-label="Open"><a href="#shipment-fold">Review shipment</a></td></tr>
-      <tr><th scope="row" data-label="Section">Files</th><td data-label="Current package data">{% for file in file_rows if file.attached %}{{ file.filename or file.name }}{% if not loop.last %}, {% endif %}{% else %}No files attached{% endfor %} · {{ attached_file_count }} of {{ file_rows|length }} attached</td><td data-label="Open"><a href="#files-fold">Review files</a></td></tr>
-      <tr><th scope="row" data-label="Section">Statements</th><td data-label="Current package data">{{ claims|length }} {{ 'statement' if claims|length == 1 else 'statements' }}{% for verdict in claim_verdicts %} · {{ {'verified':'Matches the source', 'unverifiable':'Cannot be verified', 'seller_statement':'Your own statement', 'conflict':'Does not match the source'}.get(verdict, 'Not available') }}{% endfor %}</td><td data-label="Open"><a href="#statements-fold">Review statements</a></td></tr>
-      <tr><th scope="row" data-label="Section">Checks</th><td data-label="Current package data">{% if checks_count %}{{ checks_count.line }}{% else %}No check count is available for this package{% endif %}</td><td data-label="Open"><a href="#checks-fold">Review checks</a></td></tr>
-      <tr><th scope="row" data-label="Section">What will be sent</th><td data-label="Current package data">{% if sent_version %}Sent version, read-only{% elif send_summary.sendable %}To PayPal · dispute {{ dispute_id }} · package v{{ package.version }}{% else %}Not ready to send{% endif %}</td><td data-label="Open"><a href="#what-will-be-sent">Review send content</a></td></tr>
-      <tr><th scope="row" data-label="Section">Approval</th><td data-label="Current package data">{% if approval %}Approval recorded for this package{% elif sent_version %}Approval used for the sent version{% else %}No approval recorded{% endif %}</td><td data-label="Open"><a href="#approval">Review approval status</a></td></tr>
-      {% if feature_enabled("evidence_dossier") %}<tr><th scope="row" data-label="Section">Evidence dossier</th><td data-label="Current package data">Case evidence and source records</td><td data-label="Open"><a href="#evidence-dossier">Review evidence dossier</a></td></tr>{% endif %}
-      <tr><th scope="row" data-label="Section">Technical details</th><td data-label="Current package data">Package validation and model</td><td data-label="Open"><a href="#package-technical">Review technical details</a></td></tr>
-    </tbody>
-  </table>
-</section>
 {# The one "what do I do now" panel. The single Send form of the page lives here (key send); the legacy approve form
    (feature flag off) renders in its caller block. A blocked step is a list of fixes, never an inert button. #}
 {% call next_step_panel(step, csrf_token, 'Open approval review' if step.key == 'review_approve' and step.action and not step.action.post else none) %}
@@ -68,6 +51,23 @@
   {% endif %}
   {% if step.data_state == 'evidence-listed' %}<p data-state="evidence-listed-link">If PayPal offers it, you can add to your evidence there: {{ resolution_center_link() }}</p>{% endif %}
 {% endcall %}
+{% set attached_file_count = file_rows|selectattr('attached')|list|length %}
+<section class="panel package-contents-index" data-state="package-contents-index" aria-labelledby="package-contents-title">
+  <table class="stack">
+    <caption class="visually-hidden">Current package sections and recorded content</caption>
+    <thead><tr><th scope="col">Section</th><th scope="col">Current package data</th><th scope="col">Open</th></tr></thead>
+    <tbody>
+      <tr><th scope="row" data-label="Section">Shipment</th><td data-label="Current package data">{% if tracking_current %}Saved tracking {{ mono_id(tracking_current) }}{% if carrier_current %}; carrier {{ carrier_display_name(carrier_current) }}{% endif %}{% else %}No tracking number saved in this package{% endif %}</td><td data-label="Open"><a href="#shipment-fold">Review shipment</a></td></tr>
+      <tr><th scope="row" data-label="Section">Files</th><td data-label="Current package data">{% for file in file_rows if file.attached %}{{ file.filename or file.name }}{% if not loop.last %}, {% endif %}{% else %}No files attached{% endfor %} · {{ attached_file_count }} of {{ file_rows|length }} attached</td><td data-label="Open"><a href="#files-fold">Review files</a></td></tr>
+      <tr><th scope="row" data-label="Section">Statements</th><td data-label="Current package data">{{ claims|length }} {{ 'statement' if claims|length == 1 else 'statements' }}{% for verdict in claim_verdicts %} · {{ {'verified':'Matches the source', 'unverifiable':'Cannot be verified', 'seller_statement':'Your own statement', 'conflict':'Does not match the source'}.get(verdict, 'Not available') }}{% endfor %}</td><td data-label="Open"><a href="#statements-fold">Review statements</a></td></tr>
+      <tr><th scope="row" data-label="Section">Checks</th><td data-label="Current package data">{% if checks_count %}{{ checks_count.line }}{% else %}No check count is available for this package{% endif %}</td><td data-label="Open"><a href="#checks-fold">Review checks</a></td></tr>
+      <tr><th scope="row" data-label="Section">What will be sent</th><td data-label="Current package data">{% if sent_version %}Sent version, read-only{% elif send_summary.sendable %}To PayPal · dispute {{ dispute_id }} · package v{{ package.version }}{% else %}Not ready to send{% endif %}</td><td data-label="Open"><a href="#what-will-be-sent">Review send content</a></td></tr>
+      <tr><th scope="row" data-label="Section">Approval</th><td data-label="Current package data">{% if approval %}Approval recorded for this package{% elif sent_version %}Approval used for the sent version{% else %}No approval recorded{% endif %}</td><td data-label="Open"><a href="#approval">Review approval status</a></td></tr>
+      {% if feature_enabled("evidence_dossier") %}<tr><th scope="row" data-label="Section">Evidence dossier</th><td data-label="Current package data">Case evidence and source records</td><td data-label="Open"><a href="#evidence-dossier">Review evidence dossier</a></td></tr>{% endif %}
+      <tr><th scope="row" data-label="Section">Technical details</th><td data-label="Current package data">Package validation and model</td><td data-label="Open"><a href="#package-technical">Review technical details</a></td></tr>
+    </tbody>
+  </table>
+</section>
 
 {% if not_inr %}<p class="field-hint" data-state="not-missing-item">This dispute is not about a missing item. Proofie builds proof of shipment only, which might not answer it.</p>{% endif %}
 
@@ -81,13 +81,14 @@
   {% if later.removed %}<p data-state="removed-after-send">{{ later.removed }}</p>{% endif %}
   {% if sent_view.recorded %}
   <ul data-state="sent-content">
-    <li>Tracking number: {{ mono_id(sent_view.tracking) }}{% if sent_view.carrier %} ({{ sent_view.carrier }}){% endif %}</li>
-    <li>Files: {% if sent_view.files %}{% for f in sent_view.files %}{{ mono_id(f) }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}none{% endif %}</li>
+    {# A sent version has no edit sections: the links that point at them land on these lines. #}
+    <li id="shipment-details"><span id="shipment-fold"></span><span id="field-tracking_number"></span>Tracking number: {{ mono_id(sent_view.tracking) }}{% if sent_view.carrier %} ({{ sent_view.carrier }}){% endif %}</li>
+    <li id="attachments"><span id="files-fold"></span>Files: {% if sent_view.files %}{% for f in sent_view.files %}{{ mono_id(f) }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}none{% endif %}</li>
   </ul>
-  <p>Statements, as PayPal received them:</p>
+  <p id="statements"><span id="statements-fold"></span>Statements, as PayPal received them:</p>
   {% call exact_content(sent=true) %}{{ sent_view.notes }}{% endcall %}
   {% else %}
-  <p>Proofie did not keep the exact text of this send. Files: {% if sent_view.files %}{{ sent_view.files|join(", ") }}{% else %}none{% endif %}.</p>
+  <p><span id="shipment-details"></span><span id="shipment-fold"></span><span id="field-tracking_number"></span><span id="attachments"></span><span id="files-fold"></span><span id="statements"></span><span id="statements-fold"></span>Proofie did not keep the exact text of this send. Files: {% if sent_view.files %}{{ sent_view.files|join(", ") }}{% else %}none{% endif %}.</p>
   {% endif %}
   {% if sent_view.approval %}<p data-state="approval-used">Approval used for the send at {{ sent_view.approval.at|when }}.{% if sent_view.approval.changed_after %} A source changed after sending; nothing was re-sent.{% endif %}</p>{% endif %}
 </section>
@@ -128,7 +129,7 @@
 {% endcall %}
 {% endif %}
 
-{% if package.review_flags %}
+{% if package.review_flags and not sent_version %}
 {% call banner("warn", "review-flags", "Before you send") %}
   <ul>{% for f in package.review_flags %}<li>{{ f }}</li>{% endfor %}</ul>
   <p>Review these notices before deciding what to send. <a href="#next-step">Go to approval</a></p>
@@ -445,7 +446,7 @@
 <p data-state="hosted-shared-send">Anything you send here goes to the shared sandbox dispute; the next visitor will see it.</p>
 {%- endif %}
 {% if approval %}
-<p data-state="approved">Approved {{ approval.approved_at | when }}{% if approval.sufficiency_override %} (sent anyway: "{{ approval.sufficiency_override }}"){% endif %}. What is approved is exactly the content listed under "What will be sent"; any edit clears this approval.</p>
+<p data-state="approved">Approved {{ approval.approved_at | when }}{% if approval.sufficiency_override %} (your note on the open notices: "{{ approval.sufficiency_override }}"){% endif %}. What is approved is exactly the content listed under "What will be sent"; any edit clears this approval.</p>
 {% if send_state.state == "confirmed" %}
 <p data-state="already-received">PayPal already has this exact content. There is nothing new to send.</p>
 {% elif send_state.state not in ("approved", "prepared", "rejected", "blocked") %}
@@ -509,7 +510,7 @@ documents used: {{ names }}</pre>
   {% set states = check_rows|map(attribute='tag_state')|list %}
   <p><span class="b-label">Review</span>{% if step and step.key in ('review', 'review_approve') %}Ready to review{% elif approval %}Approval recorded{% else %}{{ step.title if step and step.title else chip.label }}{% endif %}</p>
   {% if send_state.state == "confirmed" %}
-  {% if 'bad' in states or 'warn' in states %}<p class="hint" data-state="checks-after-sending">Checks run after sending: {{ 'a difference needs review' if 'bad' in states else 'some facts cannot be verified' }}. Nothing was re-sent.</p>{% endif %}
+  {% if 'bad' in states or 'warn' in states %}<p class="hint" data-state="checks-after-sending">Package checks after sending: {{ 'a difference is listed under Checks' if 'bad' in states else 'some facts cannot be checked' }}. Nothing was re-sent. <a href="#checks">See the checks</a></p>{% endif %}
   {% else %}<p><span class="b-label">Attention</span>{{ tag('bad' if 'bad' in states else 'warn' if 'warn' in states else 'ok', 'Needs attention' if 'bad' in states else 'Some facts cannot be verified' if 'warn' in states else 'Checks complete') }}{% if step and step.key in ('review', 'review_approve') and ('bad' in states or 'warn' in states) %} <span class="hint" data-state="review-vs-send">Ready to review; check the groups below for missing, differing or unverifiable facts before sending.</span>{% endif %}</p>{% endif %}
   <p data-state="{{ 'package-sent' if send_state.state == 'confirmed' else send_state.state }}"><span class="b-label">Sending</span>{{ tag('ok' if send_state.state == 'confirmed' else 'info' if send_state.state == 'approved' else 'todo', 'Sent to PayPal' if send_state.state == 'confirmed' else send_status) }}</p>
   <p><a href="#shipment-fold">Open shipment details</a></p>

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 import json
 
 from fastapi import APIRouter, Depends, Form, Request
@@ -29,7 +29,8 @@ def _page(request, view, *, token="", state="ready", action_result=None, csrf_to
 @router.get("/buyer/demo", response_class=HTMLResponse, name="buyer_demo")
 def buyer_demo(request: Request):
     view = {"description": "Cotton desk runner", "tracking_status": "In transit",
-            "expected_delivery": "2026-11-02", "locale": "en", "photo_data_uri": None}
+            "expected_delivery": (date.today() + timedelta(days=3)).isoformat(),   # a sample, so a date a few days ahead
+             "locale": "en", "photo_data_uri": None}
     return _page(request, view, demo=True)
 
 

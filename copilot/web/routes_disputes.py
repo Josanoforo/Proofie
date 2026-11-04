@@ -784,7 +784,7 @@ def _render_case(request: Request, dispute_id: str, client: SandboxClient, ws_vi
 
     csrf_token = new_csrf_token()
     status_text = _status_text(raw, norm)
-    from copilot.web.routes_package import policy_source, _checks_for
+    from copilot.web.routes_package import policy_source, _checks_for, _is_sent_version
     from copilot.core.checklist import UnknownCountryError
     checks = None
     if packages:
@@ -809,6 +809,8 @@ def _render_case(request: Request, dispute_id: str, client: SandboxClient, ws_vi
             else "Written by you"
     latest = max(packages, key=lambda p: (p["version"], p["id"])) if packages else None
     latest_info = infos.get(latest["id"]) if latest else None
+    # The sale checklist refuses a version that was already sent (409), so its link names a package only while the latest can change.
+    readiness_package_id = str(latest["id"]) if latest and not _is_sent_version(db_path, dispute_id, latest) else ""
     hosted = bool(config.hosted_demo())
     # the latest version's statements may already be in PayPal from an earlier version that carried other files
     collision = (status.statement_collision(db_path, dispute_id, latest)
@@ -873,6 +875,8 @@ def _render_case(request: Request, dispute_id: str, client: SandboxClient, ws_vi
                                           now.isoformat(), webhook_rows).get(dispute_id)
     sale_readiness_view = None
     sale_readiness_error = None
+    shipment_saved = False
+    case_terms_saved = False
     if config.feature_enabled("sale_readiness") and capture:
         try:
             from copilot.features.sale_readiness import service as sale_readiness_service
@@ -884,6 +888,8 @@ def _render_case(request: Request, dispute_id: str, client: SandboxClient, ws_vi
                 saved_file = fulfilment_store.get_file(capture)
             else:
                 saved_file = None
+            shipment_saved = bool(saved_file)
+            case_terms_saved = sale_terms is not None
             if saved_file:
                 try:
                     tracker = (json.loads(saved_file.get("request_json") or "{}").get("trackers") or [{}])[0]
@@ -894,6 +900,15 @@ def _render_case(request: Request, dispute_id: str, client: SandboxClient, ws_vi
                                                                     latest_attachments, sale_terms, saved_tracking)
         except (OSError, TypeError, ValueError) as exc:
             sale_readiness_error = str(exc)
+    lesson_ready = False
+    if config.feature_enabled("sale_lesson"):
+        from copilot.features.sale_lesson.service import closed_outcome
+        lesson_ready = closed_outcome(decided, code)
+    seeded_case = False
+    if (ws_view == "prepare" and config.feature_enabled("demo_documents_seeded") and not config.hosted_demo()
+            and norm.get("can_provide_evidence") and not rc3_reviewing and not buyer_closed):     # one read, only where the link is drawn
+        from copilot.features.demo_documents.seeded import offered as seeded_offered
+        seeded_case = seeded_offered(client, norm)
     mcp_local_notes = []
     mcp_local_notes_error = None
     if config.feature_enabled("mcp_local_contracts"):
@@ -946,6 +961,7 @@ def _render_case(request: Request, dispute_id: str, client: SandboxClient, ws_vi
                                       infos=infos, db_path=db_path),
            "tasks": tasks, "queue_explanation": queue_explanation,
            "sale_readiness_view": sale_readiness_view, "sale_readiness_error": sale_readiness_error,
+           "shipment_saved": shipment_saved, "case_terms_saved": case_terms_saved, "lesson_ready": lesson_ready, "seeded_case": seeded_case,
            "mcp_local_notes": mcp_local_notes, "mcp_local_notes_error": mcp_local_notes_error,
            "local_autopilot_history": local_autopilot_history,
            "local_autopilot_actions": local_autopilot_actions,
@@ -956,7 +972,8 @@ def _render_case(request: Request, dispute_id: str, client: SandboxClient, ws_vi
            "local_autopilot_default_amount": local_autopilot_default_amount,
            "audit_timeline": repo.list_audit(db_path, dispute_id), "documents": documents, "packages": packages,
            "sent_docs": sent_docs, "pending_sends": still_pending, "late_confirmations": late_confirmations,
-           "done": done, "capture": capture, "latest_package": latest, "next_version": next_version,
+           "done": done, "capture": capture, "latest_package": latest, "readiness_package_id": readiness_package_id,
+           "next_version": next_version,
            "can_new_version": can_new_version, "listed": next_step.seller_evidence_listed(norm),
            "once_per_dispute": next_step.ONCE_PER_DISPUTE, "csrf_token": csrf_token,
            "pending_new_version": step.key == "pending", "hosted": hosted, "due_calendar_link": ics.LINK_TEXT,

@@ -12,6 +12,7 @@ from copilot.core.checklist import ACKNOWLEDGEABLE_DATE_CHECKS, UnknownCountryEr
 from copilot.core.checklist_input import cached_rules, docs_for_dispute, extracted_docs_for
 from copilot.core.context import Field, SRC_DISPUTE
 from copilot.core.disputes import normalize
+from copilot.core.own_tracker import OwnTrackerMask, sent_tracking_numbers, tracker_numbers
 from copilot.core.evidence_model import (find_delivery_claims_citing_conflicting_sources,
                                          find_delivery_claims_citing_untrusted_documents,
                                          find_unsupported_delivery_assertions, untrusted_document_ids)
@@ -65,44 +66,12 @@ class Review:
     case_display: tuple = ()
 
 
-def sent_tracking_numbers(request_input: dict | None) -> list:
-    """The tracking numbers inside the evidence request this app sends (evidence_info.tracking_info)."""
-    return [t.get("tracking_number") for e in (request_input or {}).get("evidences", [])
-            for t in ((e.get("evidence_info") or {}).get("tracking_info") or []) if t.get("tracking_number")]
-
-
-def tracker_numbers(answer) -> list:
-    """The tracking numbers of a PayPal trackers answer (`{"trackers": [...]}`)."""
-    items = answer.get("trackers") if isinstance(answer, dict) else None
-    return [t["tracking_number"] for t in items or [] if isinstance(t, dict) and t.get("tracking_number")]
-
-
-class OwnTrackerMask:
-    """PayPal registers the tracking number of a provide-evidence request as a tracker of the
-    transaction (observed in the sandbox: GET trackers [] before the send, one MERCHANT tracker with
-    exactly the number we sent, status SHIPPED, last_updated at the second of the POST, after it). That is the send's
-    OWN effect, so the post-send comparison must not report it as a foreign change.
-
-    The ONE field excluded: a tracker entry of the transaction's trackers answer (the context_tracking read) that was
-    NOT present before the send (`baseline`) and whose tracking_number is one this app sent in the evidence
-    (`sent`). Nothing else is touched: a tracker with another number, a tracker that already existed before the send
-    (whatever changes in it), a changed transaction fact, document, statement or evidence entry still differs. The
-    dispute's own status, stage, links and allowed options are NOT excluded because they never enter the checks or
-    the review digest (verified by replaying the recorded answers: only the tracker flipped tracking_number, carrier and
-    delivery_status). The pre-send check is not loosened: this wrapper is used only after the send or on a finished
-    reservation whose approval recorded the baseline."""
-    def __init__(self, client, sent, baseline):
-        self._client, self._sent, self._baseline = client, set(sent), set(baseline)
-
-    def call(self, method, path, op, **kwargs):
-        result = self._client.call(method, path, op, **kwargs)
-        if op == "context_tracking" and isinstance(result, dict) and isinstance(result.get("trackers"), list):
-            kept = [t for t in result["trackers"] if not (
-                isinstance(t, dict) and t.get("tracking_number") in self._sent
-                and t.get("tracking_number") not in self._baseline)]
-            if len(kept) != len(result["trackers"]):
-                return {**result, "trackers": kept}
-        return result
+def requests_closed_by_answer(answer_entries) -> bool:
+    """True when the dispute's evidence list no longer holds any request made of the seller. Observed in the sandbox
+    (take-T2, rows 216/224): the case asked for PROOF_OF_FULFILLMENT, PROOF_OF_REFUND and OTHER; after our provide-evidence
+    PayPal moved it to UNDER_REVIEW and dropped all three requests, not only the type we sent. Used only together with a
+    verified landing of our own submission (see send_guard and read)."""
+    return not any(isinstance(e, dict) and e.get("source") == "REQUESTED_FROM_SELLER" for e in answer_entries or [])
 
 
 def proposed_note(review) -> str:
@@ -233,7 +202,8 @@ def read(client, db_path, dispute_id: str, package_id: int) -> Review:
             match = next((i for i,e in enumerate(remaining) if digest(e) == previous.get("sha256")), None)
             if match is not None:
                 remaining.pop(match)
-            elif not previous.get("replaceable_requested"):
+            elif not (previous.get("replaceable_requested")
+                      or (previous.get("requested_from_seller") and requests_closed_by_answer(raw.get("evidences")))):
                 preserved = False
         landed = verify_after_with_attachments({"evidences":remaining}, request_input, filenames)
         if (isinstance(approved_case, dict) and all(isinstance(approved_case.get(k), list)
@@ -242,8 +212,12 @@ def read(client, db_path, dispute_id: str, package_id: int) -> Review:
             own_types = {e["evidence_type"] for e in request_input["evidences"]}
             digest_norm = dict(norm)
             for key in evidence_keys:
-                digest_norm[key] = [v for v in (norm.get(key) or []) if v not in own_types]
-                digest_norm[key] += [v for v in approved_case[key] if v in own_types]
+                # PayPal closes every request on our send, so the requested list restores whole; the submitted list
+                # restores only the types we sent
+                restored = (set(approved_case[key]) if key == evidence_keys[0] and requests_closed_by_answer(raw.get("evidences"))
+                            else own_types)
+                digest_norm[key] = [v for v in (norm.get(key) or []) if v not in restored]
+                digest_norm[key] += [v for v in approved_case[key] if v in restored]
             baseline = approved_case.get("trackers")
             if "trackers" not in approved_case and _attempt_confirmed(db_path, dispute_id, request_input):
                 # an approval recorded by an earlier version has no trackers baseline. The attempt registry shows
@@ -343,7 +317,8 @@ def read(client, db_path, dispute_id: str, package_id: int) -> Review:
                                     ([context.get("tracking_number")] if context.get("tracking_number") else [])),
                    "entries": [{"sha256":digest(e), "replaceable_requested":
                                 e.get("source") == "REQUESTED_FROM_SELLER" and
-                                e.get("evidence_type") in {r["evidence_type"] for r in (request_input or {}).get("evidences",[])}}
+                                e.get("evidence_type") in {r["evidence_type"] for r in (request_input or {}).get("evidences",[])},
+                                "requested_from_seller": e.get("source") == "REQUESTED_FROM_SELLER"}
                                for e in (raw.get("evidences") or [])]},
                   blocked_details=blocked_details,
                   can_provide_evidence=bool(norm.get("can_provide_evidence")) or "provide-evidence" in (norm.get("action_links") or {}),
@@ -481,12 +456,13 @@ def send_guard(client, db_path, dispute_id, package_id, approval_id):
                     evidence_changed[0] = (result.get("evidences") or []) != initial_evidences
                     remaining = copy.deepcopy(result.get("evidences") or [])
                     preserved = True
+                    closed = requests_closed_by_answer(result.get("evidences"))
                     for earlier in initial_evidences:
                         if earlier in remaining:
                             remaining.remove(earlier)
                         elif not (earlier.get("source") == "REQUESTED_FROM_SELLER"
-                                  and earlier.get("evidence_type") in
-                                  {e["evidence_type"] for e in review.request_input["evidences"]}):
+                                  and (closed or earlier.get("evidence_type") in
+                                       {e["evidence_type"] for e in review.request_input["evidences"]})):
                             preserved = False
                     filenames = [a["filename"] for a in repo.list_attachments(db_path, package_id)]
                     landed = verify_after_with_attachments({"evidences": remaining}, review.request_input, filenames)

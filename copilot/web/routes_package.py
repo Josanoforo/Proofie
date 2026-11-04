@@ -28,6 +28,7 @@ from copilot.core import checklist_input
 from copilot.core.checklist_input import MANUAL_FIELD_NAMES, cached_rules, docs_for_dispute, extracted_docs_for
 from copilot.core.content_type import ALLOWED_CONTENT_TYPES, PROBLEM_TYPE, problem_message, validate_call_total
 from copilot.core.context import fetch_context
+from copilot.core.own_tracker import own_tracker_client
 from copilot.core.eligibility import EFFECT_SENTENCE as ELIGIBILITY_EFFECT_SENTENCE, notes_for
 from copilot.core.disputes import SandboxClient, humanize_evidence_type, normalize
 from copilot.core.evidence_model import (claims_from_output, describe_delivery_problem,
@@ -141,7 +142,8 @@ def _checks_for(dispute: dict, dispute_id: str, client: SandboxClient, db_path) 
     """Shared by review_package and approve_package so both always see the same checklist for the same
     data - approval must gate on exactly what the vendor was shown (never a re-computed, possibly
     different, set of checks)."""
-    context = fetch_context(client, dispute)
+    # after a send PayPal confirmed, the tracker it registered for OUR number is not a delivery report (core/own_tracker.py)
+    context = fetch_context(own_tracker_client(client, db_path, dispute_id), dispute)
     extracted_docs = extracted_docs_for(db_path, dispute_id)
     return evaluate(context, extracted_docs, cached_rules()), context
 
@@ -370,8 +372,10 @@ def _send_summary(db_path, dispute_id: str, package: dict, claims: list, attachm
     package's files). `attachment_docs` is any list of dicts with a 'filename' (repo.list_attachments rows)."""
     tracking_number, carrier = pick_tracking(extracted_docs_for(db_path, dispute_id))
     attachment_shas = _attachment_shas(db_path, package["id"])
+    notes = None
     try:
         req_input = build_request_input(claims, tracking_number, carrier)
+        notes = req_input["evidences"][0]["notes"]          # the text the approval page shows under "Exact text PayPal receives"
         current_sha = sha256_json(req_input)
         fingerprint_now = approval_fingerprint_with_attachments(dispute_id, "provide_evidence", req_input,
                                                                 attachment_shas)
@@ -397,6 +401,7 @@ def _send_summary(db_path, dispute_id: str, package: dict, claims: list, attachm
         approval_cleared = any(e["action"] == "approve_package" and e["detail"].get("package_id") == package["id"]
                                for e in repo.list_audit(db_path, dispute_id))
     return {"tracking_number": tracking_number, "carrier": carrier, "sendable": current_sha is not None,
+            "notes": notes, "fingerprint": approval["approval_sha256"] if approval else None,
             "claims_count": len(claims), "attachments": [d["filename"] for d in attachment_docs],
             "earlier_confirmed": [{"when": timefmt.fmt_iso(a["ts"]), "ts": a["ts"]} for a in earlier],
             "approval_cleared": approval_cleared, "approval_stale": approval_stale,
@@ -1032,7 +1037,12 @@ def render_package(request, dispute_id, package_id, client, *, form_values=None,
         files_count=len(attachments), has_tracking=has_tracking, carrier_missing=carrier_missing_flag,
         approval_valid=approval_valid, record=record, other_unconfirmed=other_unconfirmed,
         review_flags=tuple(package["review_flags"]) if package else (), hosted=config.hosted_demo(),
-        approval_stale=approval_stale, collision=collision, earlier_partial=earlier_partial) if package else None)
+        approval_stale=approval_stale, collision=collision, earlier_partial=earlier_partial,
+        send_notes=send_summary["notes"] if send_summary and approval_valid else None,
+        send_tracking=(f"{send_summary['tracking_number']} ({send_summary['carrier']})" if send_summary and send_summary["carrier"]
+                       else send_summary["tracking_number"] if send_summary else None),
+        send_files=tuple(send_summary["attachments"]) if send_summary else (),
+        send_fingerprint=send_summary["fingerprint"] if send_summary else None) if package else None)
 
     needed = ["delivery_status", "delivery_date", "postal_code", "city", "state"]
     signature_check = [c for c in checks if c.id == "signature"]

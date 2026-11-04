@@ -2,6 +2,7 @@
 still under its review (OCQ, 2026-11-02 00:45), and closes the case about two minutes later. The stored status follows PayPal's response
 only: closed -> sent_confirmed; link gone + transaction REFUNDED + not closed -> sent_refunded_in_review; anything else -> sent_unconfirmed.
 Synthetic fakes only, no network."""
+import re
 import sys
 from pathlib import Path
 
@@ -70,7 +71,7 @@ def test_closed_with_no_link_stays_confirmed_with_todays_sentence(monkeypatch, t
     web, where = _sent(monkeypatch, tmp_path, fake)
     assert accept.get_sent(DISPUTE_ID, _row_id(where))["status"] == accept.STATUS_CONFIRMED
     page = web.get(where).text
-    assert "PayPal shows the claim accepted" in page and "the case is closed and the buyer is refunded" in page
+    assert "PayPal shows the claim accepted" in page and "PayPal shows the claim accepted and the buyer refunded" in page and "PayPal's case status:" in page and not re.search(r"T\d\d:\d\d:\d\d", re.sub(r"<[^>]+>", "", page))      # the machine time stays in the time tag only
 
 
 @pytest.mark.parametrize("fake", [

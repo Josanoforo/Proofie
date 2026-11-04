@@ -1,13 +1,13 @@
 {
   "schema": "proofie-export/1",
-  "source_commit": "d911959b4e8dc0419ffe45860f669d2ef3eb6190",
+  "source_commit": "7aeb1e4b32107d1261304730764ec2ff91520186",
   "rules_version": "051190de893ca3e02440312abb67a19e3b48efb9bf7b9dffa8808929f31b5294",
   "tool_sha256": "988523d5d9e7902142a506a57634db1d889d0b54262d02d5e73ef27af0cdf9ee",
   "files": [
     {
       "path": ".env.example",
       "action": "copied",
-      "sha256": "39ef27678274fd51e10ac1b0bb97feb105f5bdb6a87f1fc508d9fd2eb61ad41c"
+      "sha256": "925ed84d82e644eab0a2de148477d934d083919d120b45110eb94c2d710629f3"
     },
     {
       "path": ".gitattributes",
@@ -27,7 +27,7 @@
     {
       "path": "EVIDENCE-INDEX.md",
       "action": "generated",
-      "sha256": "ca37a349a6f0d93751da40a5c317cfdd6956f0fb3ea686e0733cc32f16fb3ea0"
+      "sha256": "563b0930d945494464d2e0262896c068134a641737caf9a0140982b9b125b174"
     },
     {
       "path": "LICENSE",
@@ -37,12 +37,12 @@
     {
       "path": "README.md",
       "action": "copied",
-      "sha256": "9e57ae5095f482b226df288e0ebd9eb5fdc65c37ac8f482ba95ee0d2c1b52dea"
+      "sha256": "49b8859c3db06e57491fbcdbcc1bc18c61cb54d09fde82c8918b7adcec1e2ddb"
     },
     {
       "path": "THIRD-PARTY.md",
       "action": "copied",
-      "sha256": "bcff7cc7f77c1dc3cfab91918522887324db4817416f2a650d211dd792f7ed3c"
+      "sha256": "158a626329c873a9686be3a55fdde1d370a6398b3a398bb01f9a66df27f4e0d2"
     },
     {
       "path": "conftest.py",
@@ -57,7 +57,7 @@
     {
       "path": "copilot/app.py",
       "action": "copied",
-      "sha256": "02c2ef0d0bad77f75631e622a994dc42e340b5af207acb0d296f56b47f9a7224"
+      "sha256": "2e7cc5563fd09414f05c8a3c42ee6fbc4786651642505fbf2e63d4a5880fdc3a"
     },
     {
       "path": "copilot/config.py",
@@ -107,7 +107,7 @@
     {
       "path": "copilot/core/disputes.py",
       "action": "copied",
-      "sha256": "002857f309b1116f024ac26471d3f1c32ee22dba92e513eab53ff826e77387bc"
+      "sha256": "2b6b8df1ae9db993e3eb60627ebed30476b8f059dfcd1a0df954f61afb7bd7c9"
     },
     {
       "path": "copilot/core/document_ingest.py",
@@ -130,6 +130,11 @@
       "sha256": "f3ccc8192ea0dd845a513fd70344c45251f650e99abda218c68932bf5944e9be"
     },
     {
+      "path": "copilot/core/own_tracker.py",
+      "action": "copied",
+      "sha256": "d44072cf21847285383dd6d9ec220dc74e28db53058f2bea05920ac3970a1b00"
+    },
+    {
       "path": "copilot/core/paypal_words.py",
       "action": "copied",
       "sha256": "a032033eee92aa454fed793bcfaad2fbdd45045ea7999f34c01bd74758227594"
@@ -147,7 +152,7 @@
     {
       "path": "copilot/core/send.py",
       "action": "copied",
-      "sha256": "2a39a1fc0e5251e69d1b6f061284757820ef2924545eab45c21c6c89ef7bce35"
+      "sha256": "4bc6a988bd57b04ca265f86f189dd1c8bb7cbe2d541b78f73dc990667601bcb2"
     },
     {
       "path": "copilot/core/send_recovery.py",
@@ -257,7 +262,7 @@
     {
       "path": "copilot/features/accounting_line/routes.py",
       "action": "copied",
-      "sha256": "6536abdddab7300512b2fe9778354dc403500d5fd8d0da332c598855894871be"
+      "sha256": "ba53bc00314517092d40795a2663babe91f529e9625a30e23498f3942ffe6c12"
     },
     {
       "path": "copilot/features/accounting_line/service.py",
@@ -287,7 +292,7 @@
     {
       "path": "copilot/features/active_approval/service.py",
       "action": "copied",
-      "sha256": "a12058fcc0bf9c0a1133cfa2cec7b708ac29ce0069d2aaf0e2cec6639baef11a"
+      "sha256": "3f39389a2e9916464bc64ff8f1ea2ac0cf17fa3e7291c9521edf64c59037a84e"
     },
     {
       "path": "copilot/features/active_approval/store.py",
@@ -307,7 +312,7 @@
     {
       "path": "copilot/features/appeal_workspace/service.py",
       "action": "copied",
-      "sha256": "fcfc4a9a466a4924970d5f2000e2044102aa6b4654be3d7f2b48c6e077a82eb4"
+      "sha256": "44bacd621060cae8525e5e7181ef15842ad034033de033244a64a1795410e3d5"
     },
     {
       "path": "copilot/features/bilingual/__init__.py",
@@ -352,7 +357,7 @@
     {
       "path": "copilot/features/buyer_note/routes.py",
       "action": "copied",
-      "sha256": "995e445de50bf704a39075b7da4ce81abcc29f4140c3f95212d2a16ef12f5cb1"
+      "sha256": "0955e51f8cf317d1ba962de3b87e38d69bbad4b0b586ea141d5cf914e08be4a7"
     },
     {
       "path": "copilot/features/buyer_note/service.py",
@@ -367,7 +372,7 @@
     {
       "path": "copilot/features/buyer_page/routes.py",
       "action": "copied",
-      "sha256": "96fec32739314ac39ce520ece426e65aa8d007a47aceb4dee3ce3e0d5312435a"
+      "sha256": "4d578c070120d16399504ed07858ac8de5b6dc1d4336a0f6bc9358e0d878a801"
     },
     {
       "path": "copilot/features/buyer_page/service.py",
@@ -382,7 +387,7 @@
     {
       "path": "copilot/features/call_script/routes.py",
       "action": "copied",
-      "sha256": "3a970f24a2744197a3c0915bd67d2e57fde297d4c99e5787ff84ce582c7c3175"
+      "sha256": "48a6e779f4ee26ef5509d5b1f96191d0fd888ee9407dfda6ec91c250f211907f"
     },
     {
       "path": "copilot/features/call_script/service.py",
@@ -552,7 +557,7 @@
     {
       "path": "copilot/features/conformance/suite.py",
       "action": "copied",
-      "sha256": "3fedb00a6633fd85d406b8107053bc5f6e20e00f01dc1dfe5151cc5610286803"
+      "sha256": "79aae1ab0dadb173d3d4ea050aae38632c3d68ca56494c2e9c37b2e3f134334c"
     },
     {
       "path": "copilot/features/deadlines/__init__.py",
@@ -582,7 +587,7 @@
     {
       "path": "copilot/features/declared_limits/service.py",
       "action": "copied",
-      "sha256": "253000330358b0404fa4159b1d1bf0ea50f1266db34b9ba8b7fdd4c9e362caac"
+      "sha256": "16282302b6b6c73a07a3b82202b7151eb358c6a2914e7cf1d337c5662f1fb95e"
     },
     {
       "path": "copilot/features/delivery_facts/__init__.py",
@@ -612,7 +617,7 @@
     {
       "path": "copilot/features/demo_documents/seeded.py",
       "action": "copied",
-      "sha256": "d589ed00fa60799695adcc8e671f6b52d8b9b8db006df330fa9fcd0309a289c2"
+      "sha256": "61bda1a563da1a5e778a06b4a348df245442a89ed0463d5ca267a57e2953eee8"
     },
     {
       "path": "copilot/features/do_nothing_path/__init__.py",
@@ -802,7 +807,7 @@
     {
       "path": "copilot/features/fulfilment/routes.py",
       "action": "copied",
-      "sha256": "7988263faaae64bdc8d958426df0894913c3dbde03888da739102659f0385519"
+      "sha256": "59fa0483b58a47ff30254fe0cb9784c7cd4b22e4ae7fa2aee18766ced39249d5"
     },
     {
       "path": "copilot/features/fulfilment/store.py",
@@ -962,7 +967,7 @@
     {
       "path": "copilot/features/local_demo_hub/service.py",
       "action": "copied",
-      "sha256": "e3b8a591b73a65a7ddd3a8ffe54bdbfce14e5885376e421874ebae94d38a7a84"
+      "sha256": "21fe184ecc1ad1ab0e8a2a2036988a35737ba1c94f9ebe792ff6984f3522c59b"
     },
     {
       "path": "copilot/features/lost_package_paths/__init__.py",
@@ -1062,7 +1067,7 @@
     {
       "path": "copilot/features/outcome/gaps.py",
       "action": "copied",
-      "sha256": "ab8a06e4beabb96329bf9ecf4fd8f09cc8c8709346b4201358a4b4226c68cd71"
+      "sha256": "dcfc865636a36a099c600ce123e73b8a87dd217d165b7fcbfdf7ef19c4af7c3e"
     },
     {
       "path": "copilot/features/outcome/read.py",
@@ -1112,12 +1117,12 @@
     {
       "path": "copilot/features/package_print/routes.py",
       "action": "copied",
-      "sha256": "6b819abbafd7d241930f09348c095e682eb25eb995171f1b224d0ab739ecbbc5"
+      "sha256": "c4694be59b1c46bc0761f7b8e0bf524085c1cc261d2c87426cba00c5ca1ac318"
     },
     {
       "path": "copilot/features/package_print/service.py",
       "action": "copied",
-      "sha256": "58d063f64f98445741ac9db49de25a6e6ae45722fa23add46e27c66608c5c56a"
+      "sha256": "e05ed6c6c2db82a488eaa889d4b9b9f7f0ac259f09ea749eb259f62e577ac376"
     },
     {
       "path": "copilot/features/presentation_mode/__init__.py",
@@ -1132,7 +1137,7 @@
     {
       "path": "copilot/features/presentation_mode/service.py",
       "action": "copied",
-      "sha256": "9b24a62947c02761822afc1281afc25919a3884ffb9229136d6f63d1d57c3dfc"
+      "sha256": "7e7373b94f82c576f4ebd96cb91bcb62dee9138a850e6a22b6fbebba45400fc4"
     },
     {
       "path": "copilot/features/read_aloud_review/__init__.py",
@@ -1167,7 +1172,7 @@
     {
       "path": "copilot/features/replay/service.py",
       "action": "copied",
-      "sha256": "a87485f832cc7655ef34c34a708210d8e7a6165963bc8987a3443e2dfc01e2ae"
+      "sha256": "f8ee06bb579a7c01c2dcc47745fd93f96dd3a23a31d71443ef28ba201ff010d5"
     },
     {
       "path": "copilot/features/resolution/__init__.py",
@@ -1207,7 +1212,7 @@
     {
       "path": "copilot/features/resolution/status_message.py",
       "action": "copied",
-      "sha256": "d8015e3d8c037266788238e91675825953de6216ee2e034f70897e970c7d9220"
+      "sha256": "be221e16d778243e5140f9727beb2426ba43fc804ec55a8b1400df33592d3d37"
     },
     {
       "path": "copilot/features/resolution/store.py",
@@ -1222,12 +1227,12 @@
     {
       "path": "copilot/features/sale_lesson/routes.py",
       "action": "copied",
-      "sha256": "ce1d78cb68e5551d1c8643e1c6b7892dffd98243532cbce3208b3b1f67808064"
+      "sha256": "642715411c460a750a28827c4aa71cb779722d451aa3446488970c09678fbc43"
     },
     {
       "path": "copilot/features/sale_lesson/service.py",
       "action": "copied",
-      "sha256": "8aa9ad419979deac31f699a18fea93e4c1807444b70f8a0be84f2c8b6e2c58aa"
+      "sha256": "82cb1a9ea9a09a3dbf1ec47c5c86bd9f472355a5cf76def9e56322cd063446a6"
     },
     {
       "path": "copilot/features/sale_readiness/__init__.py",
@@ -1397,7 +1402,7 @@
     {
       "path": "copilot/features/triage/service.py",
       "action": "copied",
-      "sha256": "12279658c6ca9018e91a43c315d088a0b4127af97fa1e5c36ed14764255e99d5"
+      "sha256": "f061eaebc62450401946589ab07240120ebeec3ae729089e25a8aba3b7d8f800"
     },
     {
       "path": "copilot/features/two_clocks/__init__.py",
@@ -1627,7 +1632,7 @@
     {
       "path": "copilot/web/next_step.py",
       "action": "copied",
-      "sha256": "7dbb436b2b746b77a42d05c34034e5b977244bb94c000de7812e0f7f12390eb0"
+      "sha256": "54d95137794f74780fe427ebbc4359760d61ae1b07b3a0aeed421da15a0f4b44"
     },
     {
       "path": "copilot/web/presentation.py",
@@ -1637,7 +1642,7 @@
     {
       "path": "copilot/web/routes_disputes.py",
       "action": "copied",
-      "sha256": "5d8bfb4623293938a2a09c5c4593a353fb02f6b44908e51939ba49ab5460553f"
+      "sha256": "55dbdc0b1e150ec82630178f04e2ad95bbc0e0e5049df021c404614ed38a09a6"
     },
     {
       "path": "copilot/web/routes_documents.py",
@@ -1647,7 +1652,7 @@
     {
       "path": "copilot/web/routes_package.py",
       "action": "copied",
-      "sha256": "358f8a8f5378e2e5ea54980bb5fc19dd08bbb087deb17d1ec6cdaff0b0f79edf"
+      "sha256": "860b6f76bcafa26b006b50d7609b18836223d346b39fcc18682330db7d4ceaa1"
     },
     {
       "path": "copilot/web/routes_send.py",
@@ -1667,12 +1672,42 @@
     {
       "path": "copilot/web/static/app.css",
       "action": "copied",
-      "sha256": "fa39d8550c1c04abbe9544feaf613b680836ffe8c7ddb858c57dd2b781d82b87"
+      "sha256": "2d482b70f2953de04bce77e2ab9b18ea0c01c448d45618d043676823183f0ff8"
     },
     {
       "path": "copilot/web/static/app.js",
       "action": "copied",
-      "sha256": "b33dbc6cf284fb7a42bda3821a2605277c4784326d49bdf48559714b3737b1e3"
+      "sha256": "c5bb3fba5e8c7eee1ca5a67d032d3b4f08c91b5602afd42d8e30b52da37b2e4c"
+    },
+    {
+      "path": "copilot/web/static/brand/apple-touch-icon.png",
+      "action": "copied",
+      "sha256": "ff3a2c81df31af5c69903eb9022a0c2fd482f75f06ca35a7f2a98068159e2d82"
+    },
+    {
+      "path": "copilot/web/static/brand/favicon-32.png",
+      "action": "copied",
+      "sha256": "6d6067136c18c887b3bd15456c9ace1bb73e9ee7359e1babd9fb36a2dd984d07"
+    },
+    {
+      "path": "copilot/web/static/brand/proofie-mark-mono-ink.svg",
+      "action": "copied",
+      "sha256": "47dbe611776427fed353be132ab933e5daee35e8b8d30f8fb5d0faa7815e31b2"
+    },
+    {
+      "path": "copilot/web/static/brand/proofie-mark-on-ink.svg",
+      "action": "copied",
+      "sha256": "71c37fcd418aecde52931b0490f469bdb6d94321f7c4369e2820d63b985e9c69"
+    },
+    {
+      "path": "copilot/web/static/brand/proofie-mark.svg",
+      "action": "copied",
+      "sha256": "93bd13c745892e5b0ff9098f5e45ac0de78d5fa1c3232358c1f5b9e64e4e2755"
+    },
+    {
+      "path": "copilot/web/static/brand/proofie-social-1280x640.png",
+      "action": "copied",
+      "sha256": "624a338e0efd93123e82396baffcfc04eb84bcdf5b5a1f1146dd82d42daa1ffd"
     },
     {
       "path": "copilot/web/status.py",
@@ -1682,7 +1717,7 @@
     {
       "path": "copilot/web/templates/_base.html",
       "action": "copied",
-      "sha256": "573d532502ec218e9bb00f34e70950b8b52990aed16c61ecbf7b89634b4d785c"
+      "sha256": "dbe16c59efbb84d75bfb2e8c12c20c9291db5cc13c6c2e7db50f3f5e850e38a7"
     },
     {
       "path": "copilot/web/templates/_case_primary_nav.html",
@@ -1692,7 +1727,7 @@
     {
       "path": "copilot/web/templates/_components.html",
       "action": "copied",
-      "sha256": "664179e4bebb162dd32e277a415b5d90ed63ff84030814be62bb9d7967613ec4"
+      "sha256": "2795507fec7b4296fad75494243a638b9880d195c53e50ec3762bb663c607acb"
     },
     {
       "path": "copilot/web/templates/_form_fields.html",
@@ -1717,7 +1752,7 @@
     {
       "path": "copilot/web/templates/access.html",
       "action": "copied",
-      "sha256": "ed4382849c734bf04310fa20571616d18a1ca374b8af8d2d063312549b1ef9a3"
+      "sha256": "7bf3024a0e0819ad8ae08c9a205771bcf68449eed44694fa079a3323d3a101a7"
     },
     {
       "path": "copilot/web/templates/case/_audit_timeline.html",
@@ -1732,7 +1767,7 @@
     {
       "path": "copilot/web/templates/case/_documents.html",
       "action": "copied",
-      "sha256": "0ef43724b6b5e020fc577c981e2cfe1a84b7e1bfd2861e07ef879e462594e943"
+      "sha256": "6d6422701c2b0b53615e5e54f99d0ca1a0be2388d742b6043d09d16e695fcfbf"
     },
     {
       "path": "copilot/web/templates/case/_local_autopilot.html",
@@ -1752,12 +1787,12 @@
     {
       "path": "copilot/web/templates/case/_package.html",
       "action": "copied",
-      "sha256": "6d552c46e165c572999a6abb30ec067683ac91add338f27d50bfc2ff18ddeaed"
+      "sha256": "8bbf6a7ed22fee3a33f77a83ec9826a4da0862bcf4031a451b15c797f2ad4782"
     },
     {
       "path": "copilot/web/templates/case/_package_sending_status.html",
       "action": "copied",
-      "sha256": "beb2c741288390e40a63a7706c20d036eb435c140543e4a8a11be5fb6495af0e"
+      "sha256": "e642cc242cd8f188d190d04dae9e35d7c441a4bced9d6bd77efb0a353386b0f2"
     },
     {
       "path": "copilot/web/templates/case/_queue_explanation.html",
@@ -1767,7 +1802,7 @@
     {
       "path": "copilot/web/templates/case/_sale_readiness.html",
       "action": "copied",
-      "sha256": "61f490646890857832bb433ddc9e7bf9c620dd13572782cd7eb46aa71dc426f8"
+      "sha256": "8ac1c397ced3bab727ba57d200755b2f63e722c44fa10d4a346ab5967b8fb370"
     },
     {
       "path": "copilot/web/templates/case/_send_facts.html",
@@ -1792,7 +1827,7 @@
     {
       "path": "copilot/web/templates/case_task.html",
       "action": "copied",
-      "sha256": "8e5bdbaf23a6efdc9d67dba917f14c0bb0cbb5ed40b22d0757cd451bf2aa6a68"
+      "sha256": "b0c2c84d11b2141c0f7ada758e8d4d98ec559dda05595b3f77bd2b47f1bf5394"
     },
     {
       "path": "copilot/web/templates/dispute_detail.html",
@@ -1817,7 +1852,7 @@
     {
       "path": "copilot/web/templates/features/accept_claim/sent.html",
       "action": "copied",
-      "sha256": "0743c5b98043817bea80051d02da186f5382c59440f0eabfb614b2a3445c72f3"
+      "sha256": "84456a75470821bfafb058206eb672611ba64d5ce895f54a607329be218e7ed6"
     },
     {
       "path": "copilot/web/templates/features/account_cliff/_line.html",
@@ -1847,17 +1882,17 @@
     {
       "path": "copilot/web/templates/features/active_approval/review.html",
       "action": "copied",
-      "sha256": "ed7a403b7c375a4cff83a9c3e15cd09a49dc2451c7432de6326a19bc20fb0b08"
+      "sha256": "0de57046a0f277fdfba083f38b846e4288c40adbae5f8e66b9f631c293e84caf"
     },
     {
       "path": "copilot/web/templates/features/appeal_workspace/_recovery.html",
       "action": "copied",
-      "sha256": "809fc0b7f6daec84ed8ca2a4ae1b452cacd7bcb11c13d17e194d7227a9510ae4"
+      "sha256": "b6f87c717ce2796021d96606b16334196266bbcc1f9ae333811f2e0b97b77318"
     },
     {
       "path": "copilot/web/templates/features/appeal_workspace/index.html",
       "action": "copied",
-      "sha256": "9ee79952d199364798f5fda3e5111f2ce78e2cb5c43231e3a0842004b556b6ee"
+      "sha256": "ebb4ed32ed44c3e68696efb362e297de1912b2f3e16e39972c6145329d26865a"
     },
     {
       "path": "copilot/web/templates/features/bilingual/_statements.html",
@@ -1872,7 +1907,7 @@
     {
       "path": "copilot/web/templates/features/buyer_note/delivery_incident.html",
       "action": "copied",
-      "sha256": "2f9076ab44602423db979f91427a53a78a7421d739e1a4ad84697fb903570d14"
+      "sha256": "cfe06b3901f8fff56ddc9579b03cfe55d013cebb196fed5740be14c680ca0359"
     },
     {
       "path": "copilot/web/templates/features/buyer_note/incident_review.html",
@@ -1882,12 +1917,12 @@
     {
       "path": "copilot/web/templates/features/buyer_note/index.html",
       "action": "copied",
-      "sha256": "098fda80e68e2627f518d1d8e364da6a6e7ff480a3b0b6937ffea9ff7f1a8e91"
+      "sha256": "3c94864cdb88799d56426eb7bfb4c9456416ecb97d8be1b8698de80d8ac54ba3"
     },
     {
       "path": "copilot/web/templates/features/buyer_note/sale.html",
       "action": "copied",
-      "sha256": "6204430e152526be8437f11d7c840082a01572fc67c9c0dd78c0da917bc6a651"
+      "sha256": "3b3eaae3e422503824541d48191f28de7a8681c348ed25bc99962b5bdf76f558"
     },
     {
       "path": "copilot/web/templates/features/buyer_page/_seller_entry.html",
@@ -1972,7 +2007,7 @@
     {
       "path": "copilot/web/templates/features/declared_limits/page.html",
       "action": "copied",
-      "sha256": "c1e77c77a41f0215405d969696506288a9a9201343175a05e9fe1c94d290b25e"
+      "sha256": "50ff08406ad6db6581e02acc21c1d12469189d8b4945b7a636eb553b768043a6"
     },
     {
       "path": "copilot/web/templates/features/delivery_facts/page.html",
@@ -1987,12 +2022,12 @@
     {
       "path": "copilot/web/templates/features/demo_documents/confirm.html",
       "action": "copied",
-      "sha256": "3e56d3087a65669989eb37ca78b29484749acea7d73eba98fd837b687188c0c1"
+      "sha256": "38dd6faddbb1a5d8a953f7962d8a9b26a1328b244d85a1ff064ee7024a5e5f7f"
     },
     {
       "path": "copilot/web/templates/features/demo_documents/seeded_confirm.html",
       "action": "copied",
-      "sha256": "1e1837ab9a496dc7c89ccfd908a4315fbba29ab12885a642b5a23a7cb5558462"
+      "sha256": "ca3188afe7ab819a7b08a54871d109fcfd743a085be56d2f70349aac6ea80e9e"
     },
     {
       "path": "copilot/web/templates/features/do_nothing_path/_entry.html",
@@ -2007,7 +2042,7 @@
     {
       "path": "copilot/web/templates/features/evaluation_workbench/index.html",
       "action": "copied",
-      "sha256": "26ebeaf1029d0572126bec197a8d06fc8f93ab5d92a0e8d6449a0ad69176bcc4"
+      "sha256": "b3c17425eb3e70f58e212b80614cb21bae781ef4b31bc73ec3f6dabed140b453"
     },
     {
       "path": "copilot/web/templates/features/events/state.html",
@@ -2047,7 +2082,7 @@
     {
       "path": "copilot/web/templates/features/explainable_queue/index.html",
       "action": "copied",
-      "sha256": "bb226cc939aa606a5ab5380d8b8074fa8098fd8e8e23a47600df9c0dd7e52902"
+      "sha256": "9e7840cbf8474beaec596a3919ebdb2752b40023a35712d0a8bfe85054beb6a7"
     },
     {
       "path": "copilot/web/templates/features/first_dispute_guide/_entry.html",
@@ -2142,7 +2177,7 @@
     {
       "path": "copilot/web/templates/features/local_autopilot/index.html",
       "action": "copied",
-      "sha256": "adce1eb1fd1102efcb9af3f586497ffc6af14a98c7b21fe946dd0de019a65d59"
+      "sha256": "67524ee77cc4a863adfdbafce31bd942083da6823e675e9438c4cb5be5201532"
     },
     {
       "path": "copilot/web/templates/features/local_autopilot/plan_draft.html",
@@ -2152,7 +2187,7 @@
     {
       "path": "copilot/web/templates/features/local_demo_hub/index.html",
       "action": "copied",
-      "sha256": "ee61611f923746bff7ed7521d7aa9ba068792566292bfef6174d72e8cd204c67"
+      "sha256": "0e1f05a4cd9bd7e02ebbd9eabf9c93e6b8c8612a55be2b208d93816da3eaac92"
     },
     {
       "path": "copilot/web/templates/features/lost_package_paths/_entry.html",
@@ -2172,7 +2207,7 @@
     {
       "path": "copilot/web/templates/features/negotiation_drafts/index.html",
       "action": "copied",
-      "sha256": "daaad08213bce2fcd9fec444846275ce72833f16fc5ba049fa882e9acc2c1c93"
+      "sha256": "82169af46a78a023aa5393302488b0419ffe390ba5cc8b81b0ffd6826e2251aa"
     },
     {
       "path": "copilot/web/templates/features/offline_market_mode/_entry.html",
@@ -2222,12 +2257,12 @@
     {
       "path": "copilot/web/templates/features/package_print/print.html",
       "action": "copied",
-      "sha256": "3ff0d183236c208140f7b55ef4bf62910e0837fa18de62d7f8429880a34c8aeb"
+      "sha256": "691ddfa4db72ee8ff4e6f09abd63222ee8bde3a777e38e37bef0ada2b0a4868f"
     },
     {
       "path": "copilot/web/templates/features/presentation_mode/page.html",
       "action": "copied",
-      "sha256": "6e69775139c3e1e52ff4e3fb446a8dd6174eb0a6d6a7de81f8b53fa233baf7b1"
+      "sha256": "46573f5603ac5ec04558df4b49a5b4645211bc74cebd0e833d3fff672f50bd27"
     },
     {
       "path": "copilot/web/templates/features/read_aloud_review/_entry.html",
@@ -2237,7 +2272,7 @@
     {
       "path": "copilot/web/templates/features/replay/replay.html",
       "action": "copied",
-      "sha256": "7fde65e41f5c6a700f7417fd61c7723ad4d377a6e0f0357e7ef956fa63f26922"
+      "sha256": "2690dcb6375b8b9e72922bb4056e77c7dcddba828cc5b3ea75adcb07ca92a809"
     },
     {
       "path": "copilot/web/templates/features/resolution/_already_sent.html",
@@ -2262,7 +2297,7 @@
     {
       "path": "copilot/web/templates/features/resolution/resolution.html",
       "action": "copied",
-      "sha256": "05160098d4e2627fbf564a443791f9b03c35b5465677bfee44939b957593220b"
+      "sha256": "2d62684af372d243fd4f34cced260d73f4644b6e6f6cbc92167be7d1c6d82130"
     },
     {
       "path": "copilot/web/templates/features/resolution/sent.html",
@@ -2287,7 +2322,7 @@
     {
       "path": "copilot/web/templates/features/sale_lesson/close.html",
       "action": "copied",
-      "sha256": "8cd07dcfc6497677955340b215be291f8c65afb3f3400088fc5ccbfdc63da7cd"
+      "sha256": "f9df8ca7441ff3200facb92b1bd69198f9b11966d0a63774f37969b3d996ce17"
     },
     {
       "path": "copilot/web/templates/features/sale_lesson/list.html",
@@ -2297,7 +2332,7 @@
     {
       "path": "copilot/web/templates/features/sale_readiness/index.html",
       "action": "copied",
-      "sha256": "65470db86b1b76a4df57473f695bd3bbde4e9c52f01cbcfe15413fab4d2b8ac8"
+      "sha256": "2deb3b6b11376dacdeb32d53e7cc0b8fceddb8b6836e5fd966101039824f2a77"
     },
     {
       "path": "copilot/web/templates/features/season_prep/_entry.html",
@@ -2337,7 +2372,7 @@
     {
       "path": "copilot/web/templates/features/ship_moment_capture/_entry.html",
       "action": "copied",
-      "sha256": "61322616807874b1357a55464155ad01635f5c2dbe13290e403e03227bf70e68"
+      "sha256": "f4537f1103271a9c07d3337092bf7119343ca0c4e8d266ef7893af5a0aaf8ccc"
     },
     {
       "path": "copilot/web/templates/features/ship_moment_capture/form.html",
@@ -2377,7 +2412,7 @@
     {
       "path": "copilot/web/templates/features/status_link/public.html",
       "action": "copied",
-      "sha256": "029d6e7be67043ace158819144b750ac40f49da2b7c2391d11d459341aaa0d7d"
+      "sha256": "6691bd6bf7f8d95cf77fa546e39b095c4db944a500ba759ccb83d4f52797d547"
     },
     {
       "path": "copilot/web/templates/features/third_party_statement/_entry.html",
@@ -2432,7 +2467,7 @@
     {
       "path": "copilot/web/templates/package_review.html",
       "action": "copied",
-      "sha256": "c1d7718cb41e4785c8f09c8de12bdf94814d9d61d1ba63ba515e04caafeb25c1"
+      "sha256": "7dd4e547b5ee3d7a45fc8c0e382105ac020a8ee53fb3268176f54281c80e6341"
     },
     {
       "path": "copilot/web/templates/result.html",
@@ -2477,17 +2512,17 @@
     {
       "path": "demo/mcp_smoke.py",
       "action": "copied",
-      "sha256": "c3d82c0bc63e10b68c113189541ee44a3f3f20d3cb8e6721584a45e13b95306f"
+      "sha256": "1c306b6d005850f8e29a2dc772a1d5d5d7d81de98831a1007c29b751fb134b24"
     },
     {
       "path": "demo/ui_check.py",
       "action": "copied",
-      "sha256": "7c6bcab71bd1b067799e9846c3b0892848d0ff7372099030008bfea1e4bf1a39"
+      "sha256": "82d464632993ab71f5db94c383c5fd852638a437ecf77a2625f22caef65d1256"
     },
     {
       "path": "docs/AI-USAGE.md",
       "action": "copied",
-      "sha256": "8435a8fcac7a26f44be2a7d3adc53c1f82dc24999312e866975e30dad39ed5af"
+      "sha256": "e286af8d78f0f7794d5d922cde6718a9f40ecfac5b06963b1764dcd05774cbaa"
     },
     {
       "path": "docs/ARCHITECTURE.md",
@@ -2497,7 +2532,7 @@
     {
       "path": "docs/CONFORMANCE.md",
       "action": "copied",
-      "sha256": "9bf764abca6c8616b967d4345b71dd3046aeaab80f92e8e515ed2135b5efe211"
+      "sha256": "6330b01350240c569b7251e9551753ffbabd7d46a3ffb2dc8e024d237b315c66"
     },
     {
       "path": "docs/DECISIONS.md",
@@ -2507,32 +2542,87 @@
     {
       "path": "docs/DESIGN.md",
       "action": "copied",
-      "sha256": "731e87cfe2ecfd226c9f64a88f5d9c11009836cec75cdff30ed7afa812236ced"
+      "sha256": "1a32fdf4951f5d246e585305c7ed17ce0e536cf54dc025abcdae81d6ce75c94d"
     },
     {
       "path": "docs/JUDGE-RUN.md",
       "action": "copied",
-      "sha256": "af293f5ccc5d063e7e9f6e106fde32eaced3d70301ec268cc1d24409d0aafd59"
+      "sha256": "f93442fbfbe01c4cb5101be3a3ba81b3b67660e6b604f708159c592e872a4665"
     },
     {
       "path": "docs/MCP.md",
       "action": "copied",
-      "sha256": "e211b9bd833cf591603e265d6d416bbbb5c0797930c69672a1706e456e80b26b"
+      "sha256": "63db75db5108c4345c9b704231751e8df5eb4b3662d41c65fc5625ff68486d72"
     },
     {
-      "path": "docs/brand/proofie-mark-on-navy.svg",
+      "path": "docs/brand/BRAND-MANUAL.md",
       "action": "copied",
-      "sha256": "31898004f8b46adfa3a11554cdd2da2812fef044050d6ade0c52f4ae6053e748"
+      "sha256": "9235673a8c9db66ed736aef00dcccd5e536f11b585acfdd1bef4d1c009179b23"
+    },
+    {
+      "path": "docs/brand/proofie-devpost-thumbnail.png",
+      "action": "copied",
+      "sha256": "8da1ec89ca6056e3b4401e19d84d8637a2412172d0b811f2d19011a78799ce5c"
+    },
+    {
+      "path": "docs/brand/proofie-devpost-thumbnail.svg",
+      "action": "copied",
+      "sha256": "ebdb2d6381a8bec38ccf27fb8cb1a00a02c1cc53442d7884efd7d8d818aefab7"
+    },
+    {
+      "path": "docs/brand/proofie-lockup-on-ink.png",
+      "action": "copied",
+      "sha256": "73f17b572e5316429bf1a2bf1347da52fe060a01a03533a3692b71b42e632f4b"
+    },
+    {
+      "path": "docs/brand/proofie-lockup-on-ink.svg",
+      "action": "copied",
+      "sha256": "11c63c15e786d653f8c5a121cc75df3c9630b2188d683ac5b83b597767d185d7"
+    },
+    {
+      "path": "docs/brand/proofie-lockup.png",
+      "action": "copied",
+      "sha256": "2b2eb7d1e7417ff110991d8b87b1ce285270e30c964ad8aab874164225c6ec09"
+    },
+    {
+      "path": "docs/brand/proofie-lockup.svg",
+      "action": "copied",
+      "sha256": "26431b690045ab1f9508d7d6fc76ffcece878e29f23240336e757dd841418f88"
+    },
+    {
+      "path": "docs/brand/proofie-mark-16.svg",
+      "action": "copied",
+      "sha256": "c5afc42bb303ef14f2061d1202c409dbbaf1a3adf2902de555687ce31761c074"
+    },
+    {
+      "path": "docs/brand/proofie-mark-mono-ink.svg",
+      "action": "copied",
+      "sha256": "47dbe611776427fed353be132ab933e5daee35e8b8d30f8fb5d0faa7815e31b2"
+    },
+    {
+      "path": "docs/brand/proofie-mark-mono-white.svg",
+      "action": "copied",
+      "sha256": "0c05c23aecae689edb2d1f0fbc54e14376f3210ec6c8633396080af5ff880d48"
+    },
+    {
+      "path": "docs/brand/proofie-mark-on-ink.svg",
+      "action": "copied",
+      "sha256": "71c37fcd418aecde52931b0490f469bdb6d94321f7c4369e2820d63b985e9c69"
     },
     {
       "path": "docs/brand/proofie-mark.svg",
       "action": "copied",
-      "sha256": "67990eec54ff34cdb722d7e57ff363368a6889aba7d46a34ff9b265d7bf85233"
+      "sha256": "93bd13c745892e5b0ff9098f5e45ac0de78d5fa1c3232358c1f5b9e64e4e2755"
+    },
+    {
+      "path": "docs/brand/proofie-send-step.png",
+      "action": "copied",
+      "sha256": "c938016244c9a81093fa5239f7fe31dd9ef15dfbe303ec5d7993883677ba00ca"
     },
     {
       "path": "docs/brand/proofie-social-preview.svg",
       "action": "copied",
-      "sha256": "f2d84e9e7f4444e028c985f1d1d118dbeedbcdd2cac9ca10dee5284c9234dabf"
+      "sha256": "31840a3f60a1a7f2f67df2b2591c3bada789322442a1199f531c19e80d9a99f0"
     },
     {
       "path": "pilot/client.py",
@@ -3202,7 +3292,7 @@
     {
       "path": "tests/features/accept_claim/test_accept_claim.py",
       "action": "copied",
-      "sha256": "a3e092103555178a77abb87ac69238a3b4a6e3382782d7a54e0254ff2b3c706a"
+      "sha256": "5a8bac91612cdf52e0ea2d517c2f61c9fe5689fc8056b51a2a0e50063e06f1ff"
     },
     {
       "path": "tests/features/accept_claim/test_accept_claim_hosted.py",
@@ -3212,7 +3302,7 @@
     {
       "path": "tests/features/accept_claim/test_accept_claim_readback.py",
       "action": "copied",
-      "sha256": "a61eec41779dd51b4ddebe4fcd257017fba73c8774bba8de7fbadb0e5cac985c"
+      "sha256": "6b29a1f9a27d7dca43e06dc552cf8c873f6ac991fe4c571a89edfa1ba03a5a3e"
     },
     {
       "path": "tests/features/account_cliff/test_counting.py",
@@ -3297,7 +3387,7 @@
     {
       "path": "tests/features/active_approval/fixtures/package_review-frozen-3-delta.json",
       "action": "copied",
-      "sha256": "281411f28c8009eb866aa52223da23fc96f2066cd61a4c8f853f57a443109f86"
+      "sha256": "7f5db59a2e2fb59ede396b41870494733198289e90818a482a1395f0be810956"
     },
     {
       "path": "tests/features/active_approval/fixtures/package_review-frozen-3.html",
@@ -3313,6 +3403,11 @@
       "path": "tests/features/active_approval/fixtures/package_review-historic-2.html",
       "action": "copied",
       "sha256": "b11cf2c942c2bc6ff80d2e33baff55a7703f6d4e9ed19f393beeee9df420ae40"
+    },
+    {
+      "path": "tests/features/active_approval/test_a4_send_restates.py",
+      "action": "copied",
+      "sha256": "436be61a0b3e37b7d5e177f93cf39b42269718087f9f091fcd790d1cd461cd0e"
     },
     {
       "path": "tests/features/active_approval/test_carrier_gate_integration.py",
@@ -3345,6 +3440,16 @@
       "sha256": "ed41030723d9c0a5c60890c014ffced2278338a5c2ebc20726d4f72eb06c3401"
     },
     {
+      "path": "tests/features/active_approval/test_own_send_clears_every_request.py",
+      "action": "copied",
+      "sha256": "1032ea60b98a79a691a13ff3fae8fe8277784b74a78394e7a8d8fa7afb4daee5"
+    },
+    {
+      "path": "tests/features/active_approval/test_own_tracker_delivery.py",
+      "action": "copied",
+      "sha256": "bd33721771fac99ebd7647f54d1bf9cb1057bdd1c3b822e6e48e01b1df737f22"
+    },
+    {
       "path": "tests/features/active_approval/test_post_integ3.py",
       "action": "copied",
       "sha256": "928787f0ca944705241f59dbfb896e6afac641704de6ac2436fa165bf2024bce"
@@ -3372,7 +3477,12 @@
     {
       "path": "tests/features/active_approval/test_review.py",
       "action": "copied",
-      "sha256": "83a30bda40e79c88e8f493d00bc6e4b400cc068b14b9cfbd54b2c027c8576c92"
+      "sha256": "d03c99586d2e07927e95d7d6020879cba9859fd9499f05559a5908f1e4f11150"
+    },
+    {
+      "path": "tests/features/active_approval/test_s03d_carrier_pairing.py",
+      "action": "copied",
+      "sha256": "0f40e609d562f1df39d319cbf80bf54ba140747f48dd07e02a8cd804a8ab19f1"
     },
     {
       "path": "tests/features/active_approval/test_seller_one_control.py",
@@ -3522,7 +3632,7 @@
     {
       "path": "tests/features/buyer_note/test_shipment_package_integration.py",
       "action": "copied",
-      "sha256": "8474f908364b3ffe1fa51df5862062275eddf834eb794fa84c447e1e27e7714c"
+      "sha256": "6c0159197f9efc5475870974ddeadbf2df3193910fbd553cbc8d230ae86cbf28"
     },
     {
       "path": "tests/features/buyer_page/test_buyer_page.py",
@@ -3667,7 +3777,7 @@
     {
       "path": "tests/features/declared_limits/test_declared_limits.py",
       "action": "copied",
-      "sha256": "9e61c6c3ac67275baabbe20ac1e730af9988dc067ac1b8dcdd8859bea4bde785"
+      "sha256": "cb46654348eff4a1bdb0280e624ac2d7fb00fd879b3540961c8444b34b6429e7"
     },
     {
       "path": "tests/features/delivery_facts/__init__.py",
@@ -3945,6 +4055,11 @@
       "sha256": "fa0f05518f2281b6ce38c681d6f25bf878f9d41b8b5cadbbe4423a6b4da1a7d9"
     },
     {
+      "path": "tests/features/fulfilment/test_link_targets_sale.py",
+      "action": "copied",
+      "sha256": "34745ecaa1f364502d54026981c5c856f2fb8ebc46a28605ef850751d1e7ae5c"
+    },
+    {
       "path": "tests/features/fulfilment/test_rc42_fulfilment.py",
       "action": "copied",
       "sha256": "ddef528cd2b60f4928daeec71cc00dd8328552c39aea8cadb3d79193a3a39b06"
@@ -4013,6 +4128,11 @@
       "path": "tests/features/judge_pool/test_pool_inbox.py",
       "action": "copied",
       "sha256": "df70023414b085c518872bdec30339de8e00ee2a02643a7a32797f722aa6503f"
+    },
+    {
+      "path": "tests/features/judge_pool/test_rearm_without_receipt.py",
+      "action": "copied",
+      "sha256": "0ea36158c199468fd2630c72e5ffbb83c2c4c99a5658537f557806b144e4dd7d"
     },
     {
       "path": "tests/features/judge_walkthrough/test_judge_walkthrough_lazy_import.py",
@@ -4365,6 +4485,11 @@
       "sha256": "57298806cd2e2bfc27f07298f059fbaab55592d4c669031ab769bb5ee95aa523"
     },
     {
+      "path": "tests/features/package_print/test_legacy_fingerprint.py",
+      "action": "copied",
+      "sha256": "b40b0430df42ea8b6fe752bae3b555def8d1cdacb8249328726255453d589af1"
+    },
+    {
       "path": "tests/features/package_print/test_live_wal.py",
       "action": "copied",
       "sha256": "2aa450e95188e6a7e530c9760df66cf620b0d9af977dee2cf2d4d65907a42b4f"
@@ -4402,7 +4527,7 @@
     {
       "path": "tests/features/replay/test_replay_page.py",
       "action": "copied",
-      "sha256": "de413a86566c234d8dbd95abd48c4a7bb109d353153459480510a5d8dde3863c"
+      "sha256": "45d71309476fc6e8515cb21259b61bb5452017169d8cf3126ae63a2aa9b5b84f"
     },
     {
       "path": "tests/features/resolution/resolution_fakes.py",
@@ -4712,12 +4837,12 @@
     {
       "path": "tests/local/fixtures/_base-baseline-0.html",
       "action": "copied",
-      "sha256": "e3cc7b847602840c4f00774060d27240953fea96296cfe543793be0988b25db8"
+      "sha256": "7a5e3a272eeab457874641552a16e3d34b3da187dee4cd76f73f927495e73c44"
     },
     {
       "path": "tests/local/test_a11y_pins.py",
       "action": "copied",
-      "sha256": "fad6a12184b4622643ccc28fd176d181209980457150e49300c19ec0ab078d70"
+      "sha256": "fd23b937cb6e64366d2aac95d6aefd74a56cd62970e31eccc3dc33f5fd0bcc54"
     },
     {
       "path": "tests/local/test_attempt_store.py",
@@ -4738,6 +4863,11 @@
       "path": "tests/local/test_b_mobile_probe.py",
       "action": "copied",
       "sha256": "c89b70d80b1c2f27e5ed908c127a6af1d5f062717385edf7536993474b7e8c52"
+    },
+    {
+      "path": "tests/local/test_brand_surfaces.py",
+      "action": "copied",
+      "sha256": "df9eb0ca9a53da34fa15f742fc9df397c0714bc32a9306d6ea24b895b28600c4"
     },
     {
       "path": "tests/local/test_carriers.py",
@@ -4827,7 +4957,7 @@
     {
       "path": "tests/local/test_design_contrast.py",
       "action": "copied",
-      "sha256": "b344fcf071996920eeeaefc58a0850325d034b0a5af33dc5db7114e5d8a4bf5f"
+      "sha256": "cb1b91dc0c2197dbb7e6c3d4d90188aee17fc7b4f5d4622884daf434f1b211ba"
     },
     {
       "path": "tests/local/test_dispute_id_validation_everywhere.py",
@@ -4842,7 +4972,7 @@
     {
       "path": "tests/local/test_docs_accept_claim_text.py",
       "action": "copied",
-      "sha256": "164ccb2fa741a02a0feac1cddb0d89af5d4d8f5726fa843ae9dadb4ba23fdb26"
+      "sha256": "d98fb655556c3ffd9d082bd3b8b76ee167e6a3337a35f5b0e74a8651554aa03c"
     },
     {
       "path": "tests/local/test_docs_flag_counts.py",
@@ -4917,7 +5047,7 @@
     {
       "path": "tests/local/test_hosted_demo_sentence.py",
       "action": "copied",
-      "sha256": "e85fba5a0ce44c00c5a392fbc452ba0a63422e4b4781bea4222e6e2745bde352"
+      "sha256": "a64dee864490b16b718e897eed5fabf87915a0e4bc57624f637305b67a6690b0"
     },
     {
       "path": "tests/local/test_hosted_ephemeral.py",
@@ -4932,12 +5062,12 @@
     {
       "path": "tests/local/test_hosted_flag_off.py",
       "action": "copied",
-      "sha256": "d6928457ecef34ea39019042d67d89119822994f7024ac6a153c0f5007c72faa"
+      "sha256": "4e3e65173f16d462a1b9e71b4803df423c45b33b844c180a5d493f1b6ee32dc2"
     },
     {
       "path": "tests/local/test_hosted_gate.py",
       "action": "copied",
-      "sha256": "1fe72ad1d924a1f2afa4e541145699bea8c94681048bc0ea4e3fe516cd108529"
+      "sha256": "da9d3168dda3ebf2308a8612b21a76b16e681e58e19ad7227b7274037101b8af"
     },
     {
       "path": "tests/local/test_hosted_model_guard.py",
@@ -4965,14 +5095,34 @@
       "sha256": "ea3a3e6edb2df47c224891a8209bde3abfe00d75625f796f0b77d7ad0537f03e"
     },
     {
+      "path": "tests/local/test_link_fix2.py",
+      "action": "copied",
+      "sha256": "e306a2ba5cd26d6fc409d393d85ee45e75cc1a300df4519fe640506d077ad9e7"
+    },
+    {
+      "path": "tests/local/test_link_fragments.py",
+      "action": "copied",
+      "sha256": "99f1ba3bb50a44bf2353696ec97c54e150fc3cfeb9845ed6c31795128916f9b8"
+    },
+    {
+      "path": "tests/local/test_link_targets.py",
+      "action": "copied",
+      "sha256": "66dd5e1a7fa86f7d63f846f7407af173771d0e89c0be2be9d40fd81d1b858d18"
+    },
+    {
       "path": "tests/local/test_mcp_safety_card.py",
       "action": "copied",
-      "sha256": "f6b1820c3ca8b01ca3f5e0f042bfa7a71cb7c8f53e306f77d9ef4c49c0107143"
+      "sha256": "4d0910d7e3d9335816552f55ed61e781a70622130f220356bda2265f6151f2ba"
     },
     {
       "path": "tests/local/test_mcp_server.py",
       "action": "copied",
       "sha256": "360ac6342dc0de6e39ad73eacd1dafb5f0265e410dbf349edb2ff3a8b0c98e80"
+    },
+    {
+      "path": "tests/local/test_mcp_smoke_expected_tools.py",
+      "action": "copied",
+      "sha256": "43c7c25676bd40a99cbae0595dbb5be64decf4401ae1c7ffb70a6651506d3322"
     },
     {
       "path": "tests/local/test_no_credentials_rows.py",
@@ -5137,7 +5287,7 @@
     {
       "path": "tests/local/test_send.py",
       "action": "copied",
-      "sha256": "ff98cba79e0084d245c1c46860e35eb617b1cbf633e24d8f88761f903e6e6610"
+      "sha256": "165775b96fad55ddaeeeaa759f3bc4ec86b2e695ece6eb68e1b52e600307454a"
     },
     {
       "path": "tests/local/test_send_core_words.py",
@@ -5277,12 +5427,12 @@
     {
       "path": "tests/local/test_ux_rc41_shell.py",
       "action": "copied",
-      "sha256": "791b9e4d791345402a1573a7ba298ad6bd2bb4e61dee9f6ffc3063d7d41de4e6"
+      "sha256": "1b13438b17b63ae6403ab78e3a272cb8cd7f40bd0226ec4c5f48718cb6edbb96"
     },
     {
       "path": "tests/local/test_ux_rulebook_v2_continuation.py",
       "action": "copied",
-      "sha256": "2813e0b8b5b935edec6b597c5507d731fd930d9460ab004a9a084aab9bf9d9fc"
+      "sha256": "82241018486d22361f0fa3f909b16871dbf69a180beb581a985b9b27878d57b3"
     },
     {
       "path": "tests/local/test_ux_states.py",
@@ -5332,7 +5482,7 @@
     {
       "path": "tests/tools/test_judge_check.py",
       "action": "copied",
-      "sha256": "0ef0871bf99df01c98576e7bb44dc4d94d5351f875798f1d85d12950dc8db81c"
+      "sha256": "5c54d5ce6003b4810de851c7e3f587a137ee62d5ffa93ac84e3a53d9dec0838f"
     },
     {
       "path": "tools/auto_run_d101_b8.py",
@@ -5372,7 +5522,7 @@
     {
       "path": "tools/judge_check.py",
       "action": "copied",
-      "sha256": "65c25d5c753bd77f397dfa4ce23f5f2c5e06c7da263a70cb52b00eddf2da0b96"
+      "sha256": "d82c6c7eb79be56255e55a362c3561fdab2b1b6040ed72978e5d1629898c9afc"
     },
     {
       "path": "tools/judge_setup.py",
@@ -5501,17 +5651,17 @@
     }
   ],
   "excluded": {
-    "count": 6560,
+    "count": 6761,
     "by_rule": {
       "docs:not-public": 12,
-      "exclude:.claude/**": 10,
+      "exclude:.claude/**": 21,
       "exclude:AGENTS.md": 1,
       "exclude:CLAUDE.md": 1,
       "exclude:REVIEW.md": 1,
       "exclude:docs/brand/preview.html": 1,
       "exclude:docs/evidence-claims.json": 1,
       "exclude:evidence/**": 4,
-      "exclude:internal/**": 6465,
+      "exclude:internal/**": 6655,
       "exclude:pilot/step1_auth.py": 1,
       "exclude:render.yaml": 1,
       "exclude:research/**": 8,
@@ -5564,7 +5714,7 @@
       "exclude:tools/vendor/axe-core-4.10.2/**": 3,
       "exclude:tools/video/**": 2
     },
-    "sha256": "9cedc9da23a237f3bb47d4010ca8f7db9b4bd7ac0a040c9088adbbccf553db5b"
+    "sha256": "a161e33f7acc766d68e881e6f9487620d7f48010f55524b5883d5a7beaf865b2"
   },
   "scan": {
     "patterns": [

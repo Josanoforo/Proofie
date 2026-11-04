@@ -2,8 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<link rel="icon" href="data:,">
+<link rel="icon" type="image/svg+xml" href="/static/brand/proofie-mark.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/brand/favicon-32.png">
+<link rel="apple-touch-icon" href="/static/brand/apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+{%- set og_base = request.base_url|string if (request is defined and request.scope is defined) else '' %}
+<meta property="og:type" content="website">
+<meta property="og:title" content="Proofie">
+<meta property="og:description" content="Proofie helps a small seller answer a PayPal &quot;item not received&quot; dispute with sourced evidence they approve, then reads PayPal's record back. PayPal sandbox build, not affiliated with PayPal.">
+{%- if og_base %}
+<meta property="og:image" content="{{ og_base }}static/brand/proofie-social-1280x640.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+{%- endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:description" content="Proofie helps a small seller answer a PayPal &quot;item not received&quot; dispute with sourced evidence they approve, then reads PayPal's record back. PayPal sandbox build, not affiliated with PayPal.">
 <title>{% block title %}Proofie{% endblock %}</title>
 <link rel="stylesheet" href="/static/app.css">
 {% block head_extra %}{% endblock %}
@@ -12,7 +25,11 @@
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
 <header class="site-header">
+  {%- if request is defined and request.scope is defined and request.url.path == '/access' %}
+  <span class="brand" translate="no"><span class="brand-mark" aria-hidden="true"></span>Proofie</span>
+  {%- else %}
   <a class="brand" href="/disputes" translate="no"><span class="brand-mark" aria-hidden="true"></span>Proofie</a>
+  {%- endif %}
   {%- block nav %}
   {%- set current_path = request.url.path if (request is defined and request.scope is defined) else '' %}
   {%- set case_context = request.query_params.get('case_id', '') if (request is defined and request.query_params is defined) else '' %}
@@ -30,7 +47,7 @@
   </ul></nav>
   </div></div>
   {%- endblock %}
-  <span class="env-tag" data-safety="assistant-only">PayPal sandbox &middot; assistant only, you review everything</span>
+  <span class="env-tag" data-safety="assistant-only">PayPal sandbox &middot; Proofie prepares - you decide</span>
 </header>
 {% block breadcrumb %}{% endblock %}
 <main id="main" tabindex="-1">

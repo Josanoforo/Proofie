@@ -146,7 +146,7 @@ def test_env_tag_brand_and_frame_landmarks(web_mode, monkeypatch):
     web, _, _ = _web()
     html = web.get("/disputes").text
     dom = parse(html)
-    assert dom.find("span", class_="env-tag").text() == "PayPal sandbox · assistant only, you review everything"
+    assert dom.find("span", class_="env-tag").text() == "PayPal sandbox · Proofie prepares - you decide"
     brand = dom.find("a", class_="brand")
     assert brand.attrs["href"] == "/disputes" and brand.attrs.get("translate") == "no"
     main = dom.find("main")

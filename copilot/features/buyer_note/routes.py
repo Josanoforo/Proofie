@@ -10,11 +10,19 @@ from copilot import config
 from copilot.db import repo
 from copilot.features.buyer_note import service
 from copilot.features.fulfilment.tracker_request import validate_capture_id
-from copilot.web.routes_disputes import templates, get_client
+from copilot.web.routes_disputes import templates, get_client, refusal_page
 from copilot.web.security import new_csrf_token, rejected_dispute_id, set_csrf_cookie, verify_csrf
 from urllib.parse import urlencode, quote
 
 router = APIRouter()
+
+_REFUSAL_TITLES = {400: "Check the details", 403: "Your session expired", 404: "Nothing to show here", 409: "Not available for this sale"}
+
+
+def _refuse(request, message, status):
+    """A refusal on a page the seller reached through a link: the site's error layout, with a way back (not bare text)."""
+    return refusal_page(request, status, _REFUSAL_TITLES.get(status, "Not available"), message,
+                        back_url="/disputes", back_label="Go back to disputes")
 PACKAGE_ID = re.compile(r"^[1-9][0-9]{0,17}$")
 
 
@@ -329,7 +337,7 @@ def record_buyer_response(request: Request, dispute_id: str, state: str = Form(d
     if bad:
         return bad
     if not verify_csrf(request, csrf_token):
-        return HTMLResponse("Reload this page and try again.", status_code=403)
+        return _refuse(request, "Reload this page and try again.", 403)
     if capture_id and validate_capture_id(capture_id):
         capture_id = ""
     try:
@@ -348,7 +356,7 @@ def prepare_paypal_message(request: Request, dispute_id: str, capture_id: str = 
     if bad:
         return bad
     if not verify_csrf(request, csrf_token):
-        return HTMLResponse("Reload this page and try again.", status_code=403)
+        return _refuse(request, "Reload this page and try again.", 403)
     if capture_id and validate_capture_id(capture_id):
         capture_id = ""
     if locale not in ("en", "es"):
@@ -383,14 +391,14 @@ def prepare_paypal_message(request: Request, dispute_id: str, capture_id: str = 
 @router.get("/fulfilment/{capture_id}/buyer-note", response_class=HTMLResponse)
 def sale_buyer_note_page(request: Request, capture_id: str, locale: str = "en"):
     if validate_capture_id(capture_id):
-        return HTMLResponse("Enter a valid sale transaction ID.", status_code=400)
+        return _refuse(request, "Enter a valid sale transaction ID.", 400)
     from copilot.features.fulfilment import store as fulfilment_store
     shipment = fulfilment_store.get_file(capture_id)
     if shipment is None:
-        return HTMLResponse("No saved local shipment record exists for this sale.", status_code=404)
+        return _refuse(request, "No saved local shipment record exists for this sale.", 404)
     package_id, has_package, package_input_ok = _package_reference(request)
     if not package_input_ok:
-        return HTMLResponse("The selected package could not be found.", status_code=404)
+        return _refuse(request, "The selected package could not be found.", 404)
     locale = locale if locale in ("en", "es") else "en"
     dispute_id = ""
     sale_terms = {}
@@ -413,7 +421,7 @@ def sale_buyer_note_page(request: Request, capture_id: str, locale: str = "en"):
     try:
         note = service.sale_note(capture_id, shipment, locale, sale_terms)
     except ValueError as exc:
-        return HTMLResponse(str(exc), status_code=409)
+        return _refuse(request, str(exc), 409)
     shipment_capture = shipment_capture_record if isinstance(shipment_capture_record, dict) else None
     if shipment_capture and shipment_capture.get("capture_id") != capture_id:
         shipment_capture = None
@@ -422,7 +430,7 @@ def sale_buyer_note_page(request: Request, capture_id: str, locale: str = "en"):
         if has_package:
             selected = _explicit_sale_package(capture_id, package_id)
             if not selected or selected[0] != dispute_id:
-                return HTMLResponse("The selected package could not be found.", status_code=404)
+                return _refuse(request, "The selected package could not be found.", 404)
             package_url = selected[1]
         else:
             packages = repo.list_packages(config.db_path(), dispute_id)
@@ -430,7 +438,7 @@ def sale_buyer_note_page(request: Request, capture_id: str, locale: str = "en"):
                 latest = max(packages, key=lambda row: int(row["id"]))
                 package_url = f"/disputes/{quote(dispute_id)}/packages/{latest['id']}#attachments"
     elif has_package:
-        return HTMLResponse("The selected package could not be found.", status_code=404)
+        return _refuse(request, "The selected package could not be found.", 404)
     token = new_csrf_token()
     response = templates.TemplateResponse(request, "features/buyer_note/sale.html", {
         "capture_id": capture_id, "locale": locale, "note": note,
@@ -447,22 +455,22 @@ def sale_buyer_note_page(request: Request, capture_id: str, locale: str = "en"):
 async def record_sale_buyer_response(request: Request, capture_id: str, state: str = Form(default=""),
                                locale: str = Form(default="en"), csrf_token: str = Form(default="")):
     if validate_capture_id(capture_id):
-        return HTMLResponse("Enter a valid sale transaction ID.", status_code=400)
+        return _refuse(request, "Enter a valid sale transaction ID.", 400)
     if not verify_csrf(request, csrf_token):
-        return HTMLResponse("Reload this page and try again.", status_code=403)
+        return _refuse(request, "Reload this page and try again.", 403)
     form_data = await request.form()
     package_id, has_package, package_input_ok = _package_reference(request, form_data)
     if not package_input_ok:
-        return HTMLResponse("The selected package could not be found.", status_code=404)
+        return _refuse(request, "The selected package could not be found.", 404)
     if has_package and _explicit_sale_package(capture_id, package_id) is None:
-        return HTMLResponse("The selected package could not be found.", status_code=404)
+        return _refuse(request, "The selected package could not be found.", 404)
     from copilot.features.fulfilment import store as fulfilment_store
     if fulfilment_store.get_file(capture_id) is None:
-        return HTMLResponse("No saved local shipment record exists for this sale.", status_code=404)
+        return _refuse(request, "No saved local shipment record exists for this sale.", 404)
     try:
         service.record_sale_response(config.db_path(), capture_id, state)
     except (ValueError, OSError) as exc:
-        return HTMLResponse(str(exc), status_code=400)
+        return _refuse(request, str(exc), 400)
     locale = locale if locale in ("en", "es") else "en"
     query = {"locale": locale}
     if has_package:
@@ -474,14 +482,14 @@ async def record_sale_buyer_response(request: Request, capture_id: str, state: s
 def delivery_incident_page(request: Request, capture_id: str, from_dispute: str = "",
                            incident: str = "delivered_not_received", locale: str = "en"):
     if incident not in service.DELIVERY_INCIDENTS and not (incident == "buyer_question" and config.feature_enabled("incident_proposals")):
-        return HTMLResponse("Choose a supported delivery issue.", status_code=400)
+        return _refuse(request, "Choose a supported delivery issue.", 400)
     locale = locale if locale in ("en", "es") else "en"
     package_id, _has_package, input_ok = _package_reference(request)
     if not input_ok:
-        return HTMLResponse("The selected package could not be found.", status_code=404)
+        return _refuse(request, "The selected package could not be found.", 404)
     context, error, status = _delivery_incident_context(capture_id, from_dispute, package_id)
     if error:
-        return HTMLResponse(error, status_code=status)
+        return _refuse(request, error, status)
     return _delivery_incident_page(request, context, incident, locale)
 
 
@@ -493,25 +501,25 @@ async def record_delivery_incident_response(request: Request, capture_id: str,
                                             from_dispute: str = Form(default=""),
                                             csrf_token: str = Form(default="")):
     if validate_capture_id(capture_id):
-        return HTMLResponse("Enter a valid sale transaction ID.", status_code=400)
+        return _refuse(request, "Enter a valid sale transaction ID.", 400)
     if not verify_csrf(request, csrf_token):
-        return HTMLResponse("Reload this page and try again.", status_code=403)
+        return _refuse(request, "Reload this page and try again.", 403)
     if incident not in service.DELIVERY_INCIDENTS or state not in service.DELIVERY_INCIDENT_RESPONSES:
-        return HTMLResponse("Choose a delivery issue and seller-recorded response.", status_code=400)
+        return _refuse(request, "Choose a delivery issue and seller-recorded response.", 400)
     locale = locale if locale in ("en", "es") else "en"
     form_data = await request.form()
     query_disputes = request.query_params.getlist("from_dispute")
     form_disputes = form_data.getlist("from_dispute")
     if len(query_disputes) > 1 or len(form_disputes) > 1 or (query_disputes and form_disputes
             and query_disputes[0] != form_disputes[0]):
-        return HTMLResponse("The selected case could not be found.", status_code=404)
+        return _refuse(request, "The selected case could not be found.", 404)
     submitted_dispute = (form_disputes or query_disputes or [from_dispute])[0]
     package_id, has_package, input_ok = _package_reference(request, form_data)
     if not input_ok:
-        return HTMLResponse("The selected package could not be found.", status_code=404)
+        return _refuse(request, "The selected package could not be found.", 404)
     context, error, status = _delivery_incident_context(capture_id, submitted_dispute, package_id)
     if error:
-        return HTMLResponse(error, status_code=status)
+        return _refuse(request, error, status)
     if not context.get("case_linked"):
         return _delivery_incident_page(request, context, incident, locale,
                                        error="Save schema-1 readiness for this exact case and sale before recording a case-linked response or associating shipment originals.",
@@ -576,9 +584,9 @@ def incident_proposal(request: Request, capture_id: str, from_dispute: str = For
                       locale: str = Form(default=""), seller_text: str = Form(default=""),
                       csrf_token: str = Form(default=""), client=Depends(get_client)):
     if not verify_csrf(request, csrf_token):
-        return HTMLResponse("Reload this form.", status_code=403)
+        return _refuse(request, "Reload this form.", 403)
     if not all(config.feature_enabled(flag) for flag in ("incident_proposals", "negotiation_drafts", "resolution", "resolution_writes")):
-        return HTMLResponse("Proposal preparation is unavailable.", status_code=404)
+        return _refuse(request, "Proposal preparation is unavailable.", 404)
     fallback = {"capture_id": capture_id, "dispute_id": from_dispute, "package_id": from_package}
     try:
         context, state, gap, fingerprint = _incident_current(capture_id, from_dispute, from_package or None, locale, client)
@@ -609,9 +617,9 @@ def incident_preview(request: Request, capture_id: str, from_dispute: str = Form
                      locale: str = Form(default=""), logical_id: str = Form(default=""),
                      seller_text: str = Form(default=""), csrf_token: str = Form(default=""), client=Depends(get_client)):
     if not verify_csrf(request, csrf_token):
-        return HTMLResponse("Reload this form.", status_code=403)
+        return _refuse(request, "Reload this form.", 403)
     if not all(config.feature_enabled(flag) for flag in ("incident_proposals", "negotiation_drafts", "resolution", "resolution_writes")):
-        return HTMLResponse("Preview is unavailable.", status_code=404)
+        return _refuse(request, "Preview is unavailable.", 404)
     fallback = {"capture_id": capture_id, "dispute_id": from_dispute, "package_id": from_package}
     try:
         context, state, gap, fingerprint = _incident_current(capture_id, from_dispute, from_package or None, locale, client)

@@ -542,7 +542,7 @@ def test_nine_views_render_at_desktop_and_phone_with_local_states(monkeypatch, t
     assert 'data-state="review-vs-send"' in package_text
     assert "Ready to review; check the groups below for missing, differing or unverifiable facts before sending." in package_text
     assert 'data-state="package-workspace"' in package_text and 'aria-label="Package state"' in package_text
-    ordered_package_markers = ('data-state="paypal-limitations"', 'data-state="package-contents-index"', 'id="next-step"',
+    ordered_package_markers = ('data-state="paypal-limitations"', 'id="next-step"', 'data-state="package-contents-index"',
         'id="shipment-details"', 'id="attachments"', 'id="statements"', 'id="checks"',
         'id="what-will-be-sent"', 'id="approval"', 'id="where-it-stands"',
         'data-state="where-it-stands-details"')

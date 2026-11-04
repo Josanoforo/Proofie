@@ -62,8 +62,11 @@ class ScopedClient:
 
 # A case re-armed by tools/sandbox_dispute_state.py --rearm carries one seller entry of type OTHER: the escalate note that call
 # sends. It is not a send of evidence, so with COPILOT_FEATURE_REARM_NOTE_IGNORED an entry counts as "evidence already sent" unless
-# ALL of these hold: it is the seller's, of type OTHER, its notes equal the helper's note word for word, and our own evidence
-# file holds a 200 escalate POST by the helper for that dispute (one per entry ignored). Anything else still ends the send.
+# it is the seller's, of type OTHER, and its notes equal the helper's note word for word, AND one of these holds:
+#   - the dispute is in the hosted demo's judge pool (COPILOT_JUDGE_POOL): PayPal's own read of the case is the receipt, because a
+#     hosted session's evidence folder is ephemeral and never holds the helper's file (LINK-FIX H1); or
+#   - our own evidence file holds a 200 escalate POST by the helper for that dispute (one per entry ignored).
+# Anything else, including every other seller entry in a pool case, still ends the send.
 REARM_NOTE = "DEMO DATA - sandbox re-arm by escalate; no buyer action."
 REARM_LOG = "sandbox_dispute_state.jsonl"
 REARM_OP = "dispute_state_escalate_rearm"
@@ -98,7 +101,8 @@ def normalize(d: dict, now, expected_capture=None) -> dict:
     if config.feature_enabled("rearm_note_ignored"):
         entries = [e for e in (d.get("evidences") or []) if isinstance(e, dict) and e.get("source") == "SUBMITTED_BY_SELLER"]
         if any(_is_rearm_note(e) for e in entries):
-            budget, kept = rearm_posts(d.get("dispute_id")), []
+            pooled = config.hosted_demo() and d.get("dispute_id") in pool_scope.writable_ids()
+            budget, kept = (len(entries) if pooled else rearm_posts(d.get("dispute_id"))), []
             for e in entries:
                 if budget and _is_rearm_note(e):
                     budget -= 1

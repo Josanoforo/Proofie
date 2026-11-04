@@ -6,7 +6,7 @@
     {% else %}<p>The recorded send state is {{ b_record.state }}. Review the package for details.</p>{% endif %}
   </div>
   <div><h3>Confirmed by PayPal</h3>
-    {% if b_record.state == 'confirmed' %}<p>PayPal confirmed a send{% if b_record.confirmed_at %} at {{ b_record.confirmed_at|when }}{% endif %}. Confirmation covers the content sent then.</p>
+    {% if b_record.state == 'confirmed' %}<p>Received{% if b_record.confirmed_at %} at {{ b_record.confirmed_at|when }}{% endif %}.</p>
     {% elif b_record.state == 'partial' %}<p>PayPal showed the statements without every file; review the recorded result.</p>
     {% else %}<p>PayPal has not confirmed this package.</p>{% endif %}
   </div>

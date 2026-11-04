@@ -52,6 +52,9 @@ class NextStep:
     note: str | None = None
     data_state: str | None = None
     note_state: str | None = None
+    preview_text: str | None = None          # exact text drawn above the actions (the send step restates what PayPal receives)
+    preview: tuple = ()                      # (label, value) rows drawn under it
+    action_hint: str | None = None           # one line after the actions ("Editing clears your approval.")
 
 
 def _act(label, *, href=None, post=None, kind="primary", sending=None, sends=False, hidden=None, fields=()):
@@ -449,7 +452,8 @@ def for_dispute(*, dispute_id, norm, raw=None, has_documents, latest_package=Non
 # ------------------------------------------------------------------------------------ the package page
 def for_package(*, dispute_id, package, norm, claims_count, files_count, has_tracking, carrier_missing,
                 approval_valid, record, other_unconfirmed, review_flags=(), hosted=False,
-                approval_stale=False, collision=None, earlier_partial=False) -> NextStep:
+                approval_stale=False, collision=None, earlier_partial=False, send_notes=None, send_tracking=None,
+                send_files=(), send_fingerprint=None) -> NextStep:
     """`approval_stale` (optional, added to the contract's signature) is True when an approval existed and the
     content changed after it; it only selects the sentence of the review step. `earlier_partial` is True
     when every earlier unconfirmed send reached PayPal without a file: it only selects the words of the paused step."""
@@ -568,9 +572,18 @@ def for_package(*, dispute_id, package, norm, claims_count, files_count, has_tra
     # One plain sentence before the send button, after a refused or blocked attempt too. True: the send path claims the
     # content first and refuses a repeat itself ("Package already received", never a second POST).
     body = f"{body} {SEND_FINAL_SENTENCE}" if body else SEND_FINAL_SENTENCE
+    preview_text, preview, secondary = None, (), ()
+    if send_notes:
+        body = f"You are about to send this to the PayPal sandbox, dispute {dispute_id}. {body}"      # the refused/blocked sentence stays after it
+        preview_text = send_notes
+        preview = (("Tracking", send_tracking or "not set"),
+                   ("Files", ", ".join(send_files) if send_files else "none"),
+                   ("Fingerprint of the approved package", f"{send_fingerprint[:12]}… (SHA-256)" if send_fingerprint else "not available"))
+        secondary = (_act("Edit the package instead", href="#statements", kind="secondary"),)
     note = (f"Sends package v{n} ({_plural(int(claims_count), 'statement', 'statements')}, "
             f"{_plural(int(files_count), 'file', 'files')}) to PayPal sandbox once. Proofie cannot withdraw it.")
     return NextStep("send", "Next step: send the evidence.", body,
                     action=_act("Send evidence to PayPal", post=f"{url}/send", sending="Sending to PayPal…",
                                 sends=True),
-                    note=note, note_state="send-note")
+                    secondary=secondary, preview_text=preview_text, preview=preview,
+                    action_hint="Editing clears your approval." if secondary else None, note=note, note_state="send-note")

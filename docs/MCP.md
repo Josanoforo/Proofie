@@ -6,11 +6,10 @@ copilot to prepare a **draft**. It cannot approve anything.
 
 ## Why
 
-PayPal's own agent toolkit (`paypal/agent-toolkit`) offers `list_disputes`, `get_dispute` and
-`accept_dispute_claim` for disputes. It has **no evidence tool**: nothing to prepare or provide evidence
-(toolkit README, "Dispute Management", re-read on 2026-10-17). This server fills that gap with the
-traceable, human-approved evidence workflow the web app already has. We deliberately do not expose
-`accept_dispute_claim`: accepting liability and refunding is too dangerous for an autonomous agent.
+This server gives a seller's assistant the traceable, human-approved evidence workflow the web app already
+has: read the dispute file, see what is missing and prepare a draft, with approval left to a button in
+Proofie's web page. The server has no tool that accepts a claim: accepting liability and refunding is too
+dangerous for an autonomous agent.
 
 ## Tools
 
@@ -24,6 +23,7 @@ All tools return plain JSON with seller-friendly text and a `review_url` into th
 | `what_is_missing(dispute_id)` | Only the checks that need action (missing, unverifiable, conflict), each with its concrete action. |
 | `prepare_draft(dispute_id)` | Runs the same idempotent preparation as the inbox auto-prep. Drafts only; one preparation per dispute and data version. |
 | `get_send_status(dispute_id)` | Local send-attempt registry plus a fresh GET. Says "received" only when PayPal's own record shows the content. A refusal because PayPal already lists evidence from the seller is said in plain words, not as the raw precondition. |
+| `review_case_snapshot(dispute_id, package_id, snapshot)` | Registered only when `COPILOT_FEATURE_PRESENTATION_MODE=true` is in the server process's own environment. Compares the local package and its source bytes with a snapshot; it never approves, sends or reads PayPal's state. |
 | `send_approved_package(dispute_id)` | **Optional, off by default.** Registered only if `COPILOT_MCP_ALLOW_SEND=true` when the server starts. See below. |
 
 The four read tools (`list_disputes`, `get_dispute_file`, `what_is_missing`, `get_send_status`) are marked `readOnlyHint=true` and `destructiveHint=false` for the client. `prepare_draft` writes the draft to the local database and may call the local model, so it is marked `readOnlyHint=false`, `destructiveHint=false` and `idempotentHint=true`; the optional send tool is marked `readOnlyHint=false`. There is no approve tool, in any configuration.
@@ -41,11 +41,12 @@ The MCP server has no tool to approve. The table is Proofie's `tools/list` as a 
 | `what_is_missing` | true | false | not set | Read which checks still need the seller. |
 | `get_send_status` | true | false | not set | Read the attempt registry and a fresh GET; `received_by_paypal` only when PayPal's own record shows the content. |
 | `prepare_draft` | false | false | true | Save a draft package in the local database (the draft step may call the local model). It cannot approve and cannot send. |
+| `review_case_snapshot` | false | false | not set | Exists only when `COPILOT_FEATURE_PRESENTATION_MODE=true`. Compares the local package and its source bytes with a snapshot; it never approves, sends or reads PayPal's state. |
 | `send_approved_package` | false | not set | not set | Exists only when the server starts with `COPILOT_MCP_ALLOW_SEND=true`. Sends a package a human already approved in the web page, if the approval still matches the content. |
 | `approve` | no such tool | | | Does not exist, in any configuration. |
 | `accept_dispute_claim` | no such tool | | | Does not exist, in any configuration. No refund, offer, message or escalation tool exists either. The seller can accept a claim in Proofie's web page as a last option; the assistant cannot. |
 
-PayPal's own agent toolkit (`paypal/agent-toolkit`, package version 1.11.0, README read on 2026-10-19) lists three Dispute Management tools: `list_disputes` and `get_dispute`, which read, and `accept_dispute_claim`, which accepts the claim and so concedes the dispute. The README's own configuration example enables only `disputes: { list: true, get: true }`. The toolkit has no tool to prepare or provide evidence; Proofie has no tool to accept a claim.
+Proofie's server has no tool to accept a claim.
 
 **What was tried.** `tests/local/test_mcp_safety_card.py` puts text that gives orders (approve, send, accept the claim, refund, escalate, leak a secret, claim a receipt) in a buyer message, in the text of a seller document and in a draft statement, and calls every tool through the server's own dispatch. The draft step runs with a stand-in for the model that obeys the text. After every payload the test checks that PayPal received no write, no approval row exists, no send attempt exists, no table outside the draft's own holds a row, and the audit log holds only the server's own entries. The table below is compared with the lists in that file, so it cannot drift.
 
@@ -78,7 +79,7 @@ The injected text comes back to the assistant in one place: the draft statements
   reconciliation (about 5/15/30 s), the once-per-dispute rule (no send while PayPal lists evidence from the seller) and **no automatic retry**. "Received by PayPal" is reported only when
   PayPal's GET shows the content.
 - **Sandbox only.** `SandboxClient`'s base URL is the sandbox host (`pilot/client.py:23`); the send path accepts
-  only that host (`copilot/core/send.py:27`); the allowlists for the host and the paths the app follows are in
+  only that host (`copilot/core/send.py:28`); the allowlists for the host and the paths the app follows are in
   `copilot/core/context.py` (lines 36-37 and 91). The server never follows a URL it is given.
 - **Untrusted arguments.** `dispute_id` must match a strict PayPal id format (e.g. `PP-R-ABC-12345`, a made-up id);
   anything else is rejected before any call.
@@ -143,7 +144,7 @@ understand that the assistant can then trigger a send of an already-approved pac
 
     .\.venv\Scripts\python.exe demo\mcp_smoke.py            # macOS / Linux: .venv/bin/python demo/mcp_smoke.py; ends by itself
 
-- It asserts `COPILOT_MCP_ALLOW_SEND` is unset, that the tool list is exactly the five read and draft tools above (no approve tool, no
+- It asserts `COPILOT_MCP_ALLOW_SEND` is unset, that the tool list is exactly the five read and draft tools above (plus `review_case_snapshot` when `COPILOT_FEATURE_PRESENTATION_MODE=true` is in the environment; no approve tool, no
   send tool), then calls `list_disputes` and `get_dispute_file` on one sandbox dispute and nothing else.
 - Evidence: the one run on 2026-10-05 is recorded as claim **EV-03** in `EVIDENCE-INDEX.md`, which gives the hash
   and line range of the private log and our own summary of what it shows (the server writes its own PayPal calls to that
@@ -156,7 +157,7 @@ understand that the assistant can then trigger a send of an already-approved pac
 
 ## A second, separate server: local contracts
 
-A second server, separate from the one above, serves only cases stored locally: `python -m copilot.features.mcp_local_contracts.server`, over stdio. It starts only when `COPILOT_FEATURE_MCP_LOCAL_CONTRACTS=true`, and the hosted demo has that flag off. It has three tools: `list_local_cases`, `read_local_case` and `prepare_local_note`. Each call is checked against a local allowlist that assigns case ids to the server's configured actor (`PROOFIE_MCP_LOCAL_ACTOR`), and each call is written to a local audit file. It reads package and document records from the configured local database and registers no PayPal client, model, send, approve or accept-claim tool.
+A second server, separate from the one above, serves only cases stored locally: `python -m copilot.features.mcp_local_contracts.server`, over stdio. It needs `COPILOT_FEATURE_MCP_LOCAL_CONTRACTS=true`. The hosted demo has that flag set to true, so its `/features/mcp_local_contracts` page is there, but a stdio server is not reachable over the hosted web address: run it on your own computer. It has three tools: `list_local_cases`, `read_local_case` and `prepare_local_note`. Each call is checked against a local allowlist that assigns case ids to the server's configured actor (`PROOFIE_MCP_LOCAL_ACTOR`), and each call is written to a local audit file. It reads package and document records from the configured local database and registers no PayPal client, model, send, approve or accept-claim tool.
 
 ## Limits
 

@@ -323,6 +323,7 @@ def form_page(request: Request, capture_id: str, already: str = "", from_token: 
             context["sale_readiness_view"] = readiness.case_view(from_dispute, capture_id, view, documents,
                                                                   attachments, terms, saved_tracking)
             context["sale_readiness_dispute"] = from_dispute
+            context["case_terms_saved"] = terms is not None
             context["sale_readiness_documents"] = documents
             context["sale_readiness_terms"] = (terms or {}).get("terms", {})
             context["sale_readiness_package_url"] = (f"/disputes/{from_dispute}/packages/{selected['id']}#attachments"

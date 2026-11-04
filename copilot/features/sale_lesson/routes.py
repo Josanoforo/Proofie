@@ -18,20 +18,20 @@ def _validate_link(client, dispute_id: str, capture_id: str):
     ids = norm.get("seller_transaction_ids") or []
     if capture_id not in ids:
         return view, "The sale reference was not returned for this case by PayPal."
-    if not view.decided or not view.outcome_code or view.outcome_code == "NONE":
+    if not service.closed_outcome(view.decided, view.outcome_code):
         return view, "PayPal has not recorded a closed outcome for this case yet."
     return view, ""
 
 
 def _render(request, view, dispute_id, capture_id, record=None, error="", status=200,
-            sale_type_value="", lesson_value="", form_disabled=False):
+            sale_type_value="", lesson_value="", form_disabled=False, show_form=True):
     token = new_csrf_token()
     response = templates.TemplateResponse(request, "features/sale_lesson/close.html",
         {"view": view, "dispute_id": dispute_id, "capture_id": capture_id, "record": record,
          "error": error, "csrf_token": token, "kind_labels": (("physical", "Physical goods"),
          ("digital", "Digital goods"), ("service", "Service")),
          "sale_type_value": sale_type_value, "lesson_value": lesson_value,
-         "form_disabled": form_disabled}, status_code=status)
+         "form_disabled": form_disabled, "show_form": show_form}, status_code=status)
     set_csrf_cookie(response, token)
     response.headers["Cache-Control"] = "no-store"
     return response
@@ -43,7 +43,8 @@ def close_page(request: Request, dispute_id: str, capture_id: str, client=Depend
         return HTMLResponse("Invalid case ID", status_code=400)
     view, error = _validate_link(client, dispute_id, capture_id)
     record = next((r for r in service.list_lessons() if r.get("dispute_id") == dispute_id), None)
-    return _render(request, view, dispute_id, capture_id, record, error, 409 if error else 200)
+    # A page that cannot take the lesson draws no form (a form here would only be refused on save).
+    return _render(request, view, dispute_id, capture_id, record, error, 409 if error else 200, show_form=not error)
 
 
 @router.post("/disputes/{dispute_id}/sale-lesson", response_class=HTMLResponse)

@@ -98,8 +98,11 @@ def test_saved_shipment_photos_note_and_response_reach_same_case_package(
 
     case_page = client.get(f"/disputes/{DISPUTE}/workspace/prepare")
     assert case_page.status_code == 200
-    assert f"/fulfilment/{CAPTURE}/moment?from_dispute={DISPUTE}" in case_page.text
-    assert f"/fulfilment/{CAPTURE}/buyer-note?locale=en" in case_page.text
+    # Before the sale terms and the shipment are saved, the case page offers only what works: the plain photo page, no
+    # case link and no sale buyer note (LINK-FIX: both answered an error here).
+    assert f'href="/fulfilment/{CAPTURE}/moment"' in case_page.text
+    assert f"/fulfilment/{CAPTURE}/moment?from_dispute={DISPUTE}" not in case_page.text
+    assert f"/fulfilment/{CAPTURE}/buyer-note?locale=en" not in case_page.text
 
     form_page = client.get(f"/fulfilment/{CAPTURE}?from_dispute={DISPUTE}")
     assert form_page.status_code == 200
@@ -120,6 +123,10 @@ def test_saved_shipment_photos_note_and_response_reach_same_case_package(
     request_sha = hashlib.sha256(json.dumps(request_body, sort_keys=True).encode()).hexdigest()
     fulfilment_store.save_file(CAPTURE, request_body, request_sha, "a" * 64, None, {},
                                "saved_without_registration", "Local fixture; no tracking POST was made.")
+
+    saved_case_page = client.get(f"/disputes/{DISPUTE}/workspace/prepare")
+    assert f"/fulfilment/{CAPTURE}/moment?from_dispute={DISPUTE}" in saved_case_page.text
+    assert f"/fulfilment/{CAPTURE}/buyer-note?locale=en" in saved_case_page.text
 
     moment_url = f"/fulfilment/{CAPTURE}/moment?from_dispute={DISPUTE}"
     moment = client.get(moment_url)

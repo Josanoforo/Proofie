@@ -32,9 +32,9 @@ NOTE_INTRO = "Proofie did not send this. Copy it into your own email or chat if 
 
 
 def status_link_for(capture_id: str) -> str | None:
-    """The buyer status link (B4) for this sale, or None. B4 is not part of this build, so there is no link; when B4 lands it
-    returns its signed link here. service.message_text_problem refuses link markers in a sent message, so that change must
-    also declare the exception for B4's own prefix."""
+    """The buyer status link to put in this message, or None. The prepared status message carries no link in this build; the seller makes and shares
+    the read-only status link from /status-link. If the message is ever meant to carry it, return the signed link here; service.message_text_problem
+    refuses link markers in a sent message, so that change must also allow the status page's own prefix."""
     return None
 
 

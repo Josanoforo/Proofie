@@ -91,7 +91,7 @@ def test_everything_in_place_passes_every_row(root):
 def test_no_open_dispute_is_an_instruction_not_a_crash(root):
     rows = jc.run_checks(root, FakeApp(rows=()), environ={})
     r = results(rows)
-    assert r["5 An open dispute"] == jc.FAIL and r["6 Case pages"] == jc.SKIP
+    assert r["5 An open dispute"] == jc.SKIP and r["6 Case pages"] == jc.SKIP
     fix = next(x.fix for x in rows if x.step.startswith("5"))
     assert "JUDGE-RUN.md section 3" in fix and "not an error" in fix
     assert "Start with: 5" in jc.verdict(rows)
@@ -99,7 +99,7 @@ def test_no_open_dispute_is_an_instruction_not_a_crash(root):
 
 def test_a_dispute_that_is_not_waiting_for_you_is_not_picked(root):
     rows = jc.run_checks(root, FakeApp(rows=((DID, "Resolved"),)), environ={})
-    assert results(rows)["5 An open dispute"] == jc.FAIL
+    assert results(rows)["5 An open dispute"] == jc.SKIP
     assert "1 listed" in next(x.seen for x in rows if x.step.startswith("5"))
 
 
@@ -202,3 +202,15 @@ def test_model_absent_is_information_not_a_failure():
     assert "absent" not in jc.model_note(get=lambda url: {"models": [{"name": "m:1b"}]})
     note = jc.model_note(get=lambda url: {"models": []})
     assert "replay evaluation available" in note and "FAIL" not in note and "install" not in note.lower()
+
+
+def test_a_correct_setup_with_no_dispute_yet_exits_zero_and_a_real_failure_exits_one(root, monkeypatch, capsys):
+    monkeypatch.setattr(jc, "model_note", lambda *a, **k: "Local model (optional): absent.")
+    good = [jc.Row("1 Python", "x", "ok", jc.PASS), jc.Row("5 An open dispute", "x", "no disputes listed yet", jc.SKIP, "next step"),
+            jc.Row("6 Case pages", "x", "not checked", jc.SKIP)]
+    monkeypatch.setattr(jc, "run_checks", lambda *a, **k: good)
+    assert jc.main(["--no-start"]) == 0
+    assert "0 failed, 2 not checked" in capsys.readouterr().out
+    bad = good + [jc.Row("4 App reachable", "x", "no answer", jc.FAIL, "start it")]
+    monkeypatch.setattr(jc, "run_checks", lambda *a, **k: bad)
+    assert jc.main(["--no-start"]) == 1

@@ -2,12 +2,16 @@
 from __future__ import annotations
 import hashlib
 import json
+import logging
 import re
 import sqlite3
 import stat
 from pathlib import Path
 from copilot.core.raw_storage import read_raw
 from copilot.core.send_service import sent_files_of, split_rows
+
+logger = logging.getLogger(__name__)
+
 
 class PrintError(ValueError):
     pass
@@ -218,7 +222,7 @@ def _approval(conn, package_id):
     if row is None:
         return None
     if not (isinstance(row["approval_sha256"], str) and _SHA.fullmatch(row["approval_sha256"])):
-        raise PrintError("The approval record is inconsistent.")
+        return None  # an old placeholder row (first pilot days) is no fingerprint: print without an approval mark, never refuse
     return {"approval_sha256": row["approval_sha256"], "approved_at": _text(row["approved_at"])}
 
 
@@ -362,7 +366,9 @@ def read(db_path, uploads_dir, dispute_id, package_id):
         case={"send":case_send,"approval":approval,"exhibits":[e["sha256"] for e in exhibits]}
         return {"package_id":package_id,"version":package["version"],"pages":pages,
                 "acknowledgements":acknowledgements,"header":header,"case":case}
-    except (sqlite3.Error, OSError, json.JSONDecodeError, TypeError, OverflowError):
+    except (sqlite3.Error, OSError, json.JSONDecodeError, TypeError, OverflowError) as exc:
+        # The page words this as one refusal; the log keeps which read failed, so a one-off 400 can be told apart.
+        logger.warning("package print: package %s read failed (%s: %s)", package_id, type(exc).__name__, exc)
         raise PrintError("The local package cannot be read safely for printing.") from None
     finally:
         if conn is not None:

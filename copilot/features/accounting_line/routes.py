@@ -10,7 +10,7 @@ from copilot.features.account_cliff import service as account_cliff
 from copilot.features.accounting_line import service
 from copilot.features.ledger import service as ledger
 from copilot.features.outcome.read import read_outcome
-from copilot.web.routes_disputes import get_client, templates
+from copilot.web.routes_disputes import get_client, refusal_page, templates
 from copilot.web.security import rejected_dispute_id
 
 router = APIRouter()
@@ -73,7 +73,7 @@ def _record(client, dispute_id, capture_id=None, *, closure_summary=False):
 @router.get("/disputes/{dispute_id}/accounting-line", response_class=HTMLResponse)
 def page(request: Request, dispute_id: str, capture_id: str | None = None, client=Depends(get_client)):
     if rejected_dispute_id(dispute_id):
-        return HTMLResponse("Invalid case ID", status_code=400)
+        return refusal_page(request, 400, "Check the dispute id", "That dispute reference is not valid.", back_url="/disputes", back_label="Go back to disputes")
     enhanced = config.feature_enabled("closure_summary")
     try:
         line, outcome, ledger_view, limitations = _record(client, dispute_id, capture_id,
@@ -83,9 +83,9 @@ def page(request: Request, dispute_id: str, capture_id: str | None = None, clien
             {"line": None, "dispute_id": dispute_id, "outcome": None, "ledger": None, "limitations": [], "capture_options": exc.captures,
              "download": None, "csv_data_uri": None}, status_code=200)
     except InvalidCaptureSelection as exc:
-        return HTMLResponse(str(exc), status_code=400)
+        return refusal_page(request, 400, "Choose a sale from the list", str(exc), back_url=f"/disputes/{dispute_id}", back_label="Go back to the dispute")
     except (OSError, ValueError, TypeError):
-        return HTMLResponse("Accounting line is unavailable from the current records.", status_code=503)
+        return refusal_page(request, 503, "Accounting line unavailable", "Accounting line is unavailable from the current records.", back_url=f"/disputes/{dispute_id}", back_label="Go back to the dispute")
     csv_data_uri = None
     download = f"/disputes/{dispute_id}/accounting-line.csv"
     if enhanced:

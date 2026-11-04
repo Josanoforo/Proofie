@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 {% from "_components.html" import button %}
 {% from "_form_fields.html" import error_summary, field %}
-{% block title %}{% if access_error %}Error: {% endif %}Open the demo · Proofie{% endblock %}
+{% block title %}{% if access_error %}Error: {% endif %}Open the demo - Proofie{% endblock %}
 {% block nav %}{% endblock %}
 {% block content %}
 {{ error_summary({'code': access_error} if access_error else {}) }}

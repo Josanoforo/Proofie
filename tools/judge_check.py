@@ -294,7 +294,7 @@ def _list_and_walk(client) -> list:
             break
     if pick is None:
         seen = "no disputes listed yet" if not ids else f"{len(ids)} listed, none waiting for you in the Inquiry stage"
-        return [Row("5 An open dispute", f'a dispute "{OPEN_STATUS}", stage {OPEN_STAGE}', seen, FAIL,
+        return [Row("5 An open dispute", f'a dispute "{OPEN_STATUS}", stage {OPEN_STAGE}', seen, SKIP,
                     "This is the next step, not an error: " + GUIDE_OPEN_CASE + ". Then press 'Refresh from PayPal' in the inbox and run this check again."),
                 Row("6 Case pages", "every seller page answers 200", "not checked: needs the dispute of step 5", SKIP)]
     rows = [Row("5 An open dispute", f'a dispute "{OPEN_STATUS}", stage {OPEN_STAGE}', f"found: {pick}", PASS)]
@@ -367,7 +367,7 @@ def main(argv=None) -> int:
     print(render(rows))
     print(model_note())
     print(verdict(rows))
-    return 0 if all(r.result == PASS for r in rows) else 1
+    return 0 if not any(r.result == FAIL for r in rows) else 1      # a row not checked yet (SKIP) is a next step, not a failure
 
 
 if __name__ == "__main__":

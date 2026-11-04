@@ -55,7 +55,7 @@ def test_flag_off_or_not_literal_true_renders_nothing_and_keeps_local_text(monke
     assert config.hosted_demo() is False
     html = _page(monkeypatch)
     assert "hosted-demo" not in html and "hosted demo" not in html and LOCAL_FOOTER in html
-    assert "PayPal sandbox &middot; assistant only, you review everything" in html
+    assert "PayPal sandbox &middot; Proofie prepares - you decide" in html
 
 
 FINAL_TEXT = (

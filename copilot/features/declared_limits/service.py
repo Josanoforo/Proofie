@@ -9,7 +9,7 @@ LIMITS = (
     "No action is sent without the existing human approval flow.",
     "A local language model is an assistant and can be wrong; a person reviews its text.",
     "Webhook behavior depends on the current runtime flags.",
-    "RC44 records that public figures remain gated and does not establish this branch's release status.",
+    "Public figures stay withheld until the owner releases them; this page does not state a release status.",
 )
 
 
@@ -26,7 +26,7 @@ def rc44_snapshot(path: Path = RC44_FACTS_PATH) -> dict:
     except OSError:
         return {"source_available": False, "public_figures_gated": None,
                 "accuracy_claim_authorized": None,
-                "measured_release_status_for_this_branch": "not established; RC44 facts source unavailable"}
+                "measured_release_status_for_this_branch": "not established; the checked-in facts source is unavailable"}
     folded = " ".join(text.casefold().split())
     return {
         "source_available": True,
@@ -34,6 +34,6 @@ def rc44_snapshot(path: Path = RC44_FACTS_PATH) -> dict:
         "accuracy_claim_authorized": False if ("no claim of full suite green, accuracy, release" in folded
                                                or "no accuracy or ground-truth claim" in folded) else None,
         "measured_release_status_for_this_branch": (
-            "not established by RC44 facts" if "not an owner acceptance" in folded and "formal freeze not reached" in folded
-            else "not established; RC44 facts do not identify this branch's release status"),
+            "not established by the checked-in facts" if "not an owner acceptance" in folded and "formal freeze not reached" in folded
+            else "not established; the checked-in facts do not identify this version's release status"),
     }

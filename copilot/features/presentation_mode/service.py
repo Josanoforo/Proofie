@@ -23,8 +23,12 @@ def moments_for_case(case_id: str, package_id: str, enabled: dict | None = None)
                 evaluation_subtitle = (f"{HISTORIC.get('name')}: {passed}/{total}; {failures} did not pass. "
                                        f"Source SHA {HISTORIC.get('source_sha')}; historical, not this checkout. "
                                        "The current package manifest remains NOTRUN.")
+    package_print = bool(enabled.get("package_print"))
+    print_ready = package_print and bool(safe_case and safe_package)
+    print_reason = ("" if print_ready else "This optional flow is disabled in this configuration." if not package_print
+                    else "Open this guide from a case with a saved package to use this step.")
     return [
-        {"title": "Recorded package and its existing evidence hash", "subtitle": "Open the existing case package and hash view; no new evidence is created.", "href": package + "/print" if enabled.get("package_print") else "/disputes", "kind": "live-flow", "available": bool(enabled.get("package_print"))},
+        {"title": "Recorded package and its existing evidence hash", "subtitle": "Open the existing case package and hash view; no new evidence is created.", "href": package + "/print" if print_ready else "/disputes", "kind": "live-flow", "available": print_ready, "reason": print_reason},
         {"title": "Re-read the case from PayPal", "subtitle": "Open the case view; current status remains PayPal-sourced.", "href": detail, "kind": "live-flow"},
         {"title": "Review the case package", "subtitle": "Open the saved package and its existing evidence; this guide does not evaluate the case.", "href": package, "kind": "live-flow"},
         {"title": evaluation_title, "subtitle": evaluation_subtitle,

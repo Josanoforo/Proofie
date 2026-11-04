@@ -19,6 +19,7 @@
   {% if recovery.lesson_enabled %}
     <h4>Lesson for another sale</h4>
     {% if recovery.lesson %}<p>Seller interpretation for {{ recovery.lesson.sale_type }}: {{ recovery.lesson.seller_lesson }}. This is not a PayPal-confirmed cause.</p>
+    {% elif recovery.captures and not recovery.lesson_ready %}<p>A lesson can be recorded once PayPal has recorded the outcome of this case.</p>
     {% elif recovery.captures %}<p>Record your own interpretation for a future sale. The case and sale reference will be checked again:</p><ul>{% for capture in recovery.captures %}<li><a href="/disputes/{{ dispute_id }}/sale-lesson?capture_id={{ capture }}">Record a lesson for sale {{ capture }}</a></li>{% endfor %}</ul>
     {% else %}<p>No sale reference is available from the current outcome read; a lesson cannot be linked yet.</p>{% endif %}
   {% endif %}

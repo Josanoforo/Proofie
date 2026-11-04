@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 from copilot.core.checklist import UnknownCountryError, evaluate
 from copilot.core.checklist_input import cached_rules, extracted_docs_for
 from copilot.core.context import SRC_DISPUTE, Limitation, fetch_context
+from copilot.core.own_tracker import own_tracker_client
 from copilot.db import repo
 
 FLAG_RE = re.compile(r"^check:([\w:]+):(missing|conflict)$")
@@ -43,7 +44,7 @@ def missing_then_and_now(client, db_path, dispute_id: str, norm: dict | None) ->
     if norm is None:
         return Gaps(recorded, note, at_send, (), (), (Limitation(SRC_DISPUTE, "The dispute could not be read, so "
                                                                               "what is missing now was not computed."),))
-    ctx = fetch_context(client, norm)
+    ctx = fetch_context(own_tracker_client(client, db_path, dispute_id), norm)
     limits = list(ctx.limitations)
     try:
         checks = evaluate(ctx, extracted_docs_for(db_path, dispute_id), cached_rules())

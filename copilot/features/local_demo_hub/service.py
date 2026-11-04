@@ -42,6 +42,12 @@ INTEGRATION_LOGS = {
 def page_entries(case_id=None, package_id=None):
  package_url=f"/disputes/{case_id}/packages/{package_id}" if case_id and package_id else None
  case_url=f"/disputes/{case_id}" if case_id else None
+ if case_id and config.hosted_demo():
+  from copilot.core import pool_scope
+  if pool_scope.is_record(case_id) and not pool_scope.writable(case_id):
+   # The hosted record case is read-only: only its own page answers, so the case-bound pages are not offered for it (each
+   # entry falls back to its standalone page below).
+   package_url = case_url = None
  case_destinations={
   "evidence_dossier":f"{package_url}#evidence-dossier" if package_url else None,
   "explainable_queue":f"{case_url}/workspace/records#queue-explanation" if case_url else None,

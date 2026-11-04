@@ -132,7 +132,10 @@ def test_the_stylesheet_never_removes_a_focus_outline_without_a_replacement():
 
 
 def test_forced_colours_are_never_switched_off():
-    assert "forced-color-adjust" not in CSS
+    # One exception (BRAND-SURFACES, 2026-11-02): the header mark is a decorative background image that must keep its two brand
+    # colours in forced-colours mode. Nothing else may opt out.
+    rest = CSS.replace("@media (forced-colors: active) { .brand-mark { forced-color-adjust: none; } }", "")
+    assert "forced-color-adjust" not in rest and CSS.count("forced-color-adjust") == 1
 
 
 def test_the_error_summary_macro_keeps_its_focus_contract():

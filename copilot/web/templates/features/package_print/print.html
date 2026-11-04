@@ -5,18 +5,20 @@
 <style>
 @page { size: A4; margin: 18mm; }
 * { box-sizing: border-box; }
-body { margin: 0; color: #17212b; background: #fff; font: 11pt/1.55 Arial, sans-serif; }
+body { margin: 0; color: #102a43; background: #fff; font: 11pt/1.55 Arial, sans-serif; }
 .sheet { max-width: 174mm; margin: 0 auto; padding: 8mm 0; break-after: page; page-break-after: always; overflow-wrap: anywhere; }
 .sheet:last-child { break-after: auto; page-break-after: auto; }
 h1, .sheet-title { font-size: 22pt; font-weight: bold; margin: 0.67em 0; } h2 { font-size: 16pt; }
 .label { font-weight: bold; } .hash { font: 9pt/1.4 monospace; overflow-wrap: anywhere; }
-.notice { border-left: 3px solid #526779; padding: 3mm; }
+.notice { border-left: 3px solid #486581; padding: 3mm; }
 .claim { white-space: pre-wrap; }
-.hosted-demo-note { max-width: 174mm; margin: 4mm auto 0; font-size: 9pt; color: #17212b; } .note-line { display: block; }
-.footer { margin-top: 12mm; border-top: 1px solid #526779; padding-top: 3mm; font-size: 9pt; }
+.brand-line { display: flex; align-items: center; gap: 3mm; margin: 0 0 4mm; font-size: 10pt; font-weight: bold; color: #102a43; text-transform: lowercase; }
+.brand-line img { width: 10mm; height: 10mm; }
+.hosted-demo-note { max-width: 174mm; margin: 4mm auto 0; font-size: 9pt; color: #102a43; } .note-line { display: block; }
+.footer { margin-top: 12mm; border-top: 1px solid #486581; padding-top: 3mm; font-size: 9pt; }
 @media print { .screen-only { display: none; } }
 /* A visible focus ring that survives forced-colours mode; 44 px targets for the link and the summaries on screen. */
-a:focus-visible, summary:focus-visible { outline: 3px solid #0b4aa8; outline-offset: 2px; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #0e6e67; outline-offset: 2px; }
 @media (forced-colors: active) { a:focus-visible, summary:focus-visible { outline: 3px solid Highlight; } }
 summary { cursor: pointer; }
 @media screen { summary { display: list-item; min-height: 44px; padding: 10px 0; box-sizing: border-box; } .screen-only a { display: inline-block; min-height: 44px; padding: 10px 0; } }
@@ -27,7 +29,8 @@ summary { cursor: pointer; }
 <p class="screen-only"><a href="/disputes/{{ dispute_id }}/packages/{{ package.package_id }}">Back to the evidence package</a></p>
 {% for page in package.pages %}
 <section class="sheet">
-{% if loop.first %}<h1>Evidence package v{{ package.version }} - dispute {{ package.header.dispute_id }}</h1>
+{% if loop.first %}<p class="brand-line" translate="no"><img src="/static/brand/proofie-mark-mono-ink.svg" alt="" aria-hidden="true" width="38" height="38"><span>Proofie</span></p>
+<h1>Evidence package v{{ package.version }} - dispute {{ package.header.dispute_id }}</h1>
 <div class="header-block" data-state="print-header">
 <p>Version {{ package.version }} · Copy of the package as saved on this computer</p>
 <ul>

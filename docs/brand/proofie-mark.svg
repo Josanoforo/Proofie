@@ -1,6 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Proofie mark: a document with a check">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Proofie mark: a seller bracket and a buyer bracket around a check">
   <title>Proofie</title>
-  <path d="M14 6h24l12 12v40H14z" fill="#0b2f6b" stroke="#0b2f6b" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M38 6v12h12z" fill="#1558b0"/>
-  <path d="M23 39l8 8 14-17" fill="none" stroke="#e8590c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M21 9h-6.5A6.5 6.5 0 0 0 8 15.5v33A6.5 6.5 0 0 0 14.5 55H21" fill="none" stroke="#E4572E" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 9h6.5A6.5 6.5 0 0 1 56 15.5v33a6.5 6.5 0 0 1-6.5 6.5H43" fill="none" stroke="#12827A" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21.5 32.5l7.5 7.5 13.5-16" fill="none" stroke="#102A43" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

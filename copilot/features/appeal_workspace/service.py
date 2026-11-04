@@ -99,6 +99,8 @@ def assemble_case(dispute_id, view, db_path, uploads_dir):
         result["recovery"]["captures"] = [x for x in ((read.norm or {}).get("seller_transaction_ids") or [])
                                           if isinstance(x, str) and re.fullmatch(r"[A-Za-z0-9]{17}", x)]
         result["recovery"]["lesson_enabled"] = True
+        from copilot.features.sale_lesson.service import closed_outcome
+        result["recovery"]["lesson_ready"] = closed_outcome(read.decided, read.outcome_code)
     return result
 
 

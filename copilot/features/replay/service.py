@@ -123,15 +123,31 @@ def _load_data_only() -> dict | None:
     return {**data, "_loaded_candidate_sha256": digest}
 
 
+_PLAIN_FILE = {"RC44-B-DR4-LOCAL-RECEIPT-20261021.md": "local run receipt"}
+
+
+def _plain_file(name: str) -> str:
+    """The name a viewer reads for a recorded file: the internal receipt name becomes plain words (the fixture is unchanged)."""
+    return _PLAIN_FILE.get(name, name)
+
+
+def _plain_text(text: str) -> str:
+    return (text.replace("DR4 evidence", "the recorded evidence").replace("Final W3-4 admission", "Judge-case admission")
+            .replace("Final five-stage", "Full five-step"))
+
+
 def _view_data_only(data: dict) -> dict:
     return {
         "kind": "data_only", "candidate_sha256": data["_loaded_candidate_sha256"],
         "evidence_date": data["observed_date"], "source_commit": data["source_commit"],
         "privacy": data["privacy"], "run_observations": data["run_observations"],
         "claim_scope": data["claim_scope"], "coverage_status": data["coverage_status"],
-        "verification_result": data["verification_result"], "stages": data["stages"],
-        "sources": data["sources"], "supporting_artifacts": data["supporting_artifacts"],
-        "dispute_status": data["dispute_status"], "admission": data["admission"], "not_running_now": data["not_running_now"],
+        "verification_result": data["verification_result"],
+        "stages": [{**s, "reason": _plain_text(s["reason"]), "receipt_refs": [_plain_file(r) for r in s["receipt_refs"]]} for s in data["stages"]],
+        "sources": [{**s, "basename": _plain_file(s["basename"])} for s in data["sources"]],
+        "supporting_artifacts": data["supporting_artifacts"],
+        "dispute_status": data["dispute_status"], "admission": {**data["admission"], "reason": _plain_text(data["admission"]["reason"])},
+        "not_running_now": data["not_running_now"],
     }
 
 def load(case: str) -> dict | None:

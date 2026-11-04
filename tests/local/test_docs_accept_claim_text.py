@@ -1,11 +1,13 @@
 """D-101 B3: the public text about accepting a claim matches the product (the way test_docs_flag_counts pins the counts).
 The README and the judge guide carry strategy's sentence of record; the old "out of scope / never calls them / no accept-claim action"
 wording is gone from the README and docs/ (the parked video and presentation drafts are excluded)."""
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 RECORD = ("accepting the claim is the seller's last-resort option in Proofie, shown only when PayPal offers it and sent after the "
-          "seller's own approval; the assistant has no tool to approve, send or accept a claim.")
+          "seller's own approval; "
+          "the assistant can send a package a person already approved, through the optional `send_approved_package` tool (off by default; it exists when `COPILOT_MCP_ALLOW_SEND=true` is set as the server starts, and it refuses a package that has no approval or that changed after it), and the MCP server has none to approve and none to accept a claim.")
 STALE = ("no accept-claim action", "accepting a claim are out of scope", "never calls them", "accept-claim nowhere", "no accept-claim capability exists in any surface")
 PARKED = {"VIDEO-SCRIPT.md", "PRESENTATION-PROPOSAL.md"}
 
@@ -36,7 +38,7 @@ def test_the_mcp_statements_that_stay_true_are_still_there():
     assert "it has no send, approve or accept-claim tool" in _text(ROOT / "README.md")
     devpost = ROOT / "docs/DEVPOST.md"
     if devpost.is_file():   # the submission text is not part of the public kit; README and MCP.md are
-        assert "no tool to approve or accept a claim" in _text(devpost)
+        assert re.search(r"no tool to approve or accept a claim|no approve or accept-claim tool", _text(devpost))
     assert "The seller can accept a claim in Proofie's web page as a last option; the assistant cannot." in _text(ROOT / "docs/MCP.md")
 
 
@@ -53,3 +55,11 @@ def test_the_readme_states_the_observed_sandbox_sequence_in_the_past_tense_witho
     for banned in (" only", " first", "faster", "always", "within seconds", "will "):
         assert banned not in sentence, banned
     assert "sandbox" in sentence and "run of record" in sentence
+
+ACCEPT_CLAIM_SENTENCE = ("Proofie helps the seller make their case. If they decide to accept the claim and refund the buyer, they do it "
+                         "themselves, on a check page of its own; Proofie's role is to help them make an informed decision.")
+
+
+def test_the_readme_and_the_judge_guide_open_the_accept_claim_bullet_with_the_sellers_own_decision():
+    for name in ("README.md", "docs/JUDGE-RUN.md"):
+        assert "- " + ACCEPT_CLAIM_SENTENCE + " **Issuing a refund outside a dispute" in _text(ROOT / name), name

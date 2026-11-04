@@ -28,7 +28,7 @@ PAIRS = [
     # outlines are measured on that fill too.
     ("text", "surface-2", 4.5), ("accent-text", "surface-2", 4.5), ("border", "surface-2", 3.0),
     ("focus", "surface-2", 3.0),
-    # Palette C: the navy header, its text and focus ring, and the two orange accents (graphics, 3:1).
+    # The brand (2026-11-02): the ink header, its text and focus ring, and the seller coral and buyer teal graphics (3:1).
     ("header-fg", "header-bg", 4.5), ("header-muted", "header-bg", 4.5), ("header-focus", "header-bg", 3.0),
     ("brand-mark", "header-bg", 3.0), ("brand", "header-bg", 3.0), ("brand", "bg", 3.0),
 ]
@@ -100,7 +100,9 @@ def test_the_lowest_ratios_quoted_in_the_design_document_are_the_real_ones():
 
 
 def test_the_stylesheet_has_no_external_resources_and_no_removed_focus():
-    assert "@import" not in CSS and "url(" not in CSS and "http" not in CSS      # local only, no CDN, no web fonts
+    assert "@import" not in CSS and "http" not in CSS      # local only, no CDN, no web fonts
+    urls = re.findall(r"url\(\s*['\"]?([^)'\"]*)", CSS)                 # external resources only: no url(http, no url(//, every url( under /static/
+    assert all(u.startswith("/static/") for u in urls), urls
     assert re.search(r":focus-visible\s*\{[^}]*outline:\s*3px solid var\(--focus\)", CSS)
     assert "outline: none" not in CSS and "outline:none" not in CSS
     assert "--target: 44px" in CSS
@@ -126,7 +128,7 @@ def test_state_colours_only_mark_verified_conflict_error_and_brand_jobs():
             # p[role="alert"] (app.css, 64d9956e, C17/F3): an error paragraph is red with a cross mark, an error job.
             assert all(p.startswith((".banner-error", ".tag--bad", ".risk", ".error-summary", ".field-error", ".approval-blocked", ".claim-conflict-note", 'p[role="alert"]', 'input[aria-invalid="true"]', 'select[aria-invalid="true"]', 'textarea[aria-invalid="true"]', '.claim-card[data-verdict="conflict"]', '.task-table tr[data-status="blocked"]', ".panel--blocked", ".task-blocked", 'tr[data-check-state="conflict"]', 'tr[data-check-state="missing"]')) for p in parts), f"red outside blocked/error/conflict states: {selector}"
         if _uses(body, "brand"):
-            assert all(p.startswith((".site-header", ".brand-mark")) for p in parts), f"orange outside the header: {selector}"
+            assert all(p.startswith((".site-header", ".brand-mark")) for p in parts), f"brand colour outside the header: {selector}"
     # and each token family is really used somewhere (the test is not vacuous)
     assert any(_uses(b, "ok-") for _s, b in RULES) and any(_uses(b, "error-") for _s, b in RULES)
     assert any(_uses(b, "brand") for _s, b in RULES)
@@ -219,3 +221,15 @@ def test_the_banner_white_repaint_and_the_global_aria_disabled_rule_are_gone():
         assert not re.search(r"\." + family + r" \.btn\s*[,{]", no_comments), family     # the rule that set --surface on .btn
     assert not re.search(r"(^|\})\s*\[aria-disabled=\"true\"\]\s*\{", no_comments)
     assert 'form[data-submitting="1"] [aria-disabled="true"]' in CSS
+
+
+CASE_PIN = _block(r":root:has\(\.case-primary-nav\), :root:has\(\.approval-workspace\), :root:has\(\.package-workspace\)")
+
+
+def test_the_case_pages_light_pin_equals_the_light_block():
+    """A4-7: the case pages are pinned to the light tokens, so the dark scheme cannot flip their panels; the pin may not drift."""
+    assert CASE_PIN, "the pin block has no colour tokens"
+    assert all(LIGHT[name] == value for name, value in CASE_PIN.items())
+    not_pinned = {name for name in LIGHT if name not in CASE_PIN}
+    assert not_pinned == {"header-bg", "header-fg", "header-muted", "header-focus", "brand", "brand-mark", "ink"}
+    assert re.search(r"color-scheme: light;", re.search(r":root:has\(\.case-primary-nav\)[^{]*\{(.*?)\}", CSS, re.S).group(1))

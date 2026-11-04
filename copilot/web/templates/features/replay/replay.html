@@ -1,21 +1,21 @@
 {% extends "_base.html" %}
-{% block title %}Legacy synthetic replay · Proofie{% endblock %}
+{% block title %}Legacy synthetic replay - Proofie{% endblock %}
 {% block content %}
 {% if replay.kind == "data_only" %}
-<h1>DR4 data-only recut</h1>
+<h1>Recorded local run, data only</h1>
 <p class="notice" data-state="replay-label"><strong>Synthetic local data-only evidence; not running now. This is not a model replay.</strong></p>
 <section data-state="replay-readiness" aria-labelledby="replay-readiness-title">
 <h2 id="replay-readiness-title">Candidate and admission</h2>
-<p>Evidence date: {{ replay.evidence_date }}; RC4.3 code candidate: <code>{{ replay.source_commit }}</code>; recut candidate SHA-256: <code>{{ replay.candidate_sha256 }}</code>. The date is date-only; no execution time or model provenance is asserted.</p>
+<p>Evidence date: {{ replay.evidence_date }}; code version: <code>{{ replay.source_commit }}</code>; recording fingerprint (SHA-256): <code>{{ replay.candidate_sha256 }}</code>. The date is date-only; no execution time or model provenance is asserted.</p>
 <p>Privacy: identifiers and document bodies are omitted from this allowlist-only recut. The source ZIP itself has no verified redaction review.</p>
-<p data-state="replay-admission"><strong>Final W3-4 admission: OFF — no eligible dispute is evidenced in this recut.</strong> {{ replay.admission.reason }}</p>
+<p data-state="replay-admission"><strong>Judge-case admission: OFF — no eligible dispute is evidenced in this recut.</strong> {{ replay.admission.reason }}</p>
 <p data-state="replay-dispute-status">Eligible Sandbox dispute: {{ replay.dispute_status.eligible_sandbox_dispute|upper }}. No-click preparation: <code>{{ replay.dispute_status.no_click_preparation }}</code>. Human step, not performed: {{ replay.dispute_status.human_step }}</p>
 </section>
 <section data-state="replay-stages" aria-labelledby="replay-stages-title">
 <h2 id="replay-stages-title">Observed local stages and unrun stages</h2>
 <ol>
 {% for stage in replay.stages %}
-<li data-state="replay-stage" data-stage="{{ stage.stage_id }}" data-status="{{ stage.status }}"><strong>{{ stage.stage_id }} — <code>{{ stage.activity }}</code>: {{ stage.status|upper }}</strong>. RC4.3 candidate <code>{{ stage.candidate_code_commit }}</code>. {{ stage.reason }} Evidence receipt(s): {% for ref in stage.receipt_refs %}<code>{{ ref }}</code>{% if not loop.last %}, {% endif %}{% endfor %}.</li>
+<li data-state="replay-stage" data-stage="{{ stage.stage_id }}" data-status="{{ stage.status }}"><strong>Step {{ loop.index }} — <code>{{ stage.activity }}</code>: {{ stage.status|upper }}</strong>. Code version <code>{{ stage.candidate_code_commit }}</code>. {{ stage.reason }} Evidence receipt(s): {% for ref in stage.receipt_refs %}<code>{{ ref }}</code>{% if not loop.last %}, {% endif %}{% endfor %}.</li>
 {% endfor %}
 </ol>
 </section>

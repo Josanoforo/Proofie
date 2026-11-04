@@ -37,5 +37,6 @@
     <input type="file" id="upload-file" name="file" accept=".pdf,.png,.jpg,.jpeg,.gif" required aria-required="true" aria-describedby="hint-upload-file">
   </div>
   <p class="actions">{% if feature_enabled('seller_shortcuts') and not packages %}{{ button("Upload and prepare the package", kind="primary", name="then", value="prepare", sending="Preparing…") }} {% endif %}{{ button("Upload the document", kind="secondary", sending="Uploading…") }}</p>
+{% if not hosted %}<p class="field-hint" data-state="model-time-hint">This can take one to two minutes while the local model reads the files.</p>{% endif %}
 </form>{% endif %}
 </section>

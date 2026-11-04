@@ -13,7 +13,8 @@
 <div class="approval-workspace" data-state="approval-workspace">
 <div class="approval-main">
 <p><a href="{{ package_url }}">Package contents</a></p>
-<h1 id="approval-header">{% if state in ('approved', 'sent') %}{{ heading }}{% else %}Human approval review{% endif %}</h1>
+<h1 id="approval-header">{% if state in ('approved', 'sent') %}{{ heading }}{% else %}Check what will be sent, then approve it{% endif %}</h1>
+{% if editable %}{% call banner("info", "approval-frame", "Nothing is sent yet") %}<p>Approving records your decision for this exact content. Sending is a separate step. Target: PayPal sandbox, dispute {{ dispute_id }}, package v{{ review.package.version }}.</p>{% endcall %}{% endif %}
 {% if context_limitations %}
 {% call banner("info", "paypal-limitations", "What PayPal did not return") %}
   <ul>{% for limitation in context_limitations %}<li>{{ limitation }}</li>{% endfor %}</ul>
@@ -29,7 +30,7 @@
 <section class="panel" id="approval-done" data-state="{{ 'approval-used' if state == 'sent' else 'approved-panel' }}">
 {% if state == 'sent' %}<p id="approval-used">Approval used for the send at {{ sent_at|when }}.</p>
 {% else %}<p id="approval-receipt">You approved this package on {{ review.approval.approved_at|when }}.</p>
-{% if send_record.state == 'none' %}<p>Nothing has been sent to PayPal yet.</p>{% endif %}{% endif %}
+{% if send_record.state == 'none' %}<p>Nothing has been sent to PayPal yet.</p>{% endif %}{% if review.approval %}<p data-state="approval-fingerprint">Fingerprint of what you approved: <span translate="no">{{ review.approval.approval_sha256[:12] }}</span>… (SHA-256; any edit clears the approval)</p>{% endif %}{% endif %}
 {% if state == 'sent' %}<div class="actions actions--forward">{{ link_button('/disputes/' ~ dispute_id, "View the dispute and PayPal's answer") }}</div>
 {% elif sendable and review.can_provide_evidence %}<p data-state="send-final">Sending to PayPal cannot be undone; Proofie sends it once.</p>
 <div class="actions actions--forward">{{ link_button(package_url ~ '#next-step', 'Continue to send evidence') }}</div>
@@ -163,7 +164,7 @@
 {% if review_error and error_field == 'approval-override' %}{{ field_error('approval-override-error', review_error) }}{% endif %}<input id="approval-override" name="sufficiency_override" type="text" required value="{{ entered_override }}"{% if review_error and error_field == 'approval-override' %} aria-invalid="true" aria-describedby="approval-override-error"{% endif %}>{% endif %}{% if note_proposed %}<p class="field-hint" data-state="proposed-note">Proposed from the open notices. Edit it or replace it with your own words; it is saved as you submit it.</p>{% endif %}
 <div id="approval-control">
 <p class="action-note">Approving does not send anything. Sending is a separate step.</p>
-{% if one_control %}{{ button('Approve this package: I have read these ' ~ review.claims|length ~ (' statement' if review.claims|length == 1 else ' statements'), kind='primary') }}{% else %}{{ button('Approve this package', kind='primary') }}{% endif %}
+{% if one_control %}{{ button('Approve this package: I have read the statement' if review.claims|length == 1 else 'Approve this package: I have read these ' ~ review.claims|length ~ ' statements', kind='primary') }}{% else %}{{ button('Approve this package', kind='primary') }}{% endif %}
 </div>
 </form>
 {% endif %}

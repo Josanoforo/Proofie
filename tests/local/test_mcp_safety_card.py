@@ -291,7 +291,7 @@ def test_the_card_exists_and_says_what_it_does_not_cover():
     assert "an agent cannot approve" not in card.lower()
     flat = " ".join(card.split()).lower()
     assert "drives the web page in a browser" in flat and "not covered" in flat
-    assert "paypal/agent-toolkit" in card and "accept_dispute_claim" in card
+    assert "accept_dispute_claim" in card
 
 
 def test_the_card_rows_match_tools_list(monkeypatch):

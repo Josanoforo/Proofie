@@ -14,6 +14,11 @@ OUTCOMES = {"RESOLVED_BUYER_FAVOUR", "RESOLVED_SELLER_FAVOUR", "RESOLVED_WITH_PA
             "CANCELED_BY_BUYER", "ACCEPTED", "DENIED", "OTHER"}
 
 
+def closed_outcome(decided, outcome_code) -> bool:
+    """True when PayPal has recorded a closed outcome: the condition the lesson page needs before it accepts a sale."""
+    return bool(decided and outcome_code and outcome_code != "NONE")
+
+
 def _path():
     return config.data_dir() / "sale_lesson" / "lessons.jsonl"
 

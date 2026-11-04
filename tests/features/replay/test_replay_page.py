@@ -256,9 +256,9 @@ def test_data_only_recut_is_allowlisted_partial_readonly_and_stays_behind_access
     assert response.status_code == 200
     html = response.text
     dom = parse(html)
-    assert dom.find("h1").text() == "DR4 data-only recut"
+    assert dom.find("h1").text() == "Recorded local run, data only"
     assert "Synthetic local data-only evidence; not running now. This is not a model replay." in dom.find(data_state="replay-label").text()
-    assert "Final W3-4 admission: OFF" in dom.find(data_state="replay-admission").text()
+    assert "Judge-case admission: OFF" in dom.find(data_state="replay-admission").text()
     assert "no eligible dispute is evidenced in this recut" in dom.find(data_state="replay-admission").text()
 
     stages = dom.find_all("li", data_state="replay-stage")
@@ -306,3 +306,16 @@ def test_data_only_loader_binds_to_git_index_bytes_and_pin():
     assert loaded.pop("_loaded_candidate_sha256") == digest
     assert loaded == json.loads(index_bytes.decode("utf-8"))
 
+
+
+def test_the_data_only_page_shows_plain_words_not_release_ids_or_internal_file_names(monkeypatch):
+    """HERO filmable text: no release id, internal stage id or internal receipt file name in the visible text (the fixture is unchanged)."""
+    from copilot.features.replay import service
+
+    _env(monkeypatch)
+    app = create_app()
+    from copilot.web.routes_disputes import get_client
+    app.dependency_overrides[get_client] = lambda: NoPayPal()
+    text = re.sub(r"<[^>]+>", " ", authenticated_client(app, follow_redirects=False).get(f"/replay/{service.DATA_ONLY_CASE}").text)
+    assert not re.search(r"RC4|DR[0-9]|Stage ?[1-5]|W3-4|RC44-B", text)
+    assert "Step 1" in text and "local run receipt" in text

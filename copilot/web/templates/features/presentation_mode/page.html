@@ -14,7 +14,7 @@
 </section>{% endif %}
 <p data-state="evaluation-status">{{ eval_status }}</p>
 <nav aria-label="Presentation steps"><button class="btn btn-secondary" type="button" data-step-back aria-label="Previous moment">Previous</button><span data-step-count>1 of 5</span><button class="btn btn-secondary" type="button" data-step-next aria-label="Next moment">Next</button></nav>
-<ol id="presentation-steps">{% for step in steps %}<li data-presentation-step data-kind="{{ step.kind }}"{% if not loop.first %} hidden{% endif %}><strong>{{ step.title }}</strong> — {% if step.available is defined and not step.available %}This optional flow is disabled in this configuration.{% else %}<a href="{{ step.href }}" data-step-link>Open the current app flow</a>. <small>{{ step.subtitle }}</small>{% endif %}</li>{% endfor %}</ol>
+<ol id="presentation-steps">{% for step in steps %}<li data-presentation-step data-kind="{{ step.kind }}"{% if not loop.first %} hidden{% endif %}><strong>{{ step.title }}</strong> — {% if step.available is defined and not step.available %}{{ step.reason or "This optional flow is disabled in this configuration." }}{% else %}<a href="{{ step.href }}" data-step-link>Open the current app flow</a>. <small>{{ step.subtitle }}</small>{% endif %}</li>{% endfor %}</ol>
 <p><a href="/disputes">Return to disputes</a></p>
 <script>
 (() => {

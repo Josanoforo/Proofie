@@ -6,6 +6,7 @@ from copilot import config
 from copilot.core.checklist import Check, _status_category, evaluate
 from copilot.core.checklist_input import cached_rules, docs_for_dispute, extracted_docs_for
 from copilot.core.context import fetch_context
+from copilot.core.own_tracker import own_tracker_client
 from copilot.core.disputes import normalize
 from copilot.core.evidence_model import (find_unsupported_delivery_assertions,
     find_delivery_claims_citing_conflicting_sources, find_delivery_claims_citing_untrusted_documents,
@@ -82,7 +83,7 @@ def classify(checks, rules, docs=(), context=None, unsupported=False):
 def read(client, db_path, dispute_id):
     raw = client.call('GET', f'/v1/customer/disputes/{dispute_id}', 'show_dispute')
     norm = normalize(raw, datetime.now(timezone.utc))
-    context = fetch_context(client, norm)
+    context = fetch_context(own_tracker_client(client, db_path, dispute_id), norm)
     docs = extracted_docs_for(db_path, dispute_id)
     rules = cached_rules()
     checks = evaluate(context, docs, rules)

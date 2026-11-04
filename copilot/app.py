@@ -14,7 +14,9 @@ import secrets
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.exception_handlers import http_exception_handler
+from fastapi.exception_handlers import http_exception_handler, request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
+from urllib.parse import urlsplit
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -452,6 +454,30 @@ def create_app() -> FastAPI:
                        "Nothing was changed.",
             "retry_url": None, "dispute_id": dispute_id, "back_url": f"/disputes/{dispute_id}" if dispute_id else None,
             "back_label": "Go back to the dispute", "last_read": None, "show_last_read": False}, status_code=404)
+
+    @app.exception_handler(RequestValidationError)
+    async def form_validation_page_handler(request: Request, exc: RequestValidationError):
+        # A form the page itself posts (an emptied box, a missing file) used to answer FastAPI's raw {"detail": [...]} JSON.
+        # A browser form post gets the site's error page, naming what is missing, with a way back; any other caller (JSON
+        # clients, query or path errors) keeps the default answer, status included.
+        kind = request.headers.get("content-type", "").split(";")[0].strip().lower()
+        if request.method != "POST" or kind not in ("application/x-www-form-urlencoded", "multipart/form-data"):
+            return await request_validation_exception_handler(request, exc)
+        from copilot.web.routes_disputes import refusal_page
+        names = {"data": "the box on this page", "csrf_token": "the page's security token (reload the page)",
+                 "reminder_file": "the file to import"}
+        missing = []
+        for error in exc.errors():
+            field = str((error.get("loc") or ("", ""))[-1])
+            label = names.get(field, f"the field '{field}'")
+            if label not in missing:
+                missing.append(label)
+        referer = request.headers.get("referer", "")
+        parsed = urlsplit(referer)
+        back = parsed.path if parsed.path.startswith("/") and not parsed.path.startswith("//") and parsed.netloc == request.url.netloc else request.url.path
+        return refusal_page(request, 422, "Fill in what is missing",
+                            "Something this form needs is empty or not valid. Go back, fill it in and send it again. Nothing was changed.",
+                            items=[f"Missing or not valid: {label}." for label in missing], back_url=back, back_label="Go back to the form")
 
     @app.exception_handler(PayPalError)
     async def paypal_error_handler(request: Request, exc: PayPalError):

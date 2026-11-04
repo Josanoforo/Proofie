@@ -98,6 +98,15 @@ Endpoints used:
 - `GET /v1/reporting/transactions` (Transaction Search) and `GET /v1/shipping/trackers` (Tracking): read for context (`copilot/core/context.py`);
 - `POST /v1/shipping/trackers` (Tracking): register a tracker at the sale, once after the seller approves the exact request, then read back (`copilot/features/fulfilment/`); the setup script `tools/sandbox_seed.py` also adds one DEMO tracker to its first test sale;
 - `POST /v1/notifications/verify-webhook-signature` (Webhooks): verifies a webhook event with PayPal before it is trusted; called only when the webhook receiver is switched on, which the hosted copy's Blueprint does and the local app does not (`copilot/features/webhooks/verify.py`);
+- `POST /v1/customer/disputes/{id}/accept-claim`: accept a claim as the seller's last option, sent once after the seller types the amount phrase and approves the exact request, then read back by GET (`copilot/features/accept_claim/`);
+- `POST /v1/customer/disputes/{id}/appeal`: the appeal call, on, sent once after the seller approves the exact request and not exercised against PayPal (`copilot/features/outcome/appeal.py`);
+- `POST /v1/customer/disputes/{id}/escalate`: the sandbox judge re-arm, through the link PayPal lists on the case (`copilot/features/judge_pool/service.py`, `tools/sandbox_dispute_state.py`);
+- `POST /v1/customer/disputes/{id}/adjudicate` and `POST /v1/customer/disputes/{id}/require-evidence`: state changes the sandbox offers for testing, in the helper `tools/sandbox_dispute_state.py`;
+- `POST /v1/customer/disputes/{id}/provide-supporting-info`: one supporting note on the card-route case (`tools/sandbox_card.py`);
+- `POST /v2/customer-support/process-chargeback`: the sandbox chargeback call that opens the card-route dispute, and `GET /v2/payments/captures/{id}`: read the capture of the test sale (`tools/sandbox_card.py`, `tools/sandbox_vault.py`);
+- `GET /v3/vault/setup-tokens/{id}` and `POST /v3/vault/payment-tokens`: the one-time test-card setup (`tools/sandbox_vault.py`);
+- `GET /v1/notifications/webhooks-events` (`copilot/features/events/evlog.py`) and `POST /v1/notifications/webhooks` (`tools/register_webhook.py`): the webhook event list and the address registration;
+- `GET /v1/shipping/trackers/{id}`: read a tracker for context (`copilot/core/context.py`);
 - `POST /v2/checkout/orders`, `POST /v2/checkout/orders/{id}/capture` and `GET /v2/checkout/orders/{id}`: create a sandbox test payment (`tools/sandbox_orders.py`, used in the judge guide).
 
 ## PayPal OpenAPI schema extracts

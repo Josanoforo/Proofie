@@ -1,5 +1,6 @@
 """Optional local print route; no client or mutation dependency."""
 import hashlib
+import logging
 import sqlite3
 from typing import Annotated
 from fastapi import APIRouter, Path as RoutePath, Request
@@ -13,6 +14,7 @@ from copilot.web.routes_disputes import templates, refusal_page
 from copilot.web.security import rejected_dispute_id
 
 router=APIRouter()
+logger=logging.getLogger(__name__)
 
 def status_line(header):
     """The one status line of the header, built through the send record of copilot/web/status.py so this page and the
@@ -58,8 +60,9 @@ def _read(request,dispute_id,package_id):
         return read(config.db_path(),config.uploads_dir(),dispute_id,package_id),None
     except PackageMissing:
         return None,refusal_page(request,404,"Package not found","Package not found.",back_url=f"/disputes/{dispute_id}")
-    except PrintError:
-        return None,refusal_page(request,400,"Cannot print this package","Cannot print this package. Review its local sources first.",back_url=f"/disputes/{dispute_id}/packages/{package_id}")
+    except PrintError as exc:
+        logger.warning("package print: package %s refused (%s)",package_id,exc)
+        return None,refusal_page(request,400,"Cannot print this package",f"Cannot print this package. Review its local sources first. Reason: {exc}",back_url=f"/disputes/{dispute_id}/packages/{package_id}")
 
 @router.get("/disputes/{dispute_id}/packages/{package_id}/print",response_class=HTMLResponse)
 def page(request:Request,dispute_id:str,package_id:Annotated[int,RoutePath(gt=0,le=9223372036854775807)]):

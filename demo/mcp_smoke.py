@@ -7,7 +7,8 @@ What it does
 - asserts COPILOT_MCP_ALLOW_SEND is NOT set (in this process and in the environment it hands the server), so the
   optional send tool is not registered;
 - starts `python -m copilot.mcp_server` over stdio with the MCP Python SDK client and asserts that the tool list is
-  exactly the five read/draft tools: no approve tool and no send tool exists;
+  exactly the five read/draft tools, plus review_case_snapshot when COPILOT_FEATURE_PRESENTATION_MODE=true is in its environment:
+  no approve tool and no send tool exists;
 - calls `list_disputes`, then `get_dispute_file` on the dispute named by PROOFIE_SMOKE_DISPUTE_ID (the 40 USD dispute whose evidence was already
   sent from this app); no other tool is called;
 - appends summary lines to evidence/mcp_smoke.jsonl through pilot/client.py's `sanitize` (no token, secret, e-mail or
@@ -40,7 +41,17 @@ TARGET = os.environ.get(SMOKE_ENV, "PP-R-DEMO-0000002")    # the real sandbox id
 ALLOW_SEND_ENV = "COPILOT_MCP_ALLOW_SEND"
 LOG_NAME = "mcp_smoke"
 LOG = evidence_dir() / f"{LOG_NAME}.jsonl"
-EXPECTED_TOOLS = {"list_disputes", "get_dispute_file", "what_is_missing", "prepare_draft", "get_send_status"}
+CORE_TOOLS = {"list_disputes", "get_dispute_file", "what_is_missing", "prepare_draft", "get_send_status"}
+PRESENTATION_FLAG = "COPILOT_FEATURE_PRESENTATION_MODE"
+SNAPSHOT_TOOL = "review_case_snapshot"
+
+
+def expected_tools(env) -> set:
+    """The tools the server lists for this environment: the five core tools, plus review_case_snapshot exactly when the presentation-mode
+    flag is on in the server process's environment (copilot/config.py feature_enabled: the literal "true", case-insensitive; the server reads
+    its process environment when it builds the tool list, not the .env file). The send tool stays off here: the script never sets it."""
+    on = str(env.get(PRESENTATION_FLAG, "")).strip().lower() == "true"
+    return set(CORE_TOOLS) | ({SNAPSHOT_TOOL} if on else set())
 
 
 def log(record: dict) -> None:
@@ -83,7 +94,7 @@ async def run() -> int:
     summary: dict = {}
     async with Client(params) as client:
         tools = {t.name for t in (await client.list_tools()).tools}
-        check(tools == EXPECTED_TOOLS, f"tool list is {sorted(tools)}")
+        check(tools == expected_tools(child_env), f"tool list is {sorted(tools)}")
         check(not [t for t in tools if "approve" in t or "send_approved" in t], "an approve or send tool exists")
         log({"op": "mcp_smoke_tools", "tools": sorted(tools)})
 

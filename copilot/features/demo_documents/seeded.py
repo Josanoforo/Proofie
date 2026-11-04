@@ -14,7 +14,7 @@ from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 from copilot import config
-from copilot.core.context import SRC_SEARCH
+from copilot.core.context import SRC_SEARCH, fetch_context
 from copilot.core.disputes import SandboxClient
 from copilot.db import repo
 from copilot.features.demo_documents.routes import attach_generated, verified_sale_date
@@ -44,6 +44,20 @@ def proposal_form(sale_date: date) -> dict:
 
 def is_seeded(context) -> bool:
     return context.source_of("recipient_name") == SRC_SEARCH and context.get("recipient_name") == SHIPPING_NAME
+
+
+def offered(client: SandboxClient, norm: dict) -> bool:
+    """True when the seeded-demo page would accept this case: the same reads and checks as verified_sale_date and is_seeded.
+    The case page draws the entry link only then, so the link never leads to a refusal. A failed read is False; nothing is created."""
+    try:
+        context = fetch_context(client, norm)
+        sale_date = context.get("payment_date")
+        if context.source_of("payment_date") != SRC_SEARCH or not isinstance(sale_date, str):
+            return False
+        date.fromisoformat(sale_date[:10])
+        return is_seeded(context)
+    except Exception:  # noqa: BLE001 - an unreadable case simply gets no entry link
+        return False
 
 
 def _off(request: Request, dispute_id: str):

@@ -6,12 +6,12 @@
 :root {
   color-scheme: light dark;
   --bg: #f5f4f0; --surface: #ffffff; --surface-2: #ebe9e3;
-  --text: #1b1f23; --text-muted: #4a5159;
+  --text: #102a43; --text-muted: #486581;
   --border: #7a818a; --border-soft: #d5d2ca;
-  --accent: #1558b0; --on-accent: #ffffff; --accent-text: #1558b0; --focus: #0b4aa8;
-  --header-bg: #0b2f6b; --header-fg: #ffffff; --header-muted: #c9d7f0; --header-focus: #ffffff;
-  --brand: #e8590c; --brand-mark: #f47a2a;
-  --info-bg: #e7effa; --info-fg: #0b2f6b; --info-edge: #1558b0;
+  --accent: #102a43; --on-accent: #ffffff; --accent-text: #0e6e67; --focus: #0e6e67;
+  --header-bg: #102a43; --header-fg: #ffffff; --header-muted: #bcccdc; --header-focus: #ffffff;
+  --brand: #e4572e; --brand-mark: #12827a; --ink: #102a43;
+  --info-bg: #e6eef4; --info-fg: #102a43; --info-edge: #486581;
   --ok-bg: #e4f2e8; --ok-fg: #14532d; --ok-edge: #1e7a3f;
   --warn-bg: #fcefd0; --warn-fg: #6b4300; --warn-edge: #9a6200;
   --error-bg: #fae4e1; --error-fg: #8a1c14; --error-edge: #b3261e;
@@ -28,10 +28,10 @@
     --bg: #121518; --surface: #1b1f24; --surface-2: #252a31;
     --text: #e8ebee; --text-muted: #aab2bb;
     --border: #77818c; --border-soft: #343b44;
-    --accent: #8ab8f5; --on-accent: #08162e; --accent-text: #8ab8f5; --focus: #8ab8ff;
-    --header-bg: #0d2554; --header-fg: #ffffff; --header-muted: #bccbe8; --header-focus: #ffffff;
-    --brand: #f47a2a; --brand-mark: #ff944d;
-    --info-bg: #14284d; --info-fg: #d3e3fb; --info-edge: #8ab8f5;
+    --accent: #9fb3c8; --on-accent: #0b1a2a; --accent-text: #7dd3c8; --focus: #7dd3c8;
+    --header-bg: #0b1a2a; --header-fg: #ffffff; --header-muted: #b6c4d1; --header-focus: #ffffff;
+    --brand: #f07a55; --brand-mark: #3db5a8;
+    --info-bg: #182a3a; --info-fg: #d9e2ec; --info-edge: #9fb3c8;
     --ok-bg: #16301f; --ok-fg: #b7e4c4; --ok-edge: #5cbf7d;
     --warn-bg: #3a2c0c; --warn-fg: #f5d791; --warn-edge: #d9a63a;
     --error-bg: #3b1916; --error-fg: #f6c3be; --error-edge: #ef7c72;
@@ -42,10 +42,10 @@
   --bg: #121518; --surface: #1b1f24; --surface-2: #252a31;
   --text: #e8ebee; --text-muted: #aab2bb;
   --border: #77818c; --border-soft: #343b44;
-  --accent: #8ab8f5; --on-accent: #08162e; --accent-text: #8ab8f5; --focus: #8ab8ff;
-  --header-bg: #0d2554; --header-fg: #ffffff; --header-muted: #bccbe8; --header-focus: #ffffff;
-  --brand: #f47a2a; --brand-mark: #ff944d;
-  --info-bg: #14284d; --info-fg: #d3e3fb; --info-edge: #8ab8f5;
+  --accent: #9fb3c8; --on-accent: #0b1a2a; --accent-text: #7dd3c8; --focus: #7dd3c8;
+  --header-bg: #0b1a2a; --header-fg: #ffffff; --header-muted: #b6c4d1; --header-focus: #ffffff;
+  --brand: #f07a55; --brand-mark: #3db5a8;
+  --info-bg: #182a3a; --info-fg: #d9e2ec; --info-edge: #9fb3c8;
   --ok-bg: #16301f; --ok-fg: #b7e4c4; --ok-edge: #5cbf7d;
   --warn-bg: #3a2c0c; --warn-fg: #f5d791; --warn-edge: #d9a63a;
   --error-bg: #3b1916; --error-fg: #f6c3be; --error-edge: #ef7c72;
@@ -74,14 +74,17 @@ a:hover { text-decoration-thickness: 2px; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
 /* ------------------------------------------------------------------------------------------ frame */
-/* Orange (--brand, --brand-mark) lives ONLY in the product mark and the header rule - never on a button, chip,
-   banner or check row (docs/DESIGN.md section 2); tests/local/test_design_contrast.py greps for it. */
+/* The brand colours (--brand seller coral, --brand-mark buyer teal) live ONLY in the product mark and the header rule - never on
+   a button, chip, banner or check row (docs/DESIGN.md section 2); tests/local/test_design_contrast.py greps for it. */
 .site-header { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); padding: var(--space-2) var(--space-4);
-               background: var(--header-bg); color: var(--header-fg); border-bottom: 4px solid var(--brand); }
+               background: var(--header-bg); color: var(--header-fg); border-bottom: 4px solid var(--brand);
+               border-image: linear-gradient(to right, var(--brand) 50%, var(--brand-mark) 50%) 1; }
 .site-header :focus-visible { outline-color: var(--header-focus); }
 .brand { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target); font-weight: 700; font-size: 1rem; color: var(--header-fg); text-decoration: none; }
 .brand:hover { text-decoration: underline; }
-.brand-mark { display: inline-block; width: 14px; height: 14px; border-radius: 2px; background: var(--brand-mark); }
+.brand { font-size: 1.125rem; letter-spacing: -0.01em; text-transform: lowercase; }
+/* The mark (copilot/web/static/brand/proofie-mark-on-ink.svg, 24 px) is the header's background image; the wordmark stays HTML text. */
+.brand-mark { display: inline-block; width: 24px; height: 24px; background: url("/static/brand/proofie-mark-on-ink.svg") center / 24px 24px no-repeat; }
 .env-tag { color: var(--header-muted); font-size: 0.875rem; }
 /* Skip link: off-screen until it receives focus (never display:none, which would remove it from the tab order). */
 .skip-link { position: absolute; left: -9999px; top: 0; z-index: 100; padding: var(--space-3) var(--space-4); background: var(--surface);
@@ -247,6 +250,8 @@ td a { display: inline-flex; align-items: center; justify-content: center; min-h
 /* The notices table keeps a readable width inside its scroll region on a phone, so the hint above it is always true (it shows only below 640 px). */
 @media (max-width: 639px) { table.webhook-events { min-width: 40rem; } }
 .row-actions a, .row-actions button { min-height: var(--target); display: inline-flex; align-items: center; }
+/* A long file name in "Leave <file> out of the checks" wraps inside the button at phone width instead of running past the edge. */
+@media (max-width: 639px) { .row-actions .inline-form button { max-width: 100%; min-width: 0; white-space: normal; overflow-wrap: anywhere; text-align: left; } }
 tr[data-check-state] > td:nth-child(2) { border-left: 6px solid var(--info-edge); }
 /* State words and icons accompany every colour; a mismatch/missing fact is red. */
 tr[data-check-state="verified"] > td:nth-child(2) { border-left-color: var(--ok-edge); }
@@ -728,7 +733,7 @@ body:has(.case-primary-nav) .breadcrumbs { display: none; }
 
 /* B decision workspace: the case identity and navigation share one compact band. */
 body:has(.case-primary-nav) { background: #f4f5f7; color: #172033; font-family: Inter, "Segoe UI", Arial, sans-serif; }
-body:has(.case-primary-nav) .site-header { background: #123a70; padding-top: 0; padding-bottom: 0; border-bottom: 0; }
+body:has(.case-primary-nav) .site-header { background: var(--header-bg); padding-top: 0; padding-bottom: 0; }
 body:has(.case-primary-nav) .site-menu { display: none; }
 main:has(.case-primary-nav) { max-width: 1320px; padding-top: 0; }
 main:has(.package-workspace) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
@@ -765,7 +770,7 @@ main:has(.package-workspace) > .error-summary, main:has(.package-workspace) > .d
 @media (min-width: 960px) { .overview-workspace { grid-template-columns: minmax(0, 3fr) minmax(15rem, 1fr); } }
 .overview-main { row-gap: 12px; }
 .overview-context-rail h2 { font-size: 16px; margin: 16px 0; }
-.overview-context-rail, .review-rail, .package-state-rail, .approval-context-rail { border-color: #c6d1df; border-top: 5px solid #123a70; background: #fff; }
+.overview-context-rail, .review-rail, .package-state-rail, .approval-context-rail { border-color: #c6d1df; border-top: 5px solid var(--ink); background: #fff; }
 .overview-main { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; }
 .overview-main > *, .overview-main .case-status-request, .overview-main [data-state="status-sending"] { grid-column: 1 / -1; }
 .overview-main .case-status, .overview-main .case-status-grid { display: contents; }
@@ -796,7 +801,7 @@ main:has(.package-workspace) > .error-summary, main:has(.package-workspace) > .d
 main .review-main .claim-list { max-width: none; }
 main .review-main .claim-card { max-width: none; grid-template-columns: minmax(0,1fr) minmax(250px,340px); border: 0; padding: 0; }
 .review-main .claim-sentence { font-size: 28px; line-height: 1.25; font-weight: 650; }
-.review-main .claim-source-stack { background: #fff; border: 1px solid #c6d1df; border-top: 5px solid #123a70; border-radius: 8px; padding: 18px; }
+.review-main .claim-source-stack { background: #fff; border: 1px solid #c6d1df; border-top: 5px solid var(--ink); border-radius: 8px; padding: 18px; }
 .review-main .claim-source-card { background: #f4f7fa; }
 .review-main .claim-source-card .claim-source { display: block; }
 .review-main .claim-source-card dt { margin-top: 8px; font-size: 0.875rem; color: #556272; }
@@ -843,7 +848,7 @@ main .review-main .claim-card { max-width: none; grid-template-columns: minmax(0
 .package-contents-index tr { border-bottom: 1px solid #d2d8e0; }
 .package-contents-index th, .package-contents-index td { background: transparent; border: 0; padding: 4px; }
 .package-state-rail { padding: 0; border: 0; background: transparent; }
-.package-state-rail > .panel { border-color: #c6d1df; border-top: 5px solid #123a70; }
+.package-state-rail > .panel { border-color: #c6d1df; border-top: 5px solid var(--ink); }
 .approval-main #send-summary, .approval-main #approval-counters, .approval-main form { background: #f6f8fa; padding: 16px; }
 .approval-review-flow { background: #f6f8fa; border: 1px solid #d2d8e0; border-radius: 6px; padding: 16px; }
 .approval-review-flow #send-summary { padding: 0; }
@@ -896,3 +901,46 @@ main:has(.package-workspace) > .b-case-bar, section#approval:has(.approval-works
   .b-package-heading { flex-wrap: wrap; }
   .b-package-badge { white-space: normal; max-width: 100%; overflow-wrap: anywhere; }
 }
+
+/* The header mark keeps its two brand colours in forced-colours mode (after the shared forced-colours block: test_ux_rc41_shell reads the first one). */
+@media (forced-colors: active) { .brand-mark { forced-color-adjust: none; } }
+/* Footer mark on the buyer's status page (20 px, one colour). */
+.footer-mark { width: 20px; height: 20px; vertical-align: middle; margin-right: var(--space-1); }
+
+/* ------------------------------------------------------------------------------------------ print (pages that extend _base) */
+@media print {
+  .site-nav, .site-menu, .env-tag, .skip-link, button, .btn { display: none !important; }
+  .site-header { background: none; color: #102a43; border-bottom: 1px solid #102a43; border-image: none; }
+  .site-header .brand { color: #102a43; }
+  .brand-mark { background-image: url("/static/brand/proofie-mark-mono-ink.svg"); }
+}
+
+/* ------------------------------------------------------------------------------------------ case pages: one content edge, light tokens */
+/* One content edge (A4-6): the footer of the case pages is as wide as their content, so its text lines up with the case bar. */
+body:has(.case-primary-nav) .site-footer { max-width: 1320px; }
+/* The case pages are a fixed light design (A4-7): pin them to the light tokens of the first :root block, so the dark scheme can
+   no longer give a light panel dark-theme text and links. tests/local/test_design_contrast.py checks the values equal that block. */
+:root:has(.case-primary-nav), :root:has(.approval-workspace), :root:has(.package-workspace) {
+  color-scheme: light;
+  --bg: #f5f4f0; --surface: #ffffff; --surface-2: #ebe9e3;
+  --text: #102a43; --text-muted: #486581;
+  --border: #7a818a; --border-soft: #d5d2ca;
+  --accent: #102a43; --on-accent: #ffffff; --accent-text: #0e6e67; --focus: #0e6e67;
+  --info-bg: #e6eef4; --info-fg: #102a43; --info-edge: #486581;
+  --ok-bg: #e4f2e8; --ok-fg: #14532d; --ok-edge: #1e7a3f;
+  --warn-bg: #fcefd0; --warn-fg: #6b4300; --warn-edge: #9a6200;
+  --error-bg: #fae4e1; --error-fg: #8a1c14; --error-edge: #b3261e;
+}
+
+/* The case bar never overlaps itself (E16): its status line wraps instead of running under the tabs, and below 1440 px the tabs get their own row. */
+.b-case-bar > * { min-width: 0; }
+.b-case-bar .case-line { flex-wrap: wrap; }
+@media (min-width: 640px) and (max-width: 1439.98px) {
+  .b-case-bar { grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); }
+  .b-case-bar .case-navigation { grid-column: 1 / -1; justify-content: flex-start; }
+  .b-case-bar .case-primary-nav { justify-content: flex-start; }
+}
+
+/* LINK-FIX */
+/* A focus or click target near the top of a page must not land under the sticky header (about 93 px). */
+main a[href], main button, main summary, main input, main select, main textarea, main [tabindex] { scroll-margin-top: 7rem; }

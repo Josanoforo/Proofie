@@ -119,7 +119,8 @@ def response_counts(docs, evidence_directory=None):
     else:
         directory = Path(evidence_directory)
         if not directory.is_dir():
-            raise ValueError("assigned response evidence directory absent")
+            # The folder PROOFIE_EVIDENCE_DIR names may not exist yet on a fresh install: nothing is recorded, which is not an error.
+            return counts, rows
         for path in sorted(directory.glob("*.jsonl")):
             for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
                 try:

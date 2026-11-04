@@ -167,7 +167,7 @@ def test_the_approved_request_is_sent_once_and_read_back(monkeypatch):
     gets = [c for c in fake.calls if c[0] == "GET" and c[2] == accept.READBACK_OP]
     assert len(gets) >= 1      # the read-back GET
     page = web.get(r.headers["location"]).text
-    assert 'data-status="sent_confirmed"' in page and "closed and the buyer is refunded" in page
+    assert 'data-status="sent_confirmed"' in page and "PayPal shows the claim accepted and the buyer refunded" in page
 
 
 def test_a_wrong_or_empty_phrase_is_refused_and_sends_nothing(monkeypatch):

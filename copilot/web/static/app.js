@@ -139,6 +139,10 @@
       setMenu(!(mq && mq.matches));
       mb.addEventListener("click", function () { setMenu(mb.getAttribute("aria-expanded") !== "true"); });
       menu.insertBefore(mb, menuBody);
+      // Escape closes the phone menu and gives the focus back to its button.
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && mb.getAttribute("aria-expanded") === "true" && mq && mq.matches) { setMenu(false); mb.focus(); }
+      });
     }
     root.className += " js-disc";
   })();
@@ -212,4 +216,40 @@
     });
     if (toggle.checked) { timer = window.setTimeout(tick, every); }
   })();
+})();
+
+// Copy buttons: data-copy-target names a textarea. A denied or missing clipboard is reported in words next to the button, never as
+// a silent failure; the text is selected so the seller can copy it by hand.
+(function () {
+  "use strict";
+  function say(button, text) {
+    var note = button.nextElementSibling;
+    if (!note || !note.hasAttribute("data-copy-status")) {
+      note = document.createElement("span");
+      note.setAttribute("data-copy-status", "");
+      note.setAttribute("role", "status");
+      note.setAttribute("aria-live", "polite");
+      button.parentNode.insertBefore(note, button.nextSibling);
+    }
+    note.textContent = " " + text;
+  }
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest ? event.target.closest("button[data-copy-target]") : null;
+    if (!button) { return; }
+    var area = document.getElementById(button.getAttribute("data-copy-target"));
+    if (!area) { return; }
+    var done = function () { say(button, "Copied. Nothing was sent."); };
+    var failed = function () {
+      try { area.focus(); area.select(); } catch (_) { /* nothing to select */ }
+      say(button, "Copy failed: the text is selected, press Ctrl+C (or Cmd+C) to copy it.");
+    };
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(area.value).then(done, failed);
+      } else if (document.execCommand) {
+        area.focus(); area.select();
+        if (document.execCommand("copy")) { done(); } else { failed(); }
+      } else { failed(); }
+    } catch (_) { failed(); }
+  });
 })();

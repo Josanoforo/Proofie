@@ -50,15 +50,26 @@ def pick_tracking(extracted_docs: list) -> tuple[str | None, str | None]:
     """The tracking_number/carrier this package would actually send, from the same ExtractedDoc list the
     checklist evaluates (copilot/core/checklist_input.py) - a document's reading is preferred over a
     manual-typed one (doc_id != 'manual') when both exist, since a document is harder to mistype than a
-    form field; the first non-'manual' hit wins, else the manual one."""
+    form field; the first non-'manual' hit wins, else the manual one.
+
+    A winner that has no carrier takes one from another source (another document, or the manual form entry)
+    only when that source carries the SAME tracking number. A number is never paired with the carrier of a
+    source that reads a different number: the pair stays (number, None) and the carrier check blocks."""
     manual_tn = manual_carrier = None
+    reads = []
     for doc in extracted_docs:
         tn = (doc.fields.get("tracking_number") or {}).get("value")
         car = (doc.fields.get("carrier") or {}).get("value")
         if doc.doc_id == "manual":
             manual_tn, manual_carrier = manual_tn or tn, manual_carrier or car
             continue
+        reads.append((tn, car))
+    reads.append((manual_tn, manual_carrier))
+    for tn, car in reads:
         if tn:
+            if not car:
+                same = str(tn).strip().casefold()
+                car = next((c for t, c in reads if c and t and str(t).strip().casefold() == same), None)
             return tn, car
     return manual_tn, manual_carrier
 

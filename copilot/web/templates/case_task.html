@@ -1,7 +1,7 @@
 {% extends "case_base.html" %}
 {% from "_components.html" import banner, tag, link_button, tip, stepper %}
 {% macro step_h(n, text) %}<h3 class="step-heading"><span class="step-no" aria-hidden="true">{{ n }}</span>{{ text }}</h3>{% endmacro %}
-{% macro task_state(key, what, blocked_action=None) %}
+{% macro task_state(key, what, blocked_action=None, done_label=None) %}
 {%- set row = tasks|selectattr("key", "equalto", key)|first %}
 {%- if row %}
 <section class="panel" data-state="task-state-{{ key }}" data-status="{{ row.status }}">
@@ -12,8 +12,9 @@
 <p class="actions"><a class="btn btn-primary" href="{{ row.blocker[2] }}">{{ (blocked_action or row.blocker[1])|capitalize }}</a></p>
 {%- endif %}
 {%- else %}
-<p>{{ tag(row.kind, row.label) }}{% if row.mark %} <span class="task-mark">{{ row.mark }}</span>{% endif %}</p>
-<p class="actions">{{ link_button(row.href, caller(), kind="primary") }}</p>
+{% set is_done = row.status == "done" %}
+<p>{{ tag(row.kind, row.label) }}{% if row.mark and not is_done %} <span class="task-mark">{{ row.mark }}</span>{% endif %}</p>
+<p class="actions">{{ link_button(row.href, done_label if is_done and done_label else caller(), kind="secondary" if is_done else "primary") }}</p>
 {%- endif %}
 </section>
 {%- endif %}
@@ -86,12 +87,12 @@
 </ul>
 </section>
 {% endif %}
-{% call task_state("approve", "Approval for the exact package") %}{% if approve_preview %}Open package approval review{% else %}Open the package approval review{% endif %}{% endcall %}
+{% call task_state("approve", "Approval for the exact package", done_label="View what was approved") %}{% if approve_preview %}Open package approval review{% else %}Open the package approval review{% endif %}{% endcall %}
 <p class="action-note" data-safety="nothing-sent">Approving does not send anything. {% call tip("What approving means") %}If you change the package afterwards, the approval no longer counts and you approve again. Nothing is sent until you approve and send.{% endcall %}</p>
 {% if pkg_url %}<p data-state="full-package-link"><a href="{{ pkg_url }}">Full package details</a></p>{% endif %}
 
 {% elif view == "send" %}
-{% call task_state("send", "Sending to PayPal", "Open approval review") %}Open the package to send{% endcall %}
+{% call task_state("send", "Sending to PayPal", "Open approval review", "View PayPal's answer") %}Open the package to send{% endcall %}
 <p class="action-note">If the answer is unclear, check by reading; do not send twice. {% call tip("How sending works") %}Sending is its own step. Afterwards Proofie reads PayPal again and shows what PayPal confirmed.{% endcall %}</p>
 {% include "case/_send_facts.html" %}
 {% if pkg_url %}<p data-state="full-package-link"><a href="{{ pkg_url }}">Full package details</a></p>{% endif %}
@@ -119,7 +120,7 @@
 <ul class="optional-list">
 {% if feature_enabled("fulfilment") %}<li><a href="/fulfilment/{{ capture }}?from_dispute={{ norm.dispute_id }}">Open the sale checklist and tracking</a></li>{% endif %}
 {% if feature_enabled("sale_readiness") %}<li><a href="{{ ws_url('prepare') }}#sale-readiness">Is the sale ready? (in Prepare)</a></li>{% endif %}
-{% if feature_enabled("sale_lesson") and decided %}<li><a href="/disputes/{{ norm.dispute_id }}/sale-lesson?capture_id={{ capture }}">Record a seller lesson for the next sale</a></li>{% endif %}
+{% if feature_enabled("sale_lesson") and lesson_ready %}<li><a href="/disputes/{{ norm.dispute_id }}/sale-lesson?capture_id={{ capture }}">Record a seller lesson for the next sale</a></li>{% elif feature_enabled("sale_lesson") and decided %}<li data-state="sale-lesson-waiting">A seller lesson can be recorded once PayPal has recorded the outcome of this case.</li>{% endif %}
 {% if feature_enabled("accounting_line") and decided %}<li><a href="/disputes/{{ norm.dispute_id }}/accounting-line">Prepare an accounting line</a></li>{% endif %}
 </ul>
 {% else %}
