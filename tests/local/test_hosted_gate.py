@@ -377,7 +377,7 @@ def test_local_review_render_matches_original_template_bytes(monkeypatch):
     assert hashlib.sha256(baseline.encode()).hexdigest() == "83e85d5c4c0ad8f2a7b208884b08315cc4144d01e075edcb52c796562d9ba620"
     # An explicit, counted list of approved edits on top of that fixture (tests/local/_template_delta.py)
     import _template_delta as delta
-    assert len(delta.edits()) == 107 and delta.apply(baseline) == delta.current_template()
+    assert len(delta.edits()) == 108 and delta.apply(baseline) == delta.current_template()
     env = templates.env.overlay(loader=ChoiceLoader([DictLoader({"package_review.html": delta.apply(baseline)}),
                                                      templates.env.loader]))
     assert response.content == env.get_template("package_review.html").render(response.context).encode("utf-8")

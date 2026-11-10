@@ -21,7 +21,7 @@ from copilot import config
 from copilot.web.dispute_state import buyer_closed_raw, BUYER_CLOSED_LABEL
 from copilot.core import auto_prep, pool_scope
 from copilot.core.attempt_store import SQLiteAttemptStore
-from copilot.core.disputes import (SandboxClient, ScopedClient, fetch_all_disputes, humanize_deadline, humanize_evidence_type,
+from copilot.core.disputes import (SandboxClient, ScopedClient, fetch_all_disputes, list_cut_line, humanize_deadline, humanize_evidence_type,
                                    humanize_reason, humanize_status, normalize)
 from copilot.core.send_recovery import recover_dispute
 from copilot.db import repo
@@ -664,6 +664,7 @@ def list_disputes(request: Request, background_tasks: BackgroundTasks,
             urgency_fn = None
     view = inbox_view.build(rows, db_path, now, urgency=urgency_fn, detail_reader=client)
     exposure_context = None
+    unexplained = 0
     if config.feature_enabled("explainable_queue"):
         from copilot.features.explainable_queue.service import explain_cases, exposure_context as build_exposure_context
         webhook_rows = {}
@@ -684,11 +685,17 @@ def list_disputes(request: Request, background_tasks: BackgroundTasks,
                                  "queue_status": item["status"].code,
                                  "status_label": item["status"].label,
                                  "events": webhook_rows.get(did, [])})
-        explanations = explain_cases(queue_inputs, now.isoformat(), webhook_rows)
+        # explain the rows that wait for the seller first (the only ones whose explanation the page shows), in inbox order
+        queue_inputs.sort(key=lambda item: not item.get("waiting"))
+        try:
+            explanations = explain_cases(queue_inputs, now.isoformat(), webhook_rows)
+        except ValueError:
+            explanations = {}
         exposure_context = (next(iter(explanations.values())).get("exposure_context")
                             if explanations else build_exposure_context(queue_inputs, now.isoformat()))
         for item in view["rows"]:
             item["queue_explanation"] = explanations.get(item["norm"].get("dispute_id"))
+        unexplained = sum(1 for item in view["rows"] if item.get("waiting") and not item.get("queue_explanation"))
     selected_preparation_token = selected_preparation_csrf = None
     selected_preparation_cases = []
     if (config.feature_enabled("explainable_queue") and config.feature_enabled("local_autopilot")
@@ -711,6 +718,7 @@ def list_disputes(request: Request, background_tasks: BackgroundTasks,
                                            "selected_preparation_cases": selected_preparation_cases, "selected_preparation_scope": {"shown": len(selected_preparation_cases), "total": len(view["rows"])},
                                            "exposure_context": exposure_context, "rows": view["rows"], "summary": view["summary"],
                                            "needs_count": view["needs_count"], "pages": pages,
+                                           "list_cut_line": list_cut_line(items), "unexplained": unexplained,
                                            "checked_at": mark_paypal_read("list"), "account_cliff": account_cliff_line,
                                            "sort_caption": inbox_view.SORT_CAPTION,
                                            "inaction": (inbox_view.INACTION_BEFORE, inbox_view.INACTION_LINK,
@@ -802,9 +810,7 @@ def _render_case(request: Request, dispute_id: str, client: SandboxClient, ws_vi
         missing_required = not info["claims"] or not info["has_tracking"]
         view = status.package_status(info["record"], info["approval_valid"], conflict, missing_required)
         package["status_view"] = view
-        package["checks_line"] = (f"{verified} of {total} {'check' if total == 1 else 'checks'} verified; "
-                                  f"{cannot_check} cannot be checked."
-                                  if checks is not None and total else None)    # same sentence as the package page
+        package["checks_line"] = presentation.verdict_line(checks) if checks is not None and total else None    # same sentence as the package page
         package["source_words"] = "Written with AI (local model)" if package["source"] in ("ai", "auto_ai") \
             else "Written by you"
     latest = max(packages, key=lambda p: (p["version"], p["id"])) if packages else None
@@ -982,6 +988,10 @@ def _render_case(request: Request, dispute_id: str, client: SandboxClient, ws_vi
            "paypal_timeline": _paypal_timeline(raw, now, dispute_id)}
     if config.feature_enabled("local_autopilot"):
         if config.feature_enabled("local_preparation"):
+            # with no document and no typed shipment detail the preparation creates nothing: the page says what to add
+            # instead of offering a button that does nothing
+            ctx["preparation_needs_input"] = (not packages and not any(not d.get("excluded") for d in documents)
+                                              and not repo.get_manual_fields(db_path, dispute_id))
             try:
                 from copilot.features.local_autopilot import observations
                 ctx["preparation_observation_token"] = observations.issue(db_path, [{"norm": norm, "actions": local_autopilot_actions}], observed_at=now.isoformat(), provenance="provider_read")

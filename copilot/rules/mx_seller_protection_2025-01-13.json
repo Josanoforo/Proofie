@@ -58,6 +58,12 @@
       "label": "Who received the package", "citation": "app_quality_rule:receiver_name (information for the seller; not a PayPal requirement)"},
     "capture_date": {"kind": "informational", "basis": "app_quality_rule",
       "label": "Date the proof was captured", "citation": "app_quality_rule:capture_date_expiry (Proofie's own caution; not a PayPal requirement)"},
+    "invoice_amount": {
+      "kind": "quality",
+      "basis": "app_quality_rule",
+      "label": "Invoice total equals the PayPal amount",
+      "citation": "app_quality_rule:invoice_amount (Proofie's own consistency check)"
+    },
     "dates_coherent": {"kind": "quality", "basis": "app_quality_rule",
       "label": "Ship date is before the delivery date", "citation": "app_quality_rule:dates_coherent (Proofie's own consistency check)"},
     "branch_pickup": {"kind": "risk", "basis": "app_quality_rule",

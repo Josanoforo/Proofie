@@ -155,7 +155,23 @@ _CHECK_GROUP_TITLES = (("verified", "Verified"), ("missing", "Missing"), ("confl
 
 # The rule files and checklist (copilot/core, copilot/rules) own these labels; the page may word one differently
 # for the seller without touching them.
-_SELLER_LABELS = {"Delivered at a branch (ocurre)": "Delivered to a carrier branch for pickup"}
+_SELLER_LABELS = {"Delivered at a branch (ocurre)": "Delivered to a carrier branch for pickup",
+                  "Tracking number": "The tracking number is this order's",
+                  "Delivery place matches the address on the PayPal transaction": "The delivery address matches the sale in PayPal",
+                  "Shipment shows as delivered": "The proof PayPal asks for: delivered",
+                  "Delivery date": "The proof PayPal asks for: delivery date",
+                  "Signed proof of delivery (total above the limit for the payment currency)":
+                      "The proof PayPal asks for: signed receipt (total above the limit for the payment currency)"}
+
+
+def blocking_conflict_line(checks) -> str | None:
+    """The consequence of a conflict that blocks the approval (the two date checks she can acknowledge do not block):
+    the receipt sentence only for the address check, the general one otherwise, None when nothing blocks."""
+    from copilot.core.checklist import ACKNOWLEDGEABLE_DATE_CHECKS
+    blocking = {c.id for c in checks if c.state == "conflict" and c.id not in ACKNOWLEDGEABLE_DATE_CHECKS}
+    if "destination" in blocking:
+        return "This answer cannot be sent while the receipt does not match PayPal's data."
+    return "This answer cannot be sent while a check does not match PayPal's data." if blocking else None
 
 
 def seller_label(text: str) -> str:
@@ -279,7 +295,7 @@ def _checks_count(checks: list) -> dict | None:
     noun = "check" if total == 1 else "checks"
     return {"verified": len(verified), "total": total, "cannot": len(cannot), "noun": noun,
             "first_verified": verified[0].id if verified else None, "first_cannot": cannot[0].id if cannot else None,
-            "line": f"{len(verified)} of {total} {noun} verified; {len(cannot)} cannot be checked."}
+            "line": presentation.verdict_line(checks)}
 
 
 def _settle_case_request_rows(rows: list, approved_and_sendable: bool) -> None:
@@ -1042,7 +1058,8 @@ def render_package(request, dispute_id, package_id, client, *, form_values=None,
         send_tracking=(f"{send_summary['tracking_number']} ({send_summary['carrier']})" if send_summary and send_summary["carrier"]
                        else send_summary["tracking_number"] if send_summary else None),
         send_files=tuple(send_summary["attachments"]) if send_summary else (),
-        send_fingerprint=send_summary["fingerprint"] if send_summary else None) if package else None)
+        send_fingerprint=send_summary["fingerprint"] if send_summary else None,
+        conflict_line=blocking_conflict_line(checks)) if package else None)
 
     needed = ["delivery_status", "delivery_date", "postal_code", "city", "state"]
     signature_check = [c for c in checks if c.id == "signature"]
@@ -1486,6 +1503,9 @@ def approve_package(request: Request, dispute_id: str, package_id: int, csrf_tok
             presentation.DELIVERY_WORDS_HINT_HTML,
             items=_delivery_block_items(claims, unsupported, checks, extracted_docs,
                                         repo.list_documents(db_path, dispute_id)), **back)
+
+    if any(a["excluded"] for a in repo.list_attachments(db_path, package_id)):
+        return refusal_page(request, 400, "This package cannot be approved yet", send_service.LEFT_OUT_ATTACHED_BLOCK, **back)
 
     # A checklist conflict cannot pass silently into approval - the vendor must explicitly
     # review it (fix the data, remove the document, or approve anyway while noting the discrepancy).

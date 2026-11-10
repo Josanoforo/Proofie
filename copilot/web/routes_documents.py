@@ -155,6 +155,22 @@ def _return_target(db_path, dispute_id: str, return_to) -> int | None:
     return package["id"] if package is not None and package["dispute_id"] == dispute_id else None
 
 
+def _take_out_of_unsent_responses(db_path, dispute_id: str, document_id: int) -> None:
+    """v1.1.2: a file left out of the checks is also out of what is sent. It is removed from every response of this case
+    that PayPal does not hold yet (a sent version is PayPal's record and never changes); the approval of a response it
+    was part of is cleared, exactly as when she removes a file herself."""
+    from copilot.web import routes_package
+    for package in repo.list_packages(db_path, dispute_id):
+        if not any(a["document_id"] == document_id for a in repo.list_attachments(db_path, package["id"])):
+            continue
+        if routes_package._is_sent_version(db_path, dispute_id, package):
+            continue
+        repo.detach_document(db_path, package["id"], document_id)
+        repo.log_action(db_path, "vendor", "detach_document", dispute_id,
+                        {"package_id": package["id"], "document_id": document_id, "because": "left_out_of_checks"})
+        routes_package._clear_approval(db_path, dispute_id, package["id"], log=True)
+
+
 def _set_excluded(request: Request, dispute_id: str, document_id: int, excluded: bool,
                   csrf_token: str, action: str, return_to="") -> HTMLResponse:
     if not verify_csrf(request, csrf_token):
@@ -168,6 +184,8 @@ def _set_excluded(request: Request, dispute_id: str, document_id: int, excluded:
         return refusal_page(request,404,"Document not found","That document could not be found.",back_url=f"/disputes/{dispute_id}/workspace/prepare#documents")
     repo.set_document_excluded(db_path, document_id, excluded)
     repo.log_action(db_path, "vendor", action, dispute_id, {"document_id": document_id})
+    if excluded:
+        _take_out_of_unsent_responses(db_path, dispute_id, document_id)
     done = "document_excluded" if excluded else "document_included"
     query = urlencode({"done": done, "doc": document_id})
     package_id = _return_target(db_path, dispute_id, return_to)

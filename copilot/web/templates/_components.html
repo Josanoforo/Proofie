@@ -94,6 +94,9 @@
 {%- if step.preview_text %}
 {% call exact_content() %}{{ step.preview_text }}{% endcall %}
 <dl class="send-rows">{% for label, value in step.preview %}<dt>{{ label }}</dt><dd>{{ value }}</dd>{% endfor %}</dl>
+{%- if step.technical %}
+<details data-state="send-technical"><summary>Technical details</summary><dl class="send-rows">{% for label, value in step.technical %}<dt>{{ label }}</dt><dd>{{ value }}</dd>{% endfor %}</dl></details>
+{%- endif %}
 {%- endif %}
 {%- if step.items %}
 <ul class="fix-list">{% for item in step.items %}<li>{{ item.text }} <a href="{{ item.href }}">{{ item.link }}</a></li>{% endfor %}</ul>

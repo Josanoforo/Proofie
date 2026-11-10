@@ -140,10 +140,9 @@ def test_shf9_a_file_the_partial_send_carried_but_paypal_does_not_list_reads_as_
     pkg = draft(c, db, token, STATEMENT)
     add_file(c, db, token, pkg, "a.pdf", LABEL_A)
     doc_b = add_file(c, db, token, pkg, "b.pdf", LABEL_B)
-    assert c.post(f"/disputes/{DID}/documents/{doc_b}/exclude", data={"csrf_token": token},
-                  follow_redirects=False).status_code == 303                     # attached, left out of the checks
     approve_passive(c, token, pkg)
     seed_attempt(db, pkg, "sent_unconfirmed", reason="missing_attachment:b.pdf")  # PayPal lists a.pdf only
+    repo.set_document_excluded(db, doc_b, True)       # left out of the checks after the send (v1.1.2: before it, approval stops)
     html = c.get(f"/disputes/{DID}/packages/{pkg}/print").text
     notes = [n.text() for n in parse(html).find_all(data_state="sent-not-listed")]
     assert notes == ["Sent with the response; PayPal does not list it."]

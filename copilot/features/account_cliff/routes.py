@@ -32,7 +32,7 @@ def account(request: Request, client: SandboxClient = Depends(get_client)):
     elif summary.sales <= 100:
         status = f"Not high volume: needs more than 100 sales in the window ({summary.sales} so far)"
     elif summary.high_volume:
-        status = "At or above the 1.50 % threshold: the high-volume fee applies"
+        status = "At or above the 1.50 % threshold: the high-volume fee may apply"
     else:
         noun = "dispute" if summary.disputes_to_threshold == 1 else "disputes"
         status = f"Below the 1.50 % threshold: {summary.disputes_to_threshold} more {noun} would reach it"

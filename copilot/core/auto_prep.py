@@ -81,6 +81,40 @@ def should_prepare(dispute_norm: dict) -> bool:
            and dispute_norm.get("dispute_id") not in config.AUTOPREP_EXCLUDE_IDS)
 
 
+# What the seller does to a package by hand (copilot/web/routes_package.py audits each as actor "vendor").
+SELLER_PACKAGE_ACTIONS = frozenset({"add_claim", "edit_claim", "remove_claim", "attach_document", "detach_document",
+                                    "start_manual_package", "start_manual_package_no_documents",
+                                    "start_manual_package_ai_unavailable", "approve_package", "approve_despite_conflict"})
+
+
+def seller_package(db_path, dispute_id: str) -> int | None:
+    """The id of the latest package when it is the seller's own: she approved it (a valid approval), started it by hand,
+    or changed it by hand. The background preparation never creates a version on top of such a package: a new version
+    would leave her statement or her file on a superseded one, and her approval without a send. None otherwise (no
+    package yet, or a draft only the system has touched)."""
+    packages = repo.list_packages(db_path, dispute_id)
+    if not packages:
+        return None
+    latest = max(packages, key=lambda p: (p["version"], p["id"]))
+    if latest.get("source") == "human_edit" or repo.get_latest_valid_approval(db_path, latest["id"]):
+        return latest["id"]
+    for row in repo.list_audit(db_path, dispute_id):
+        detail = row.get("detail")
+        if (row.get("actor") == "vendor" and row.get("action") in SELLER_PACKAGE_ACTIONS
+                and isinstance(detail, dict) and detail.get("package_id") == latest["id"]):
+            return latest["id"]
+    return None
+
+
+def _kept_for_the_seller(db_path, dispute_id: str, version_hash: str, claim_token: str, stage: str) -> bool:
+    held = seller_package(db_path, dispute_id)
+    if held is None:
+        return False
+    repo.set_auto_prep_result(db_path, dispute_id, version_hash, claim_token, "ready", package_id=held)
+    repo.log_action(db_path, "system", "auto_prep_kept_seller_package", dispute_id, {"package_id": held, "stage": stage})
+    return True
+
+
 def prepare_dispute(dispute_id: str, dispute_norm: dict, client, db_path, version_hash: str,
                     claim_token: str, *, local_context=None) -> None:
     """The actual background work for one dispute - called from a FastAPI BackgroundTask AFTER the inbox
@@ -94,6 +128,8 @@ def prepare_dispute(dispute_id: str, dispute_norm: dict, client, db_path, versio
     between stages and after each vision-processed image, so claim_auto_prep's staleness check measures
     silence, not total runtime - a genuinely slow run (model timeout 300s, ~180s per image with no cap on
     how many) must never be mistaken for a crashed one just because it takes a while."""
+    if _kept_for_the_seller(db_path, dispute_id, version_hash, claim_token, "start"):
+        return                       # her package stays the latest; she attaches the new file to it herself
     docs, names = docs_for_dispute(db_path, dispute_id)
     manual = repo.get_manual_fields(db_path, dispute_id)
     has_images = any(d["content_type"].startswith("image/") and not d["excluded"]
@@ -173,6 +209,9 @@ def prepare_dispute(dispute_id: str, dispute_norm: dict, client, db_path, versio
             if unsupported:
                 review_flags += list(dict.fromkeys(describe_delivery_problem(u) for u in unsupported))
 
+            # the model took its time: if she typed or attached something meanwhile, her package stays the latest
+            if _kept_for_the_seller(db_path, dispute_id, version_hash, claim_token, "before_ai_draft"):
+                return
             package_id = repo.insert_package(
                 db_path, dispute_id, source="ai", validation_ok=rec["validation_ok"],
                 review_flags=review_flags, model=rec.get("model"),
@@ -195,6 +234,8 @@ def prepare_dispute(dispute_id: str, dispute_norm: dict, client, db_path, versio
             # the AI WAS tried and could not be used; the seller must not read this shell as
             # "nobody asked the AI". With no readable document the AI is never tried and no such note is added.
             shell_flags.append(ai_unavailable_flag())
+        if _kept_for_the_seller(db_path, dispute_id, version_hash, claim_token, "before_manual_draft"):
+            return
         package_id = repo.insert_package(
             db_path, dispute_id, source="auto_manual", validation_ok=False, review_flags=shell_flags)
         repo.log_action(db_path, "system", "auto_prep_manual_draft", dispute_id, {"package_id": package_id})

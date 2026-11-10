@@ -29,7 +29,7 @@ def inbox_watch(request: Request, seen: str = "", client: SandboxClient = Depend
     known = split_seen(seen)
     items, _pages = fetch_all_disputes(client)
     listed = [raw.get("dispute_id") for raw in items if isinstance(raw, dict) and isinstance(raw.get("dispute_id"), str)]
-    response = JSONResponse({"new": [i for i in listed if i not in known], "listed": len(listed),
+    response = JSONResponse({"new": [i for i in listed if i not in known], "listed": len(listed), "cut": bool(getattr(items, "cut", False)),
                              "checked_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")})
     response.headers["Cache-Control"] = "no-store"
     return response

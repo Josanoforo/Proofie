@@ -1080,8 +1080,8 @@ def test_for_package_send_key_and_its_note_counts_come_from_code(monkeypatch):
     action = s.action
     assert (action.label, action.post, action.sends, action.sending, action.kind, action.large) == ("Send evidence to PayPal", f"{url}/send", True, "Sending to PayPal…", "primary", True)
     assert s.body == "Sending to PayPal cannot be undone; Proofie sends it once."          # before the control, in the body
-    assert s.note == "Sends package v2 (1 statement, 1 file) to PayPal sandbox once. Proofie cannot withdraw it." and s.note_state == "send-note"
-    assert _pstep(claims_count=2, files_count=0).note == "Sends package v2 (2 statements, 0 files) to PayPal sandbox once. Proofie cannot withdraw it."
+    assert s.note == "Sends package v2 (1 statement, 1 file) to PayPal once. Proofie cannot withdraw it." and s.note_state == "send-note"
+    assert _pstep(claims_count=2, files_count=0).note == "Sends package v2 (2 statements, 0 files) to PayPal once. Proofie cannot withdraw it."
     refused = _pstep(record=_record("refused"))
     assert refused.key == "send" and refused.body == "PayPal did not accept the last attempt. Fix what the result page said before sending again. Sending to PayPal cannot be undone; Proofie sends it once."
     blocked = _pstep(record=_record("blocked", attempt={"reason": "no link"}))

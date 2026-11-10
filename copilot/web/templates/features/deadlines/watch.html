@@ -18,6 +18,7 @@
 {%- elif row.waiting %}<td data-label="Respond by">No verified deadline available</td><td data-label="Time left">—</td>
 {%- else %}<td data-label="Respond by">No response due from you</td><td data-label="Time left">—</td>{% endif %}</tr>{% endfor %}
 </tbody></table>{% else %}<p>No disputes were returned by this PayPal read.</p>{% endif %}
+{% if list_cut_line %}<p class="checked-at" data-state="list-cut">{{ list_cut_line }}</p>{% endif %}
 <p class="checked-at">{{ pages }} {{ 'page' if pages == 1 else 'pages' }} read.</p>
 {% endif %}
 {% endblock %}

@@ -45,11 +45,14 @@ def test_send_panel_restates_the_approved_package_in_order(env):
     pkg = draft(c, db, token, "We shipped the parcel with FedEx.")
     approve_passive(c, token, pkg)
     panel = _panel(page(c, pkg).text)
-    order = ["You are about to send this to the PayPal sandbox", "data-exact-content", "Tracking", "Files",
-             "Fingerprint of the approved package", "Send evidence to PayPal", "Edit the package instead", "Editing clears your approval."]
+    order = ["You are about to send this to PayPal, dispute", "data-exact-content", "Tracking", "Files",
+             "<summary>Technical details</summary>", "PayPal receives this line before your text", "Fingerprint of the approved package", "Send evidence to PayPal", "Edit the package instead", "Editing clears your approval."]
     at = [panel.index(s) for s in order]
     assert at == sorted(at), dict(zip(order, at))
     assert f"dispute {DID}" in panel and "DEMO-FDX-000001" in panel and "SHA-256" in panel
+    assert "PayPal sandbox" not in panel                      # the environment is said once, by the page's own tag
+    fold = panel[panel.index('<details data-state="send-technical">'):]
+    assert "DEMO DATA (sandbox test with synthetic documents)." in fold and "DEMO DATA" not in panel[:panel.index("<details")]
     approval = repo.get_latest_valid_approval(db, pkg)
     assert approval["approval_sha256"][:12] + "…" in panel
     assert panel.count("btn-primary") == 1 and "Cannot be undone" not in panel
@@ -81,7 +84,7 @@ def test_the_approval_page_is_framed_and_names_one_statement_in_the_singular(env
     text = c.get(f"/disputes/{DID}/packages/{pkg}/active-approval").text
     assert "Check what will be sent, then approve it" in text and "Human approval review" not in text
     assert 'data-state="approval-frame"' in text and "Nothing is sent yet" in text
-    assert f"PayPal sandbox, dispute {DID}, package v" in text
+    assert f"Target: PayPal, dispute {DID}, package v" in text and "PayPal sandbox, dispute" not in text
     assert "Approve this package: I have read the statement<" in text and "these 1" not in text
 
 
@@ -151,5 +154,5 @@ def test_the_approved_receipt_shows_the_fingerprint(env_active):
                              {k.key: "seller_statement" if k.verdict == "unverifiable" else "confirmed" for k in review.claims}, "", "")
     text = c.get(f"/disputes/{DID}/packages/{pkg}/active-approval").text
     sha = repo.get_latest_valid_approval(db, pkg)["approval_sha256"]
-    assert f'Fingerprint of what you approved: <span translate="no">{sha[:12]}</span>' in text and "any edit clears the approval" in text
+    assert f'<details data-state="approval-fingerprint"><summary>Technical details</summary><p>Fingerprint of what you approved: <span translate="no">{sha[:12]}</span>' in text and "any edit clears the approval" in text
     assert "Nothing is sent yet" not in text                    # the frame belongs to the unapproved page only

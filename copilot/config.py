@@ -21,6 +21,23 @@ ROOT = Path(__file__).resolve().parents[1]
 def load_env_file() -> None:
     """Load project-local settings before router registration; shell values win."""
     load_dotenv(ROOT / ".env", override=False)
+    _refresh_rules_country()
+
+
+def _refresh_rules_country() -> None:
+    """RULES_COUNTRY below is read when this module is imported, which is before the .env file is loaded: a country set
+    only in .env was ignored. After the load, a value now in the environment replaces it (and the rule set cached for the
+    old value is dropped). Nothing changes when the variable is not set."""
+    import sys
+    global RULES_COUNTRY
+    value = os.environ.get("COPILOT_RULES_COUNTRY")
+    if value is None or value == RULES_COUNTRY:
+        return
+    RULES_COUNTRY = value
+    module = sys.modules.get("copilot.core.checklist_input")
+    if module is not None:
+        module.RULES_COUNTRY = value
+        module._RULES_CACHE.clear()
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DB_PATH = DATA_DIR / "copilot.db"

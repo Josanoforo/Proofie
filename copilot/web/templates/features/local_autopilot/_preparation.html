@@ -2,7 +2,8 @@
 <section id="local-preparation" data-state="local-preparation">
 <h3>Prepare from this recorded case</h3>
 <p>This uses the case observation shown here and existing records. A person reviews the result; nothing is sent or approved.</p>
-{% if preparation_observation_token is defined and preparation_observation_token %}
+{% if preparation_needs_input is defined and preparation_needs_input %}<p data-state="local-preparation-needs-input">Nothing to prepare from yet: add a case document or enter a shipment detail first. To write the answer yourself, use "Start manually instead".</p>
+{% elif preparation_observation_token is defined and preparation_observation_token %}
 <form method="post" action="/disputes/{{ norm.dispute_id }}/local-preparation">
 <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="observation_token" value="{{ preparation_observation_token }}">
 <button type="submit" class="btn-secondary">Prepare locally for review</button></form>

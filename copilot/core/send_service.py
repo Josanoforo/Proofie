@@ -373,6 +373,8 @@ def send_package(client, db_path, dispute_id: str, package_id: int) -> SendOutco
         return SendOutcome(400, "Cannot send", f"{exc}.")
 
     attachment_rows = repo.list_attachments(db_path, package_id)
+    if any(a["excluded"] for a in attachment_rows):
+        return SendOutcome(400, "Cannot send", LEFT_OUT_ATTACHED_SEND)
     attachment_shas = [a["sha256"] for a in attachment_rows]
     current_fp = approval_fingerprint_with_attachments(dispute_id, "provide_evidence", req_input,
                                                         attachment_shas)
@@ -419,6 +421,13 @@ ABANDONED_PARTIAL_REASON = "vendor confirmed PayPal's Resolution Center shows th
 # confirm-not-received action on some other package, before this one was ever edited again) - "wait and
 # check again" is the wrong advice, since nothing is actually in flight; the content must change (a new
 # version) before it can be claimed/sent again. Shared by every call site that discovers this.
+# A file the seller left out of the checks is no longer compared with PayPal's data. While it is still attached it would be
+# sent, so a wrong receipt could reach PayPal with its conflict hidden: approval and sending stop until she removes it.
+LEFT_OUT_ATTACHED_BLOCK = ("A file you left out of the checks is still attached to this package, so it would be sent to PayPal. "
+                           "Remove it from the package before approving.")
+LEFT_OUT_ATTACHED_SEND = ("A file you left out of the checks is still attached to this package. Remove it from the package, "
+                          "approve again, then send. Nothing was sent.")
+
 _ABANDONED_OUTCOME = SendOutcome(409, "Not sent", "This exact package was marked as not received. To send "
                                  "again, edit it (this creates a new version).")
 # A true partial send that was marked as not received. The text depends on the fresh read the caller holds: the way out

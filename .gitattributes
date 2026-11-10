@@ -5,3 +5,4 @@
 *.gif -text
 pilot/eval/** text eol=lf
 tools/vendor/axe-core-4.10.2/axe.min.js -text
+docs/impact-1/** -text

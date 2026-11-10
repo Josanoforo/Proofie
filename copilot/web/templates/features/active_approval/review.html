@@ -14,7 +14,8 @@
 <div class="approval-main">
 <p><a href="{{ package_url }}">Package contents</a></p>
 <h1 id="approval-header">{% if state in ('approved', 'sent') %}{{ heading }}{% else %}Check what will be sent, then approve it{% endif %}</h1>
-{% if editable %}{% call banner("info", "approval-frame", "Nothing is sent yet") %}<p>Approving records your decision for this exact content. Sending is a separate step. Target: PayPal sandbox, dispute {{ dispute_id }}, package v{{ review.package.version }}.</p>{% endcall %}{% endif %}
+{% if editable %}{% call banner("info", "approval-frame", "Nothing is sent yet") %}<p>Approving records your decision for this exact content. Sending is a separate step. Target: PayPal, dispute {{ dispute_id }}, package v{{ review.package.version }}.</p>{% endcall %}{% endif %}
+{% if proof_missing and state not in ('approved', 'sent') %}{% call banner("warn", "proof-missing-head", "PayPal can reject this answer") %}<p>PayPal's published rule asks for proof that is not in this package: no {{ proof_missing|join("; no ") }}. You can add it on the <a href="{{ package_url }}">package page</a>, or approve without it.</p>{% endcall %}{% endif %}
 {% if context_limitations %}
 {% call banner("info", "paypal-limitations", "What PayPal did not return") %}
   <ul>{% for limitation in context_limitations %}<li>{{ limitation }}</li>{% endfor %}</ul>
@@ -30,7 +31,7 @@
 <section class="panel" id="approval-done" data-state="{{ 'approval-used' if state == 'sent' else 'approved-panel' }}">
 {% if state == 'sent' %}<p id="approval-used">Approval used for the send at {{ sent_at|when }}.</p>
 {% else %}<p id="approval-receipt">You approved this package on {{ review.approval.approved_at|when }}.</p>
-{% if send_record.state == 'none' %}<p>Nothing has been sent to PayPal yet.</p>{% endif %}{% if review.approval %}<p data-state="approval-fingerprint">Fingerprint of what you approved: <span translate="no">{{ review.approval.approval_sha256[:12] }}</span>… (SHA-256; any edit clears the approval)</p>{% endif %}{% endif %}
+{% if send_record.state == 'none' %}<p>Nothing has been sent to PayPal yet.</p>{% endif %}{% if review.approval %}<details data-state="approval-fingerprint"><summary>Technical details</summary><p>Fingerprint of what you approved: <span translate="no">{{ review.approval.approval_sha256[:12] }}</span>… (SHA-256; any edit clears the approval)</p></details>{% endif %}{% endif %}
 {% if state == 'sent' %}<div class="actions actions--forward">{{ link_button('/disputes/' ~ dispute_id, "View the dispute and PayPal's answer") }}</div>
 {% elif sendable and review.can_provide_evidence %}<p data-state="send-final">Sending to PayPal cannot be undone; Proofie sends it once.</p>
 <div class="actions actions--forward">{{ link_button(package_url ~ '#next-step', 'Continue to send evidence') }}</div>
@@ -52,6 +53,7 @@
 {% elif state == 'blocked' %}
 <section class="panel" id="approval-block-reasons" data-state="blocked-panel">
 <h2>Cannot approve yet</h2>
+{% if conflict_blocks %}<p data-state="conflict-consequence">{{ conflict_blocks }}</p>{% endif %}
 <ul class="fix-list">{% for item in blocked_items %}<li class="approval-blocked">{{ item.text }} {% if loop.first %}{{ link_button(item.href, item.link) }}{% else %}<a href="{{ item.href }}">{{ item.link }}</a>{% endif %}</li>{% endfor %}</ul>
 {% if has_delivery_block %}<p class="field-hint">{{ DELIVERY_WORDS_HINT_HTML }}</p>{% endif %}
 </section>
@@ -70,13 +72,14 @@
 </dl>
 {% else %}<p>Proofie did not keep the exact text of this send. Files: {% if sent_view.files %}{{ sent_view.files|join(", ") }}{% else %}none{% endif %}.</p>{% endif %}
 {% else %}<h2>What will be sent</h2>
-{% if review.request_input %}<p class="send-label"><strong>Exact text PayPal receives</strong></p>
-{% call exact_content() %}{{ summary.notes }}{% endcall %}
+{% if review.request_input %}<p class="send-label"><strong>{% if summary.prefix %}Your text, as PayPal receives it{% else %}Exact text PayPal receives{% endif %}</strong></p>
+{% call exact_content() %}{{ summary.own_text }}{% endcall %}
+{% if summary.prefix %}<details data-state="send-prefix"><summary>Technical details</summary><p>PayPal receives this line before your text: {{ summary.prefix }}</p></details>{% endif %}
 <dl class="send-rows">
 <dt>To</dt><dd>PayPal, only when you press Send evidence to PayPal on the package page</dd>
 <dt>Tracking number</dt><dd>{{ mono_id(safe_text(summary.tracking)) }}</dd>
 <dt>Carrier</dt><dd>{{ mono_id(safe_text(summary.carrier)) }}</dd>
-<dt>Files ({{ summary.files|length }})</dt><dd>{% if summary.files %}<ul>{% for f in summary.files %}<li>{{ mono_id(safe_text(f.filename)) }}{% if f.excluded %} (left out of the checks, but still sent){% endif %}</li>{% endfor %}</ul>{% else %}Files: none. PayPal receives the text only. <a href="{{ package_url }}#attachments">Attach a document</a>{% endif %}</dd>
+<dt>Files ({{ summary.files|length }})</dt><dd>{% if summary.files %}<ul>{% for f in summary.files %}<li>{{ mono_id(safe_text(f.filename)) }}{% if f.excluded %} (left out of the checks: remove it from the package before approving){% endif %}</li>{% endfor %}</ul>{% else %}Files: none. PayPal receives the text only. <a href="{{ package_url }}#attachments">Attach a document</a>{% endif %}</dd>
 </dl>
 {% if summary.was_cut %}<p class="field-hint" id="notes-cut">PayPal receives only the first 2,000 characters.</p>{% endif %}
 {% else %}<p>No sendable request yet: add tracking before sending and approve again.</p>{% endif %}
@@ -90,7 +93,7 @@
 <h2 id="approval-changes-title">What changed since you approved</h2>
 <ul>{% for change in review.view_changes %}<li><p>Statement {{ change.claim_id }}: {{ safe_text(change.statement) }}</p>
 {% if change.statement_changed %}<p>The statement text changed since approval.</p>{% endif %}
-{% for file in change.files %}<p>File {{ safe_text(file.filename) }} ({{ safe_text(file.field) }}): its stored hash differs from the approved version.</p>{% endfor %}
+{% for file in change.files %}<p>File {{ safe_text(file.filename) }} ({{ safe_text(file.field) }}): this file changed since you approved it.</p>{% endfor %}
 </li>{% endfor %}</ul></section>{% endif %}
 
 {% if editable and earlier_approval %}<section class="reapproval-callout reapproval-callout--info" id="reapproval-fixed" data-reapproval="fixed" role="group" aria-labelledby="reapproval-fixed-title">
@@ -160,16 +163,17 @@
 <input id="approval-phrase" name="phrase" type="text" required autocomplete="off" value="{{ entered_phrase }}" aria-describedby="approval-phrase-reasons{% if review_error and error_field == 'approval-phrase' %} approval-phrase-error{% endif %}"{% if review_error and error_field == 'approval-phrase' %} aria-invalid="true"{% endif %}>
 </section>{% endif %}
 {% if review.flags %}<label for="approval-override">Open notices: explain your decision <strong class="field-mark">Required while a notice is open</strong></label>
-<ul>{% for flag in review.flags %}<li>{{ tag('bad',safe_text(flag)) }} <a href="{{ package_url }}#checks">Review the difference</a></li>{% endfor %}</ul>
+<details data-state="open-notices"><summary>{{ review.flags|length }} open {{ 'notice' if review.flags|length == 1 else 'notices' }}: what each one says</summary><ul>{% for flag in review.flags %}<li>{{ tag('bad',safe_text(flag)) }} <a href="{{ package_url }}#checks">Review the difference</a></li>{% endfor %}</ul></details>
 {% if review_error and error_field == 'approval-override' %}{{ field_error('approval-override-error', review_error) }}{% endif %}<input id="approval-override" name="sufficiency_override" type="text" required value="{{ entered_override }}"{% if review_error and error_field == 'approval-override' %} aria-invalid="true" aria-describedby="approval-override-error"{% endif %}>{% endif %}{% if note_proposed %}<p class="field-hint" data-state="proposed-note">Proposed from the open notices. Edit it or replace it with your own words; it is saved as you submit it.</p>{% endif %}
 <div id="approval-control">
+{% if proof_missing %}<p data-state="proof-missing-approve"><strong>You are approving sending without: {{ proof_missing|join("; ") }}.</strong></p>{% endif %}
 <p class="action-note">Approving does not send anything. Sending is a separate step.</p>
 {% if one_control %}{{ button('Approve this package: I have read the statement' if review.claims|length == 1 else 'Approve this package: I have read these ' ~ review.claims|length ~ ' statements', kind='primary') }}{% else %}{{ button('Approve this package', kind='primary') }}{% endif %}
 </div>
 </form>
 {% endif %}
 </div>
-{% if state in ('approved', 'sent') %}<p>This is exactly the text and files you approved. The content hash under Technical details identifies this version.</p><details><summary>Technical details</summary><p>Local content hash: {{ review.approval.approval_sha256 if review.approval else 'Not available' }}</p></details>{% endif %}
+{% if state in ('approved', 'sent') %}<p>This is exactly the text and files you approved.</p><details><summary>Technical details</summary><p>Local content hash: {{ review.approval.approval_sha256 if review.approval else 'Not available' }}</p></details>{% endif %}
 <p><a href="{{ package_url }}">Package contents</a> · <a href="{{ package_url }}#what-will-be-sent">What will be sent</a>{% if feature_enabled('evidence_dossier') %} · <a href="{{ package_url }}#evidence-dossier">Evidence dossier</a>{% endif %}</p>
 </div>
 <aside class="approval-context-rail" aria-label="Package approval and send status">
@@ -178,6 +182,7 @@
   <dl class="approval-state-list">
     <dt>Package</dt><dd>{{ review.package.status|default('Draft', true)|capitalize }} · v{{ review.package.version }}</dd>
     <dt>Review</dt><dd>{% if state == 'blocked' %}Needs changes before approval{% elif state == 'cleared' %}Review again; earlier approval was cleared{% elif state == 'typed-required' %}Additional confirmation required{% elif state in ('approved', 'sent') %}Reviewed{% else %}Ready to review{% endif %}</dd>
+    {% if verdict_line %}<dt>Checks</dt><dd data-state="verdict-line">{{ verdict_line }}</dd>{% endif %}
     <dt>Attention</dt><dd>{% if 'conflict' in check_states or 'missing' in check_states %}Needs attention{% elif 'present_unverifiable' in check_states %}Some facts cannot be verified{% else %}No outstanding check notices{% endif %}</dd>
     <dt>Approval</dt><dd>{% if review.approval %}Recorded for this package version{% elif state == 'blocked' %}Not available yet{% else %}Not recorded{% endif %}</dd>
     <dt>Sending</dt><dd>{% if state == 'sent' %}Sent; read-back is shown on this page{% elif send_record.state == 'none' %}Not sent yet{% else %}A send attempt is recorded; see the result on this page{% endif %}</dd>

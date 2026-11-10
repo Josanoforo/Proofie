@@ -87,5 +87,5 @@ def test_rc43_wider_fixture_review_and_prompt_pin_w3_off(prepared, monkeypatch):
                             for name, text in sorted(docs.items())]}
     actual = hashlib.sha256(json.dumps(result, ensure_ascii=True, sort_keys=True,
         separators=(",", ":")).encode("utf-8")).hexdigest()
-    assert actual == "8f405dc25e323938f86db04ed85df26582bcfc5561cfe90b4af6198626d8be88"
+    assert actual == "efbd1f8712f1f6fe020d0f8dbdbf10aca7bdb9b68b00bbd3fc01149252ec0784"
     assert all(method == "GET" for method, _, _ in fake.calls)

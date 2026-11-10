@@ -42,10 +42,29 @@ class OwnTrackerMask:
     reservation whose approval recorded the baseline.
 
     `status_only=True` keeps that entry in the answer and drops only its `status` (what the pages use: the own tracker's
-    number and carrier still show and compare, its SHIPPED just is not a delivery report)."""
-    def __init__(self, client, sent, baseline, status_only=False):
+    number and carrier still show and compare, its SHIPPED just is not a delivery report).
+
+    v1.1.2, a second sandbox fact (take-902, copilot_web.jsonl rows 14 and 261): when the tracker of the number we send
+    ALREADY exists, PayPal sets it back to SHIPPED at the second of the POST (it read DELIVERED four minutes before).
+    That reset is the send's own effect too. `approved_status` maps a tracking number to the status PayPal showed when
+    the seller approved: an entry that was there before the send, whose number we sent, whose status is now SHIPPED
+    and was something else at approval, is read with the status of the approval. Any other change of an existing
+    tracker (another status, another carrier, another number) still differs."""
+    def __init__(self, client, sent, baseline, status_only=False, approved_status=None):
         self._client, self._sent, self._baseline = client, set(sent), set(baseline)
         self._status_only = status_only
+        self._approved_status = {k: v for k, v in (approved_status or {}).items() if isinstance(v, str) and v != "SHIPPED"}
+
+    def _reset(self, entry) -> bool:
+        number = entry.get("tracking_number") if isinstance(entry, dict) else None
+        return (number in self._sent and number in self._baseline and entry.get("status") == "SHIPPED"
+                and number in self._approved_status)
+
+    def _restored(self, result):
+        if not any(self._reset(t) for t in result["trackers"]):
+            return result
+        return {**result, "trackers": [{**t, "status": self._approved_status[t["tracking_number"]]} if self._reset(t) else t
+                                       for t in result["trackers"]]}
 
     def _own(self, entry) -> bool:
         return (isinstance(entry, dict) and entry.get("tracking_number") in self._sent
@@ -54,6 +73,7 @@ class OwnTrackerMask:
     def call(self, method, path, op, **kwargs):
         result = self._client.call(method, path, op, **kwargs)
         if op == "context_tracking" and isinstance(result, dict) and isinstance(result.get("trackers"), list):
+            result = self._restored(result)
             if self._status_only:
                 if any(self._own(t) and "status" in t for t in result["trackers"]):
                     return {**result, "trackers": [{k: v for k, v in t.items() if k != "status"} if self._own(t) else t
@@ -73,6 +93,25 @@ def _confirmed_sends(db_path, dispute_id: str) -> list:
         rows = conn.execute("SELECT request_input_json FROM send_attempts WHERE dispute_id=? AND state='confirmed'",
                             (dispute_id,)).fetchall()
     return [json.loads(r[0]) for r in rows if r[0]]
+
+
+def _approval_statuses(db_path, dispute_id: str) -> dict:
+    """number -> the tracker status PayPal showed when an approval of this dispute was recorded (latest approval wins)."""
+    with closing(sqlite3.connect(str(db_path))) as conn:
+        if not conn.execute("SELECT 1 FROM sqlite_master WHERE name='active_approval_receipts'").fetchone():
+            return {}
+        rows = conn.execute("SELECT r.confirmations_json FROM active_approval_receipts r "
+                            "JOIN approvals a ON a.id = r.approval_id JOIN packages p ON p.id = a.package_id "
+                            "WHERE p.dispute_id=? ORDER BY a.id", (dispute_id,)).fetchall()
+    statuses = {}
+    for (raw,) in rows:
+        try:
+            recorded = json.loads(raw)[0]["approved_case_evidence"].get("tracker_status")
+        except (TypeError, ValueError, KeyError, IndexError, AttributeError):
+            continue
+        if isinstance(recorded, dict):
+            statuses.update({k: v for k, v in recorded.items() if isinstance(k, str) and isinstance(v, str)})
+    return statuses
 
 
 def _approval_baselines(db_path, dispute_id: str) -> set:
@@ -100,4 +139,5 @@ def own_tracker_client(client, db_path, dispute_id: str):
     sent = {n for request_input in _confirmed_sends(db_path, dispute_id) for n in sent_tracking_numbers(request_input)}
     if not sent:
         return client
-    return OwnTrackerMask(client, sent, _approval_baselines(db_path, dispute_id), status_only=True)
+    return OwnTrackerMask(client, sent, _approval_baselines(db_path, dispute_id), status_only=True,
+                          approved_status=_approval_statuses(db_path, dispute_id))

@@ -318,7 +318,8 @@ def test_successful_fake_send_is_identical_for_active_and_core_approval(prepared
     core_result = send_package(second, core_db, DID, package)
     assert active_result.sent and core_result.sent
     assert active_result == core_result
-    assert [c for c in first.calls if c[1] != "show_dispute"] == second.calls
+    # v1.1.2 O: the active review reads the sale itself (capture) when the report has no row; a read-only extra, like show_dispute
+    assert [c for c in first.calls if c[1] not in ("show_dispute", "context_capture", "context_order")] == second.calls
     assert len([m for m, _ in first.calls if m == "POST"]) == 1
 
 
@@ -341,7 +342,7 @@ def test_flag_off_core_template_bytes_identical_and_on_only_active_entry(prepare
     # The template differs from that frozen fixture by an explicit, counted list of approved edits
     # (tests/local/_template_delta.py); applying exactly those edits must give the template in the tree, byte for byte.
     import _template_delta as delta
-    assert len(delta.edits()) == 107 and delta.apply(frozen) == delta.current_template()
+    assert len(delta.edits()) == 108 and delta.apply(frozen) == delta.current_template()
     assert any("The assistant's answer could not be checked" in e["new"] for e in delta.edits())
     env = routes_package.templates.env.overlay(loader=ChoiceLoader([
         DictLoader({"package_review.html": delta.apply(frozen)}), routes_package.templates.env.loader]))
@@ -371,7 +372,7 @@ def test_rc43_hooks_off_page_identical_to_the_46_edit_template(prepared_web, mon
     assert '{% include "features/clauses/_clause.html" ignore missing %}' in hooks["edit-pk3"]
     lines = (Path(__file__).parent/"fixtures/package_review-frozen-3.html").read_text(encoding="utf-8").split("\n")
     earlier = [e for e in delta.edits() if not e["id"].startswith("edit-pk")]
-    assert len(earlier) == 104     # 79 earlier edits plus the 19 NIVEL2-FIX entries of the O4 B composition plus the 2 seller-shortcuts proposals plus the LINK-FIX F-04 anchors plus the 3 HERO send-panel entries
+    assert len(earlier) == 105     # the v1.1.2 verdict line plus 79 earlier edits plus the 19 NIVEL2-FIX entries of the O4 B composition plus the 2 seller-shortcuts proposals plus the LINK-FIX F-04 anchors plus the 3 HERO send-panel entries
     for edit in reversed(earlier):
         old = edit["old"].split("\n") if edit["old"] != "" else []
         lines[edit["at"]:edit["at"] + len(old)] = edit["new"].split("\n") if edit["new"] != "" else []
@@ -490,7 +491,7 @@ def test_rc43_golden_review_and_prompt_hash_w3_off(prepared):
     docs, names = docs_for_dispute(db, DID)
     messages = build_messages(fake.raw, docs, names)
     prompt_sha = hashlib.sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
-    assert review.review_sha256 == "a7bde61ef16ee03241e0f2de787d7e50aab650cd189454f768871d256f40f0eb"
+    assert review.review_sha256 == "4c22504ba4c6568ab423016f4b44bfd0a20ed9a6797c889e6d5a4e7572234f88"
     assert prompt_sha == "975bea58fadf42940d8a973e95f495b5c5653077c45c4abee31d281a4ab1acf1"
 
     assert all(method == "GET" for method, _, _ in fake.calls)

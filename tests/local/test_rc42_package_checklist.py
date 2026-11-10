@@ -39,5 +39,7 @@ def test_the_verified_and_conflict_messages_read_as_before_minus_the_repeated_la
     messages = {c.state: c.seller_message for _, c in destination_checks() if c.state in ("verified", "conflict")}
     assert re.fullmatch(r"Matches the (transaction address in PayPal|address you declared \(not from PayPal\)) \(.+\)\.",
                         messages["verified"])
-    assert re.fullmatch(r"Does not match the (transaction address in PayPal|address you declared \(not from PayPal\)) "
-                        r"\(.+\)\. The document may belong to another order\.", messages["conflict"])
+    # v1.1.2: a postal-code difference names each value by its source
+    assert re.fullmatch(r"(Your receipt says \S+\. PayPal says \S+\.|Does not match the (transaction address in PayPal|"
+                        r"address you declared \(not from PayPal\)) \(.+\)\.) The document may belong to another order\.",
+                        messages["conflict"])

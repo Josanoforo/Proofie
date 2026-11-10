@@ -73,6 +73,14 @@
  },
  {
   "at": 27,
+  "id": "v112-verdict@line28",
+  "old": "",
+  "new": "{% if checks_count and checks_count.line %}<p class=\"checks-count\" data-state=\"verdict-line\">{{ checks_count.line }} <a href=\"#checks-fold\">Review checks</a></p>{% endif %}",
+  "insert_only": true,
+  "reason": "v1.1.2 copy 2 / template 1 (table 2 screen audit): the one verdict sentence at the head of the package page, above the folds."
+ },
+ {
+  "at": 27,
   "id": "nfix-4@line28",
   "old": "{% call next_step_panel(step, csrf_token) %}",
   "new": "{% call next_step_panel(step, csrf_token, 'Open approval review' if step.key == 'review_approve' and step.action and not step.action.post else none) %}",
@@ -642,9 +650,9 @@
   "at": 274,
   "id": "edit-30@line275",
   "old": "",
-  "new": "<details class=\"dossier-fold\" id=\"checks-fold\" data-state=\"fold-checks\"><summary>Show the checks and where each comes from</summary>\n{% if checks_count %}<p class=\"checks-count\" data-state=\"checks-count\">{% if checks_count.first_verified %}<a href=\"#check-{{ checks_count.first_verified }}\">{{ checks_count.verified }} of {{ checks_count.total }} {{ checks_count.noun }} verified</a>{% else %}{{ checks_count.verified }} of {{ checks_count.total }} {{ checks_count.noun }} verified{% endif %}; {% if checks_count.first_cannot %}<a href=\"#check-{{ checks_count.first_cannot }}\">{{ checks_count.cannot }} cannot be checked</a>{% else %}{{ checks_count.cannot }} cannot be checked{% endif %}.</p>{% endif %}",
+  "new": "<details class=\"dossier-fold\" id=\"checks-fold\" data-state=\"fold-checks\"><summary>Show the checks and where each comes from</summary>\n{% if checks_count %}<p class=\"checks-count\" data-state=\"checks-count\">{{ checks_count.line }}{% if checks_count.first_verified %} <a href=\"#check-{{ checks_count.first_verified }}\">First verified check</a>{% endif %}{% if checks_count.first_cannot %} <a href=\"#check-{{ checks_count.first_cannot }}\">First check that cannot be checked</a>{% endif %}</p>{% endif %}",
   "insert_only": true,
-  "reason": "the counts sentence under the Checks heading | amended: UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed. | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test)"
+  "reason": "the counts sentence under the Checks heading | amended: UX pass 3 wave 3 (rulebook v2 V13): the connection box moves below the package title into one closed block; the shipment, files, statements and checks sections are closed with a one-line summary and open on errors or when a link points inside. Presentation only; no field, form, route or state changed. | amended: NIVEL2-FIX: the O4 'approved B' composition of the package page (Codex commits 898570c9, a773cc74, e6742166, c59ac0e2, 51c04171): compact case header and one h1 'Package contents', a contents index, the editable sections in one closed 'Open package details' block (it opens on errors and when a cleared approval is blocked by delivery statements), the package state in a side rail, the sending status partial; no field, route, check or approval rule changes; the sent-version note says 'a copy', not 'snapshot' (plain-words test) | v1.1.2: the count line inside the fold uses the same verdict sentence as the head of the page (table 2 screen audit)."
  },
  {
   "at": 275,

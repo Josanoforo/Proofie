@@ -614,7 +614,7 @@ def test_p1_78_the_conflict_page_offers_three_clear_ways_and_no_required_sentenc
     assert "This note is added to your statements and sent to PayPal with your evidence. Approving does not send anything." in dom.text()
     exclude = dom.find("form", action=f"/disputes/{DISPUTE_ID}/documents/3/exclude")
     assert exclude is not None and "btn-link" in exclude.find("button").attrs["class"]
-    assert "If this file is attached to your response, it is still sent. Remove it from the response on the package page." in dom.text()
+    assert "A file you leave out of the checks is also taken out of your response: it is not sent to PayPal." in dom.text()
     assert 'Remove "receipt.pdf" from consideration' not in html and "Leave receipt.pdf out of the checks" in dom.text()
     approve = dom.find("form", action=f"/disputes/{DISPUTE_ID}/packages/7/approve")
     assert approve.find("button").text() == "Approve with this note" and "novalidate" in approve.attrs

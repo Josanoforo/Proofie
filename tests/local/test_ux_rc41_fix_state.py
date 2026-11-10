@@ -312,8 +312,9 @@ def env_print(monkeypatch):
 def excluded_attached(c, db, token):
     pkg = draft(c, db, token, STATEMENT)
     doc = add_file(c, db, token, pkg, "photo.pdf", LABEL_A)
-    r = c.post(f"/disputes/{DID}/documents/{doc}/exclude", data={"csrf_token": token}, follow_redirects=False)
-    assert r.status_code == 303 and repo.get_document(db, doc)["excluded"] is True
+    # v1.1.2: the leave-out route also takes the file out of the response; this state (attached and left out) now comes
+    # only from a file attached while it is left out, so the test sets it directly
+    repo.set_document_excluded(db, doc, True)
     return pkg, doc
 
 
@@ -329,7 +330,7 @@ def test_the_print_view_of_a_never_sent_package_does_not_say_the_file_was_sent(e
     assert r.status_code == 200
     note = exhibit_note(r.text)
     assert note is not None
-    assert note.text() == "Attached to the response (it is sent with it), but left out of the checks."
+    assert note.text() == "Attached to the response, but left out of the checks: it must be removed from the response before it can be approved or sent."
     # the header says "Not sent to PayPal"; no other sentence may claim a send
     assert r.text.count("sent to PayPal") == r.text.count("Not sent to PayPal")
 
@@ -337,8 +338,10 @@ def test_the_print_view_of_a_never_sent_package_does_not_say_the_file_was_sent(e
 def test_the_print_view_says_sent_when_a_confirmed_send_carried_that_exact_file(env_print):
     c, db, token, fake = env_print
     pkg, doc = excluded_attached(c, db, token)
-    approve_passive(c, token, pkg)
+    repo.set_document_excluded(db, doc, False)                    # v1.1.2: a left-out file stops the approval, so the file
+    approve_passive(c, token, pkg)                                # is left out only after the package was approved and sent
     seed_confirmed(db, pkg)
+    repo.set_document_excluded(db, doc, True)
     r = c.get(f"/disputes/{DID}/packages/{pkg}/print")
     assert exhibit_note(r.text).text() == "Attached to the response and sent to PayPal, but left out of the checks."
 
@@ -352,9 +355,9 @@ def test_the_print_view_does_not_say_sent_for_another_file_with_the_same_name(en
     v2 = new_package(c, token)
     add_claims(db, v2, STATEMENT)
     doc2 = add_file(c, db, token, v2, "photo.pdf", LABEL_B)       # same name, other bytes, never sent
-    c.post(f"/disputes/{DID}/documents/{doc2}/exclude", data={"csrf_token": token}, follow_redirects=False)
+    repo.set_document_excluded(db, doc2, True)                    # set directly: the route would also remove it (v1.1.2)
     r = c.get(f"/disputes/{DID}/packages/{v2}/print")
-    assert exhibit_note(r.text).text() == "Attached to the response (it is sent with it), but left out of the checks."
+    assert exhibit_note(r.text).text() == "Attached to the response, but left out of the checks: it must be removed from the response before it can be approved or sent."
 
 
 # --- message label needs message_listed

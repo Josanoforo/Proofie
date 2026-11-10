@@ -1,0 +1,2381 @@
+{
+ "class_D_pairs_report_flag_not_recorded": 0,
+ "closed_before_send": {
+  "closed_pairs": 3,
+  "currencies": {
+   "MXN": {
+    "a_lost_withheld": {
+     "by_class": {},
+     "cents": 0,
+     "count": 0,
+     "in_headline": true,
+     "pairs": [],
+     "sources": [],
+     "without_those_pairs": {
+      "A_lost_cents": 2054700,
+      "B_follow_lost_cents": 1349900,
+      "B_hard_lost_cents": 1349900,
+      "DIFF_cents": 704800,
+      "DIFF_hard_cents": 704800,
+      "pairs": 3,
+      "sold_per_arm_cents": 2054700
+     }
+    },
+    "a_lost_withheld_clean": {
+     "A_lost_cents_without_them": 2054700,
+     "A_lost_count_without_them": 3,
+     "cents": 0,
+     "count": 0,
+     "pairs": [],
+     "sources": []
+    },
+    "arms": {
+     "A": {
+      "adjudicated_by_sandbox": 3,
+      "decided_by_rule_only": 0,
+      "exposed_cents": 1349900,
+      "fees_minor": 95496,
+      "fees_published_minor": 33000,
+      "fees_recorded_members": 3,
+      "kept_cents": 0,
+      "lost_by_dispute_amount_count": 0,
+      "lost_by_refund_count": 3,
+      "lost_cents": 2054700,
+      "lost_count": 3,
+      "n": 3,
+      "off_expected": [
+       "IMP1-08",
+       "IMP1-11"
+      ],
+      "record_not_as_expected": [],
+      "sold_cents": 2054700,
+      "sources": [
+       189,
+       194,
+       210
+      ]
+     },
+     "B_follow": {
+      "adjudicated_by_sandbox": 3,
+      "decided_by_rule_only": 0,
+      "exposed_cents": 0,
+      "fees_minor": 62289,
+      "fees_published_minor": 11000,
+      "fees_recorded_members": 1,
+      "kept_cents": 704800,
+      "lost_by_dispute_amount_count": 0,
+      "lost_by_refund_count": 1,
+      "lost_cents": 1349900,
+      "lost_count": 1,
+      "n": 3,
+      "off_expected": [
+       "IMP1-121"
+      ],
+      "record_not_as_expected": [],
+      "sold_cents": 2054700,
+      "sources": [
+       190,
+       195,
+       211
+      ]
+     },
+     "B_hard": {
+      "adjudicated_by_sandbox": 2,
+      "decided_by_rule_only": 1,
+      "exposed_cents": 1349900,
+      "fees_minor": 0,
+      "fees_published_minor": 11000,
+      "fees_recorded_members": 0,
+      "kept_cents": 704800,
+      "lost_by_dispute_amount_count": 1,
+      "lost_by_refund_count": 0,
+      "lost_cents": 1349900,
+      "lost_count": 1,
+      "n": 3,
+      "off_expected": [],
+      "record_not_as_expected": [],
+      "sold_cents": 2054700,
+      "sources": [
+       190,
+       195,
+       317
+      ]
+     }
+    },
+    "b_either_flag": {
+     "cents": 0,
+     "count": 0,
+     "headline_policy_members": 0,
+     "if_counted_as_lost": {
+      "B_follow_kept_cents": 704800,
+      "B_follow_lost_cents": 1349900,
+      "B_follow_lost_count": 1,
+      "DIFF_cents": 704800,
+      "DIFF_with_fees_minor": 738007,
+      "note": "the members counted as lost here have no fee on PayPal's record (they were kept), so no fee is added for them"
+     },
+     "in_headline": true,
+     "members": [],
+     "of_those_kept": 0,
+     "sources": []
+    },
+    "b_manual_statement": {
+     "cents": 0,
+     "count": 0,
+     "headline_policy_members": 0,
+     "if_counted_as_lost": {
+      "B_follow_kept_cents": 704800,
+      "B_follow_lost_cents": 1349900,
+      "B_follow_lost_count": 1,
+      "DIFF_cents": 704800,
+      "DIFF_with_fees_minor": 738007,
+      "note": "the members counted as lost here have no fee on PayPal's record (they were kept), so no fee is added for them"
+     },
+     "in_headline": true,
+     "members": [],
+     "of_those_kept": 0,
+     "sources": []
+    },
+    "b_removed_statements": {
+     "cents": 0,
+     "count": 0,
+     "headline_policy_members": 0,
+     "if_counted_as_lost": {
+      "B_follow_kept_cents": 704800,
+      "B_follow_lost_cents": 1349900,
+      "B_follow_lost_count": 1,
+      "DIFF_cents": 704800,
+      "DIFF_with_fees_minor": 738007,
+      "note": "the members counted as lost here have no fee on PayPal's record (they were kept), so no fee is added for them"
+     },
+     "in_headline": true,
+     "members": [],
+     "of_those_kept": 0,
+     "sources": []
+    },
+    "classes": {
+     "C": {
+      "A": {
+       "lost": 2,
+       "lost_cents": 704800,
+       "n": 2
+      },
+      "B_follow": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 2
+      },
+      "B_hard": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 2
+      }
+     },
+     "D": {
+      "A": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      },
+      "B_follow": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      },
+      "B_hard": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      }
+     },
+     "G": {
+      "A": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      },
+      "B_follow": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      },
+      "B_hard": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      }
+     },
+     "M": {
+      "A": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      },
+      "B_follow": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      },
+      "B_hard": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      }
+     },
+     "P": {
+      "A": {
+       "lost": 1,
+       "lost_cents": 1349900,
+       "n": 1
+      },
+      "B_follow": {
+       "lost": 1,
+       "lost_cents": 1349900,
+       "n": 1
+      },
+      "B_hard": {
+       "lost": 1,
+       "lost_cents": 1349900,
+       "n": 1
+      }
+     },
+     "T": {
+      "A": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      },
+      "B_follow": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      },
+      "B_hard": {
+       "lost": 0,
+       "lost_cents": 0,
+       "n": 0
+      }
+     }
+    },
+    "diff_A_minus_B_follow": {
+     "DIFF_kept_B_minus_kept_A_cents": 704800,
+     "DIFF_with_fees_minor": 738007,
+     "fees_minor": 33207,
+     "kept_diff_cents": 704800,
+     "lost_cents": 704800,
+     "per_100_orders_fees_minor": 1106900,
+     "per_100_orders_lost_cents": 23493333
+    },
+    "diff_A_minus_B_hard": {
+     "DIFF_kept_B_minus_kept_A_cents": 704800,
+     "DIFF_with_fees_minor": 800296,
+     "fees_minor": 95496,
+     "kept_diff_cents": 704800,
+     "lost_cents": 704800,
+     "per_100_orders_fees_minor": 3183200,
+     "per_100_orders_lost_cents": 23493333
+    },
+    "fee_per_lost_minor": 11000,
+    "fee_source": "FEES.md (a) MX merchant-fees page row \"Peso mexicano | 110.00 MXN\"",
+    "member_flags": {
+     "flags": {},
+     "in_headline": true
+    },
+    "pairs": 3,
+    "resumed_after_paypal_error": {
+     "A": {
+      "count": 0,
+      "members": []
+     },
+     "B_follow": {
+      "count": 0,
+      "members": []
+     },
+     "B_hard": {
+      "count": 0,
+      "members": []
+     },
+     "in_headline": true
+    },
+    "sold_per_arm_cents": 2054700
+   }
+  },
+  "label": "closed before its send",
+  "members": {
+   "IMP1-08": {
+    "closed": true,
+    "closed_line": 189,
+    "final_outcome": "BUYER_FAVOR",
+    "route": "route_1_sandbox_accept_claim_then_adjudication"
+   },
+   "IMP1-108": {
+    "closed": true,
+    "closed_line": 190,
+    "final_outcome": "SELLER_FAVOR",
+    "route": "route_1_sandbox_adjudication"
+   },
+   "IMP1-11": {
+    "closed": true,
+    "closed_line": 194,
+    "final_outcome": "BUYER_FAVOR",
+    "route": "route_1_sandbox_accept_claim_then_adjudication"
+   },
+   "IMP1-111": {
+    "closed": true,
+    "closed_line": 195,
+    "final_outcome": "SELLER_FAVOR",
+    "route": "route_1_sandbox_adjudication"
+   },
+   "IMP1-121": {
+    "closed": true,
+    "closed_line": 211,
+    "final_outcome": "BUYER_FAVOR",
+    "route": "route_1_sandbox_accept_claim_then_adjudication"
+   },
+   "IMP1-21": {
+    "closed": true,
+    "closed_line": 210,
+    "final_outcome": "BUYER_FAVOR",
+    "route": "route_1_sandbox_adjudication"
+   },
+   "IMP1-221": {
+    "closed": true,
+    "closed_line": 317,
+    "final_outcome": "BUYER_FAVOR",
+    "route": "route_2_rule_only_posted_not_resolved_in_time"
+   }
+  },
+  "merged_into_headline": false,
+  "pairs": [
+   "W01-08",
+   "W01-11",
+   "W01-21"
+  ]
+ },
+ "closed_pairs": 70,
+ "closed_pairs_unindexed_line": 0,
+ "currencies": {
+  "MXN": {
+   "a_lost_withheld": {
+    "by_class": {
+     "G": {
+      "cents": 3264355,
+      "count": 7
+     },
+     "P": {
+      "cents": 2957505,
+      "count": 3
+     }
+    },
+    "cents": 6221860,
+    "count": 10,
+    "in_headline": true,
+    "pairs": [
+     "W01-23",
+     "W01-24",
+     "W01-25",
+     "W01-26",
+     "W01-36",
+     "W02-26",
+     "W02-28",
+     "W02-29",
+     "W02-31",
+     "W02-32"
+    ],
+    "sources": [
+     213,
+     216,
+     218,
+     220,
+     240,
+     279,
+     281,
+     282,
+     284,
+     285
+    ],
+    "without_those_pairs": {
+     "A_lost_cents": 12374140,
+     "B_follow_lost_cents": 1695724,
+     "B_hard_lost_cents": 7806821,
+     "DIFF_cents": 10678416,
+     "DIFF_hard_cents": 4567319,
+     "pairs": 48,
+     "sold_per_arm_cents": 25138254
+    }
+   },
+   "a_lost_withheld_clean": {
+    "A_lost_cents_without_them": 18596000,
+    "A_lost_count_without_them": 38,
+    "cents": 0,
+    "count": 0,
+    "pairs": [],
+    "sources": []
+   },
+   "arms": {
+    "A": {
+     "adjudicated_by_sandbox": 57,
+     "decided_by_rule_only": 1,
+     "exposed_cents": 12374140,
+     "fees_minor": 795580,
+     "fees_published_minor": 418000,
+     "fees_recorded_members": 37,
+     "kept_cents": 12764114,
+     "lost_by_dispute_amount_count": 1,
+     "lost_by_refund_count": 37,
+     "lost_cents": 18596000,
+     "lost_count": 38,
+     "n": 58,
+     "off_expected": [],
+     "record_not_as_expected": [],
+     "sold_cents": 31360114,
+     "sources": [
+      175,
+      177,
+      179,
+      181,
+      183,
+      185,
+      187,
+      191,
+      193,
+      196,
+      198,
+      200,
+      202,
+      204,
+      206,
+      207,
+      208,
+      209,
+      310,
+      213,
+      216,
+      218,
+      220,
+      222,
+      224,
+      226,
+      228,
+      230,
+      232,
+      234,
+      236,
+      237,
+      240,
+      242,
+      244,
+      248,
+      249,
+      253,
+      255,
+      259,
+      261,
+      265,
+      266,
+      269,
+      272,
+      273,
+      275,
+      276,
+      278,
+      279,
+      281,
+      282,
+      284,
+      285,
+      287,
+      288,
+      290,
+      291
+     ]
+    },
+    "B_follow": {
+     "adjudicated_by_sandbox": 56,
+     "decided_by_rule_only": 2,
+     "exposed_cents": 1695724,
+     "fees_minor": 80446,
+     "fees_published_minor": 66000,
+     "fees_recorded_members": 6,
+     "kept_cents": 29664390,
+     "lost_by_dispute_amount_count": 0,
+     "lost_by_refund_count": 6,
+     "lost_cents": 1695724,
+     "lost_count": 6,
+     "n": 58,
+     "off_expected": [],
+     "record_not_as_expected": [],
+     "sold_cents": 31360114,
+     "sources": [
+      176,
+      178,
+      180,
+      182,
+      184,
+      186,
+      188,
+      192,
+      319,
+      197,
+      199,
+      201,
+      203,
+      205,
+      320,
+      321,
+      322,
+      323,
+      212,
+      214,
+      292,
+      219,
+      221,
+      223,
+      225,
+      227,
+      229,
+      231,
+      233,
+      235,
+      328,
+      238,
+      241,
+      243,
+      245,
+      325,
+      250,
+      254,
+      256,
+      260,
+      262,
+      293,
+      267,
+      295,
+      329,
+      333,
+      332,
+      297,
+      300,
+      301,
+      305,
+      306,
+      308,
+      309,
+      311,
+      313,
+      315,
+      316
+     ]
+    },
+    "B_hard": {
+     "adjudicated_by_sandbox": 54,
+     "decided_by_rule_only": 4,
+     "exposed_cents": 7806821,
+     "fees_minor": 223784,
+     "fees_published_minor": 110000,
+     "fees_recorded_members": 8,
+     "kept_cents": 23553293,
+     "lost_by_dispute_amount_count": 2,
+     "lost_by_refund_count": 8,
+     "lost_cents": 7806821,
+     "lost_count": 10,
+     "n": 58,
+     "off_expected": [
+      "IMP1-223",
+      "IMP1-224",
+      "IMP1-2226"
+     ],
+     "record_not_as_expected": [],
+     "sold_cents": 31360114,
+     "sources": [
+      176,
+      178,
+      180,
+      182,
+      184,
+      186,
+      188,
+      192,
+      319,
+      197,
+      199,
+      201,
+      203,
+      205,
+      320,
+      321,
+      322,
+      323,
+      318,
+      215,
+      217,
+      219,
+      221,
+      223,
+      225,
+      227,
+      229,
+      231,
+      233,
+      235,
+      328,
+      239,
+      241,
+      243,
+      245,
+      325,
+      250,
+      254,
+      256,
+      260,
+      262,
+      293,
+      267,
+      295,
+      329,
+      333,
+      332,
+      298,
+      326,
+      303,
+      305,
+      306,
+      308,
+      309,
+      311,
+      313,
+      315,
+      316
+     ]
+    }
+   },
+   "b_either_flag": {
+    "cents": 5787762,
+    "count": 7,
+    "headline_policy_members": 7,
+    "if_counted_as_lost": {
+     "B_follow_kept_cents": 23876628,
+     "B_follow_lost_cents": 7483486,
+     "B_follow_lost_count": 13,
+     "DIFF_cents": 11112514,
+     "DIFF_with_fees_minor": 11827648,
+     "note": "the members counted as lost here have no fee on PayPal's record (they were kept), so no fee is added for them"
+    },
+    "in_headline": true,
+    "members": [
+     "IMP1-124",
+     "IMP1-127",
+     "IMP1-2104",
+     "IMP1-2119",
+     "IMP1-2120",
+     "IMP1-2132",
+     "IMP1-3102"
+    ],
+    "of_those_kept": 7,
+    "sources": [
+     292,
+     223,
+     325,
+     329,
+     333,
+     309,
+     316
+    ]
+   },
+   "b_manual_statement": {
+    "cents": 5787762,
+    "count": 7,
+    "headline_policy_members": 7,
+    "if_counted_as_lost": {
+     "B_follow_kept_cents": 23876628,
+     "B_follow_lost_cents": 7483486,
+     "B_follow_lost_count": 13,
+     "DIFF_cents": 11112514,
+     "DIFF_with_fees_minor": 11827648,
+     "note": "the members counted as lost here have no fee on PayPal's record (they were kept), so no fee is added for them"
+    },
+    "in_headline": true,
+    "members": [
+     "IMP1-124",
+     "IMP1-127",
+     "IMP1-2104",
+     "IMP1-2119",
+     "IMP1-2120",
+     "IMP1-2132",
+     "IMP1-3102"
+    ],
+    "of_those_kept": 7,
+    "sources": [
+     292,
+     223,
+     325,
+     329,
+     333,
+     309,
+     316
+    ]
+   },
+   "b_removed_statements": {
+    "cents": 0,
+    "count": 0,
+    "headline_policy_members": 0,
+    "if_counted_as_lost": {
+     "B_follow_kept_cents": 29664390,
+     "B_follow_lost_cents": 1695724,
+     "B_follow_lost_count": 6,
+     "DIFF_cents": 16900276,
+     "DIFF_with_fees_minor": 17615410,
+     "note": "the members counted as lost here have no fee on PayPal's record (they were kept), so no fee is added for them"
+    },
+    "in_headline": true,
+    "members": [],
+    "of_those_kept": 0,
+    "sources": []
+   },
+   "classes": {
+    "C": {
+     "A": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 20
+     },
+     "B_follow": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 20
+     },
+     "B_hard": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 20
+     }
+    },
+    "D": {
+     "A": {
+      "lost": 8,
+      "lost_cents": 1327284,
+      "n": 8
+     },
+     "B_follow": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 8
+     },
+     "B_hard": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 8
+     }
+    },
+    "G": {
+     "A": {
+      "lost": 9,
+      "lost_cents": 3614155,
+      "n": 9
+     },
+     "B_follow": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 9
+     },
+     "B_hard": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 9
+     }
+    },
+    "M": {
+     "A": {
+      "lost": 6,
+      "lost_cents": 1695724,
+      "n": 6
+     },
+     "B_follow": {
+      "lost": 6,
+      "lost_cents": 1695724,
+      "n": 6
+     },
+     "B_hard": {
+      "lost": 6,
+      "lost_cents": 1695724,
+      "n": 6
+     }
+    },
+    "P": {
+     "A": {
+      "lost": 7,
+      "lost_cents": 9068602,
+      "n": 7
+     },
+     "B_follow": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 7
+     },
+     "B_hard": {
+      "lost": 4,
+      "lost_cents": 6111097,
+      "n": 7
+     }
+    },
+    "T": {
+     "A": {
+      "lost": 8,
+      "lost_cents": 2890235,
+      "n": 8
+     },
+     "B_follow": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 8
+     },
+     "B_hard": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 8
+     }
+    }
+   },
+   "diff_A_minus_B_follow": {
+    "DIFF_kept_B_minus_kept_A_cents": 16900276,
+    "DIFF_with_fees_minor": 17615410,
+    "fees_minor": 715134,
+    "kept_diff_cents": 16900276,
+    "lost_cents": 16900276,
+    "per_100_orders_fees_minor": 1232989,
+    "per_100_orders_lost_cents": 29138406
+   },
+   "diff_A_minus_B_hard": {
+    "DIFF_kept_B_minus_kept_A_cents": 10789179,
+    "DIFF_with_fees_minor": 11360975,
+    "fees_minor": 571796,
+    "kept_diff_cents": 10789179,
+    "lost_cents": 10789179,
+    "per_100_orders_fees_minor": 985855,
+    "per_100_orders_lost_cents": 18602032
+   },
+   "fee_per_lost_minor": 11000,
+   "fee_source": "FEES.md (a) MX merchant-fees page row \"Peso mexicano | 110.00 MXN\"",
+   "member_flags": {
+    "flags": {
+     "manual_statement": {
+      "A": {
+       "cents": 0,
+       "count": 0,
+       "members": []
+      },
+      "B_follow": {
+       "cents": 5787762,
+       "count": 7,
+       "members": [
+        "IMP1-124",
+        "IMP1-127",
+        "IMP1-2104",
+        "IMP1-2119",
+        "IMP1-2120",
+        "IMP1-2132",
+        "IMP1-3102"
+       ]
+      },
+      "B_hard": {
+       "cents": 5367862,
+       "count": 6,
+       "members": [
+        "IMP1-127",
+        "IMP1-2104",
+        "IMP1-2119",
+        "IMP1-2120",
+        "IMP1-2132",
+        "IMP1-3102"
+       ]
+      }
+     }
+    },
+    "in_headline": true
+   },
+   "pairs": 58,
+   "resumed_after_paypal_error": {
+    "A": {
+     "count": 0,
+     "members": []
+    },
+    "B_follow": {
+     "count": 0,
+     "members": []
+    },
+    "B_hard": {
+     "count": 0,
+     "members": []
+    },
+    "in_headline": true
+   },
+   "sold_per_arm_cents": 31360114
+  },
+  "USD": {
+   "a_lost_withheld": {
+    "by_class": {
+     "G": {
+      "cents": 59861,
+      "count": 1
+     },
+     "P": {
+      "cents": 51423,
+      "count": 1
+     }
+    },
+    "cents": 111284,
+    "count": 2,
+    "in_headline": true,
+    "pairs": [
+     "W02-24",
+     "W02-30"
+    ],
+    "sources": [
+     277,
+     283
+    ],
+    "without_those_pairs": {
+     "A_lost_cents": 300239,
+     "B_follow_lost_cents": 67538,
+     "B_hard_lost_cents": 177863,
+     "DIFF_cents": 232701,
+     "DIFF_hard_cents": 122376,
+     "pairs": 10,
+     "sold_per_arm_cents": 344453
+    }
+   },
+   "a_lost_withheld_clean": {
+    "A_lost_cents_without_them": 411523,
+    "A_lost_count_without_them": 8,
+    "cents": 0,
+    "count": 0,
+    "pairs": [],
+    "sources": []
+   },
+   "arms": {
+    "A": {
+     "adjudicated_by_sandbox": 12,
+     "decided_by_rule_only": 0,
+     "exposed_cents": 300239,
+     "fees_minor": 19128,
+     "fees_published_minor": 8000,
+     "fees_recorded_members": 8,
+     "kept_cents": 44214,
+     "lost_by_dispute_amount_count": 0,
+     "lost_by_refund_count": 8,
+     "lost_cents": 411523,
+     "lost_count": 8,
+     "n": 12,
+     "off_expected": [],
+     "record_not_as_expected": [],
+     "sold_cents": 455737,
+     "sources": [
+      246,
+      251,
+      257,
+      263,
+      268,
+      271,
+      274,
+      277,
+      280,
+      283,
+      286,
+      289
+     ]
+    },
+    "B_follow": {
+     "adjudicated_by_sandbox": 12,
+     "decided_by_rule_only": 0,
+     "exposed_cents": 67538,
+     "fees_minor": 3163,
+     "fees_published_minor": 2000,
+     "fees_recorded_members": 2,
+     "kept_cents": 388199,
+     "lost_by_dispute_amount_count": 0,
+     "lost_by_refund_count": 2,
+     "lost_cents": 67538,
+     "lost_count": 2,
+     "n": 12,
+     "off_expected": [],
+     "record_not_as_expected": [],
+     "sold_cents": 455737,
+     "sources": [
+      247,
+      252,
+      258,
+      264,
+      294,
+      330,
+      331,
+      299,
+      304,
+      307,
+      312,
+      314
+     ]
+    },
+    "B_hard": {
+     "adjudicated_by_sandbox": 11,
+     "decided_by_rule_only": 1,
+     "exposed_cents": 177863,
+     "fees_minor": 3163,
+     "fees_published_minor": 3000,
+     "fees_recorded_members": 2,
+     "kept_cents": 277874,
+     "lost_by_dispute_amount_count": 1,
+     "lost_by_refund_count": 2,
+     "lost_cents": 177863,
+     "lost_count": 3,
+     "n": 12,
+     "off_expected": [
+      "IMP1-2224"
+     ],
+     "record_not_as_expected": [],
+     "sold_cents": 455737,
+     "sources": [
+      247,
+      252,
+      258,
+      264,
+      294,
+      330,
+      331,
+      302,
+      327,
+      307,
+      312,
+      314
+     ]
+    }
+   },
+   "b_either_flag": {
+    "cents": 14123,
+    "count": 1,
+    "headline_policy_members": 1,
+    "if_counted_as_lost": {
+     "B_follow_kept_cents": 374076,
+     "B_follow_lost_cents": 81661,
+     "B_follow_lost_count": 3,
+     "DIFF_cents": 329862,
+     "DIFF_with_fees_minor": 345827,
+     "note": "the members counted as lost here have no fee on PayPal's record (they were kept), so no fee is added for them"
+    },
+    "in_headline": true,
+    "members": [
+     "IMP1-2109"
+    ],
+    "of_those_kept": 1,
+    "sources": [
+     258
+    ]
+   },
+   "b_manual_statement": {
+    "cents": 14123,
+    "count": 1,
+    "headline_policy_members": 1,
+    "if_counted_as_lost": {
+     "B_follow_kept_cents": 374076,
+     "B_follow_lost_cents": 81661,
+     "B_follow_lost_count": 3,
+     "DIFF_cents": 329862,
+     "DIFF_with_fees_minor": 345827,
+     "note": "the members counted as lost here have no fee on PayPal's record (they were kept), so no fee is added for them"
+    },
+    "in_headline": true,
+    "members": [
+     "IMP1-2109"
+    ],
+    "of_those_kept": 1,
+    "sources": [
+     258
+    ]
+   },
+   "b_removed_statements": {
+    "cents": 0,
+    "count": 0,
+    "headline_policy_members": 0,
+    "if_counted_as_lost": {
+     "B_follow_kept_cents": 388199,
+     "B_follow_lost_cents": 67538,
+     "B_follow_lost_count": 2,
+     "DIFF_cents": 343985,
+     "DIFF_with_fees_minor": 359950,
+     "note": "the members counted as lost here have no fee on PayPal's record (they were kept), so no fee is added for them"
+    },
+    "in_headline": true,
+    "members": [],
+    "of_those_kept": 0,
+    "sources": []
+   },
+   "classes": {
+    "C": {
+     "A": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 4
+     },
+     "B_follow": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 4
+     },
+     "B_hard": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 4
+     }
+    },
+    "D": {
+     "A": {
+      "lost": 2,
+      "lost_cents": 45740,
+      "n": 2
+     },
+     "B_follow": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 2
+     },
+     "B_hard": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 2
+     }
+    },
+    "G": {
+     "A": {
+      "lost": 1,
+      "lost_cents": 59861,
+      "n": 1
+     },
+     "B_follow": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 1
+     },
+     "B_hard": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 1
+     }
+    },
+    "M": {
+     "A": {
+      "lost": 2,
+      "lost_cents": 67538,
+      "n": 2
+     },
+     "B_follow": {
+      "lost": 2,
+      "lost_cents": 67538,
+      "n": 2
+     },
+     "B_hard": {
+      "lost": 2,
+      "lost_cents": 67538,
+      "n": 2
+     }
+    },
+    "P": {
+     "A": {
+      "lost": 2,
+      "lost_cents": 161748,
+      "n": 2
+     },
+     "B_follow": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 2
+     },
+     "B_hard": {
+      "lost": 1,
+      "lost_cents": 110325,
+      "n": 2
+     }
+    },
+    "T": {
+     "A": {
+      "lost": 1,
+      "lost_cents": 76636,
+      "n": 1
+     },
+     "B_follow": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 1
+     },
+     "B_hard": {
+      "lost": 0,
+      "lost_cents": 0,
+      "n": 1
+     }
+    }
+   },
+   "diff_A_minus_B_follow": {
+    "DIFF_kept_B_minus_kept_A_cents": 343985,
+    "DIFF_with_fees_minor": 359950,
+    "fees_minor": 15965,
+    "kept_diff_cents": 343985,
+    "lost_cents": 343985,
+    "per_100_orders_fees_minor": 133041,
+    "per_100_orders_lost_cents": 2866541
+   },
+   "diff_A_minus_B_hard": {
+    "DIFF_kept_B_minus_kept_A_cents": 233660,
+    "DIFF_with_fees_minor": 249625,
+    "fees_minor": 15965,
+    "kept_diff_cents": 233660,
+    "lost_cents": 233660,
+    "per_100_orders_fees_minor": 133041,
+    "per_100_orders_lost_cents": 1947166
+   },
+   "fee_per_lost_minor": 1000,
+   "fee_source": "FEES.md (a2) MX merchant-fees page row \"Dolar estadounidense | 10.00 USD\"",
+   "member_flags": {
+    "flags": {
+     "manual_statement": {
+      "A": {
+       "cents": 0,
+       "count": 0,
+       "members": []
+      },
+      "B_follow": {
+       "cents": 14123,
+       "count": 1,
+       "members": [
+        "IMP1-2109"
+       ]
+      },
+      "B_hard": {
+       "cents": 14123,
+       "count": 1,
+       "members": [
+        "IMP1-2109"
+       ]
+      }
+     },
+     "resumed_after_paypal_error": {
+      "A": {
+       "cents": 0,
+       "count": 0,
+       "members": []
+      },
+      "B_follow": {
+       "cents": 0,
+       "count": 0,
+       "members": []
+      },
+      "B_hard": {
+       "cents": 51423,
+       "count": 1,
+       "members": [
+        "IMP1-2224"
+       ]
+      }
+     }
+    },
+    "in_headline": true
+   },
+   "pairs": 12,
+   "resumed_after_paypal_error": {
+    "A": {
+     "count": 0,
+     "members": []
+    },
+    "B_follow": {
+     "count": 0,
+     "members": []
+    },
+    "B_hard": {
+     "count": 1,
+     "members": [
+      "IMP1-2224"
+     ]
+    },
+    "in_headline": true
+   },
+   "sold_per_arm_cents": 455737
+  }
+ },
+ "film": {
+  "held": [
+   "IMP1-902"
+  ],
+  "members": {
+   "IMP1-901": {
+    "amount_refunded_to_buyer_cents": 50000,
+    "arm": "B_follow",
+    "closed": true,
+    "closed_line": 324,
+    "evidence": [
+     {
+      "file": "evidence/impact_decide_IMP1-901.jsonl",
+      "line": 56,
+      "op": "decide_dispute_read"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-901.jsonl",
+      "line": 57,
+      "op": "decide_tracker_read"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-901.jsonl",
+      "line": 58,
+      "op": "decide_order_read"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-901.jsonl",
+      "line": 59,
+      "op": "decide_rule"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-901.jsonl",
+      "line": 41,
+      "op": "dispute_state_adjudicate_win"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-901.jsonl",
+      "line": 43,
+      "op": "state_transition"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-901.jsonl",
+      "line": 60,
+      "op": "decide_dispute_read_final"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-901.jsonl",
+      "line": 61,
+      "op": "decide_capture_read_final"
+     }
+    ],
+    "expected": "SELLER_FAVOR",
+    "fee_minor": 0,
+    "fee_published_minor": 0,
+    "final_outcome": "SELLER_FAVOR",
+    "final_status": "RESOLVED",
+    "kept_cents": 50000,
+    "label": null,
+    "loss_cents": 0,
+    "loss_source": null,
+    "off_expected": false,
+    "outcome_code": "RESOLVED_WITH_PAYOUT",
+    "outcome_reason": "REPRESENTED_BY_PAYPAL",
+    "record_pattern": "kept",
+    "refund_cents": null,
+    "route": "route_1_sandbox_adjudication",
+    "sale_breakdown_cents": {
+     "gross": 50000,
+     "net": 47246,
+     "paypal_fee": 2754
+    },
+    "seller_debit_cents": 0,
+    "seller_debits": {},
+    "seller_protection_status": "NOT_ELIGIBLE"
+   },
+   "IMP1-903": {
+    "amount_refunded_to_buyer_cents": 50000,
+    "arm": "A",
+    "closed": true,
+    "closed_line": 174,
+    "evidence": [
+     {
+      "file": "evidence/impact_decide_IMP1-903.jsonl",
+      "line": 122,
+      "op": "decide_dispute_read"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-903.jsonl",
+      "line": 123,
+      "op": "decide_tracker_read"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-903.jsonl",
+      "line": 124,
+      "op": "decide_order_read"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-903.jsonl",
+      "line": 125,
+      "op": "decide_rule"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-903.jsonl",
+      "line": 80,
+      "op": "dispute_state_adjudicate_lose"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-903.jsonl",
+      "line": 82,
+      "op": "state_transition"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-903.jsonl",
+      "line": 126,
+      "op": "decide_dispute_read_final"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-903.jsonl",
+      "line": 127,
+      "op": "decide_capture_read_final"
+     }
+    ],
+    "expected": "BUYER_FAVOR",
+    "fee_minor": 2754,
+    "fee_published_minor": 11000,
+    "final_outcome": "BUYER_FAVOR",
+    "final_status": "RESOLVED",
+    "kept_cents": 0,
+    "label": "earlier document set, not the film's twin",
+    "loss_cents": 50000,
+    "loss_source": "seller_debit_on_dispute_record",
+    "off_expected": false,
+    "outcome_code": "RESOLVED_BUYER_FAVOUR",
+    "outcome_reason": "INELIGIBLE_SELLER_PROTECTION_POLICY",
+    "record_pattern": "lost",
+    "refund_cents": null,
+    "route": "route_1_sandbox_adjudication",
+    "sale_breakdown_cents": {
+     "gross": 50000,
+     "net": 47246,
+     "paypal_fee": 2754
+    },
+    "seller_debit_cents": 50000,
+    "seller_debits": {
+     "DISPUTE_SETTLEMENT": [
+      50000
+     ],
+     "DISPUTE_SETTLEMENT_FEE": [
+      2754
+     ]
+    },
+    "seller_protection_status": "NOT_ELIGIBLE"
+   },
+   "IMP1-905": {
+    "amount_refunded_to_buyer_cents": 50000,
+    "arm": "A",
+    "closed": true,
+    "closed_line": 173,
+    "evidence": [
+     {
+      "file": "evidence/impact_decide_IMP1-905.jsonl",
+      "line": 53,
+      "op": "decide_dispute_read"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-905.jsonl",
+      "line": 54,
+      "op": "decide_tracker_read"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-905.jsonl",
+      "line": 55,
+      "op": "decide_order_read"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-905.jsonl",
+      "line": 56,
+      "op": "decide_rule"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-905.jsonl",
+      "line": 33,
+      "op": "dispute_state_adjudicate_lose"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-905.jsonl",
+      "line": 35,
+      "op": "state_transition"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-905.jsonl",
+      "line": 57,
+      "op": "decide_dispute_read_final"
+     },
+     {
+      "file": "evidence/impact_decide_IMP1-905.jsonl",
+      "line": 58,
+      "op": "decide_capture_read_final"
+     }
+    ],
+    "expected": "BUYER_FAVOR",
+    "fee_minor": 2754,
+    "fee_published_minor": 11000,
+    "final_outcome": "BUYER_FAVOR",
+    "final_status": "RESOLVED",
+    "kept_cents": 0,
+    "label": null,
+    "loss_cents": 50000,
+    "loss_source": "seller_debit_on_dispute_record",
+    "off_expected": false,
+    "outcome_code": "RESOLVED_BUYER_FAVOUR",
+    "outcome_reason": "INELIGIBLE_SELLER_PROTECTION_POLICY",
+    "record_pattern": "lost",
+    "refund_cents": null,
+    "route": "route_1_sandbox_adjudication",
+    "sale_breakdown_cents": {
+     "gross": 50000,
+     "net": 47246,
+     "paypal_fee": 2754
+    },
+    "seller_debit_cents": 50000,
+    "seller_debits": {
+     "DISPUTE_SETTLEMENT": [
+      50000
+     ],
+     "DISPUTE_SETTLEMENT_FEE": [
+      2754
+     ]
+    },
+    "seller_protection_status": "NOT_ELIGIBLE"
+   }
+  },
+  "pair": "FILM-01"
+ },
+ "not_scored_record_fits_neither_pattern": {
+  "label": "resolved, but PayPal's record fits neither pattern: not scored",
+  "members": {},
+  "merged_into_headline": false,
+  "pairs": [
+   "W02-17"
+  ]
+ },
+ "per_check": {
+  "MXN": {
+   "also_fired": {
+    "delivery_status": {
+     "delivery_date": 3,
+     "unsupported_statement": 1
+    },
+    "destination": {
+     "unsupported_statement": 8
+    },
+    "signature": {
+     "unsupported_statement": 1
+    },
+    "tracking_number": {
+     "unsupported_statement": 8
+    }
+   },
+   "approval_layer": {},
+   "checks": {
+    "changed_after_approval": {
+     "by_report_had_sale": {
+      "report_did_not_have_sale": {
+       "stopped_n": 9,
+       "worth_cents": 3614155
+      }
+     },
+     "pairs": [
+      "W01-25",
+      "W01-26",
+      "W01-27",
+      "W01-28",
+      "W01-36",
+      "W02-28",
+      "W02-29",
+      "W02-31",
+      "W02-32"
+     ],
+     "stopped_n": 9,
+     "worth_cents": 3614155
+    },
+    "delivery_status": {
+     "by_report_had_sale": {
+      "report_did_not_have_sale": {
+       "stopped_n": 3,
+       "worth_cents": 2957505
+      }
+     },
+     "pairs": [
+      "W01-23",
+      "W01-24",
+      "W02-26"
+     ],
+     "stopped_n": 3,
+     "worth_cents": 2957505
+    },
+    "destination": {
+     "by_report_had_sale": {
+      "report_had_sale": {
+       "stopped_n": 8,
+       "worth_cents": 1327284
+      }
+     },
+     "pairs": [
+      "W01-17",
+      "W01-18",
+      "W01-19",
+      "W01-20",
+      "W01-34",
+      "W02-19",
+      "W02-20",
+      "W02-22"
+     ],
+     "stopped_n": 8,
+     "worth_cents": 1327284
+    },
+    "signature": {
+     "by_report_had_sale": {
+      "report_did_not_have_sale": {
+       "stopped_n": 4,
+       "worth_cents": 6111097
+      }
+     },
+     "pairs": [
+      "W01-22",
+      "W01-35",
+      "W02-23",
+      "W02-25"
+     ],
+     "stopped_n": 4,
+     "worth_cents": 6111097
+    },
+    "tracking_number": {
+     "by_report_had_sale": {
+      "report_did_not_have_sale": {
+       "stopped_n": 8,
+       "worth_cents": 2890235
+      }
+     },
+     "pairs": [
+      "W01-13",
+      "W01-14",
+      "W01-15",
+      "W01-16",
+      "W01-33",
+      "W02-13",
+      "W02-14",
+      "W02-16"
+     ],
+     "stopped_n": 8,
+     "worth_cents": 2890235
+    }
+   },
+   "false_alarms": {},
+   "pairs_with_fired_checks_known": 59
+  },
+  "USD": {
+   "also_fired": {
+    "delivery_status": {
+     "delivery_date": 1
+    },
+    "destination": {
+     "unsupported_statement": 2
+    },
+    "tracking_number": {
+     "unsupported_statement": 1
+    }
+   },
+   "approval_layer": {},
+   "checks": {
+    "changed_after_approval": {
+     "by_report_had_sale": {
+      "report_did_not_have_sale": {
+       "stopped_n": 1,
+       "worth_cents": 59861
+      }
+     },
+     "pairs": [
+      "W02-30"
+     ],
+     "stopped_n": 1,
+     "worth_cents": 59861
+    },
+    "delivery_status": {
+     "by_report_had_sale": {
+      "report_did_not_have_sale": {
+       "stopped_n": 1,
+       "worth_cents": 51423
+      }
+     },
+     "pairs": [
+      "W02-24"
+     ],
+     "stopped_n": 1,
+     "worth_cents": 51423
+    },
+    "destination": {
+     "by_report_had_sale": {
+      "report_had_sale": {
+       "stopped_n": 2,
+       "worth_cents": 45740
+      }
+     },
+     "pairs": [
+      "W02-18",
+      "W02-21"
+     ],
+     "stopped_n": 2,
+     "worth_cents": 45740
+    },
+    "signature": {
+     "by_report_had_sale": {
+      "report_did_not_have_sale": {
+       "stopped_n": 1,
+       "worth_cents": 110325
+      }
+     },
+     "pairs": [
+      "W02-27"
+     ],
+     "stopped_n": 1,
+     "worth_cents": 110325
+    },
+    "tracking_number": {
+     "by_report_had_sale": {
+      "report_did_not_have_sale": {
+       "stopped_n": 1,
+       "worth_cents": 76636
+      }
+     },
+     "pairs": [
+      "W02-15"
+     ],
+     "stopped_n": 1,
+     "worth_cents": 76636
+    }
+   },
+   "false_alarms": {},
+   "pairs_with_fired_checks_known": 12
+  }
+ },
+ "record_differs_from_rule": {
+  "label": "PayPal's record differs from the rule's outcome (adjudicated by mistake): not scored",
+  "members": {
+   "IMP1-2017": {
+    "amount_cents": 29478,
+    "closed_line": 270,
+    "currency": "MXN",
+    "record_pattern": "kept",
+    "rule_failed": [
+     "2_tracking"
+    ],
+    "rule_outcome": "BUYER_FAVOR"
+   }
+  },
+  "merged_into_headline": false,
+  "pairs": [
+   "W02-17"
+  ]
+ },
+ "seller_protection_status_on_captures": {
+  "by_value": {
+   "NOT_ELIGIBLE": 161
+  },
+  "members": 161,
+  "source": "seller_protection.status of each capture's final GET"
+ },
+ "time": {
+  "A": {
+   "model_ms": {
+    "IMP1-01": 6523,
+    "IMP1-02": 12187,
+    "IMP1-03": 6901,
+    "IMP1-04": 10097,
+    "IMP1-05": 6566,
+    "IMP1-06": 7712,
+    "IMP1-07": 13275,
+    "IMP1-08": 13189,
+    "IMP1-09": 6395,
+    "IMP1-10": 6856,
+    "IMP1-11": 6186,
+    "IMP1-12": 6579,
+    "IMP1-13": 7631,
+    "IMP1-14": 6370,
+    "IMP1-15": 6506,
+    "IMP1-16": 5793,
+    "IMP1-17": 9007,
+    "IMP1-18": 7308,
+    "IMP1-19": 7670,
+    "IMP1-20": 7242,
+    "IMP1-2001": 7493,
+    "IMP1-2002": 7155,
+    "IMP1-2003": 11767,
+    "IMP1-2004": 10131,
+    "IMP1-2005": 7691,
+    "IMP1-2006": 7189,
+    "IMP1-2007": 8137,
+    "IMP1-2008": 7365,
+    "IMP1-2009": 7616,
+    "IMP1-2010": 10329,
+    "IMP1-2011": 10093,
+    "IMP1-2012": 8369,
+    "IMP1-2013": 7081,
+    "IMP1-2014": 6312,
+    "IMP1-2015": 10178,
+    "IMP1-2016": 7238,
+    "IMP1-2017": 8043,
+    "IMP1-2018": 9168,
+    "IMP1-2019": 13828,
+    "IMP1-2020": 15143,
+    "IMP1-2021": 7515,
+    "IMP1-2022": 8277,
+    "IMP1-2023": 8428,
+    "IMP1-2024": 6462,
+    "IMP1-2025": 6889,
+    "IMP1-2026": 8458,
+    "IMP1-2027": 7421,
+    "IMP1-2028": 5278,
+    "IMP1-2029": 13064,
+    "IMP1-2030": 5757,
+    "IMP1-2031": 8315,
+    "IMP1-2032": 5009,
+    "IMP1-2033": 8956,
+    "IMP1-2034": 13215,
+    "IMP1-2035": 6834,
+    "IMP1-2036": 6466,
+    "IMP1-21": 7012,
+    "IMP1-22": 8911,
+    "IMP1-23": 5692,
+    "IMP1-24": 10520,
+    "IMP1-25": 5508,
+    "IMP1-26": 3543,
+    "IMP1-27": 8956,
+    "IMP1-28": 7804,
+    "IMP1-29": 7163,
+    "IMP1-30": 8762,
+    "IMP1-3001": 8331,
+    "IMP1-3002": 6253,
+    "IMP1-31": 7303,
+    "IMP1-32": 6018,
+    "IMP1-33": 10378,
+    "IMP1-34": 7523,
+    "IMP1-35": 12620,
+    "IMP1-36": 12189
+   },
+   "summary": {
+    "median_ms": 7569,
+    "n": 74,
+    "total_ms": 611149
+   }
+  },
+  "B": {
+   "members": {
+    "IMP1-101": {
+     "to_readback_ms": 28936,
+     "to_ready_ms": 11616
+    },
+    "IMP1-102": {
+     "to_readback_ms": 27782,
+     "to_ready_ms": 12807
+    },
+    "IMP1-103": {
+     "to_readback_ms": 28909,
+     "to_ready_ms": 12150
+    },
+    "IMP1-104": {
+     "to_readback_ms": 28999,
+     "to_ready_ms": 12373
+    },
+    "IMP1-105": {
+     "to_readback_ms": 35669,
+     "to_ready_ms": 18593
+    },
+    "IMP1-106": {
+     "to_readback_ms": 31148,
+     "to_ready_ms": 16224
+    },
+    "IMP1-107": {
+     "to_readback_ms": 34687,
+     "to_ready_ms": 17598
+    },
+    "IMP1-108": {
+     "to_readback_ms": 29641,
+     "to_ready_ms": 12713
+    },
+    "IMP1-109": {
+     "to_readback_ms": 31438,
+     "to_ready_ms": 13130
+    },
+    "IMP1-110": {
+     "to_readback_ms": 71161,
+     "to_ready_ms": 56591
+    },
+    "IMP1-111": {
+     "to_readback_ms": 34811,
+     "to_ready_ms": 15527
+    },
+    "IMP1-112": {
+     "to_readback_ms": 32132,
+     "to_ready_ms": 12624
+    },
+    "IMP1-113": {
+     "to_readback_ms": 47732,
+     "to_ready_ms": 30055
+    },
+    "IMP1-114": {
+     "to_readback_ms": 45152,
+     "to_ready_ms": 28120
+    },
+    "IMP1-115": {
+     "to_readback_ms": 35660,
+     "to_ready_ms": 21451
+    },
+    "IMP1-116": {
+     "to_readback_ms": 43953,
+     "to_ready_ms": 25819
+    },
+    "IMP1-117": {
+     "to_readback_ms": 88710,
+     "to_ready_ms": 74712
+    },
+    "IMP1-118": {
+     "to_readback_ms": 40906,
+     "to_ready_ms": 25596
+    },
+    "IMP1-119": {
+     "to_readback_ms": 41439,
+     "to_ready_ms": 25924
+    },
+    "IMP1-120": {
+     "to_readback_ms": 37162,
+     "to_ready_ms": 21627
+    },
+    "IMP1-121": {
+     "to_readback_ms": null,
+     "to_ready_ms": null
+    },
+    "IMP1-122": {
+     "to_readback_ms": 41423,
+     "to_ready_ms": 26238
+    },
+    "IMP1-123": {
+     "to_readback_ms": 44575,
+     "to_ready_ms": 27321
+    },
+    "IMP1-124": {
+     "to_readback_ms": 342260,
+     "to_ready_ms": 325013
+    },
+    "IMP1-125": {
+     "to_readback_ms": 35951,
+     "to_ready_ms": 12762
+    },
+    "IMP1-126": {
+     "to_readback_ms": 35547,
+     "to_ready_ms": 12808
+    },
+    "IMP1-127": {
+     "to_readback_ms": 35972,
+     "to_ready_ms": 13552
+    },
+    "IMP1-128": {
+     "to_readback_ms": 38462,
+     "to_ready_ms": 14682
+    },
+    "IMP1-129": {
+     "to_readback_ms": 38061,
+     "to_ready_ms": 20359
+    },
+    "IMP1-130": {
+     "to_readback_ms": 30202,
+     "to_ready_ms": 13414
+    },
+    "IMP1-131": {
+     "to_readback_ms": 33556,
+     "to_ready_ms": 14033
+    },
+    "IMP1-132": {
+     "to_readback_ms": 32372,
+     "to_ready_ms": 14879
+    },
+    "IMP1-133": {
+     "to_readback_ms": 41937,
+     "to_ready_ms": 27455
+    },
+    "IMP1-134": {
+     "to_readback_ms": 161450,
+     "to_ready_ms": 147508
+    },
+    "IMP1-135": {
+     "to_readback_ms": 39039,
+     "to_ready_ms": 23468
+    },
+    "IMP1-136": {
+     "to_readback_ms": 30805,
+     "to_ready_ms": 12364
+    },
+    "IMP1-2101": {
+     "to_readback_ms": 31057,
+     "to_ready_ms": 14170
+    },
+    "IMP1-2102": {
+     "to_readback_ms": 25332,
+     "to_ready_ms": 11196
+    },
+    "IMP1-2103": {
+     "to_readback_ms": 29474,
+     "to_ready_ms": 12989
+    },
+    "IMP1-2104": {
+     "to_readback_ms": 27346,
+     "to_ready_ms": 12672
+    },
+    "IMP1-2105": {
+     "to_readback_ms": 29009,
+     "to_ready_ms": 13982
+    },
+    "IMP1-2106": {
+     "to_readback_ms": 30971,
+     "to_ready_ms": 13757
+    },
+    "IMP1-2107": {
+     "to_readback_ms": 26373,
+     "to_ready_ms": 10970
+    },
+    "IMP1-2108": {
+     "to_readback_ms": 24814,
+     "to_ready_ms": 10948
+    },
+    "IMP1-2109": {
+     "to_readback_ms": 26947,
+     "to_ready_ms": 10877
+    },
+    "IMP1-2110": {
+     "to_readback_ms": 34515,
+     "to_ready_ms": 17424
+    },
+    "IMP1-2111": {
+     "to_readback_ms": 31280,
+     "to_ready_ms": 13351
+    },
+    "IMP1-2112": {
+     "to_readback_ms": 29009,
+     "to_ready_ms": 11859
+    },
+    "IMP1-2113": {
+     "to_readback_ms": 93230,
+     "to_ready_ms": 75123
+    },
+    "IMP1-2114": {
+     "to_readback_ms": 41943,
+     "to_ready_ms": 25505
+    },
+    "IMP1-2115": {
+     "to_readback_ms": 42236,
+     "to_ready_ms": 25152
+    },
+    "IMP1-2116": {
+     "to_readback_ms": 40121,
+     "to_ready_ms": 23096
+    },
+    "IMP1-2117": {
+     "to_readback_ms": 39440,
+     "to_ready_ms": 21584
+    },
+    "IMP1-2118": {
+     "to_readback_ms": 34042,
+     "to_ready_ms": 20552
+    },
+    "IMP1-2119": {
+     "to_readback_ms": 32374,
+     "to_ready_ms": 18222
+    },
+    "IMP1-2120": {
+     "to_readback_ms": 88238,
+     "to_ready_ms": 72172
+    },
+    "IMP1-2121": {
+     "to_readback_ms": 38880,
+     "to_ready_ms": 22402
+    },
+    "IMP1-2122": {
+     "to_readback_ms": 44723,
+     "to_ready_ms": 27227
+    },
+    "IMP1-2123": {
+     "to_readback_ms": 40047,
+     "to_ready_ms": 24892
+    },
+    "IMP1-2124": {
+     "to_readback_ms": 37851,
+     "to_ready_ms": 21193
+    },
+    "IMP1-2125": {
+     "to_readback_ms": 42964,
+     "to_ready_ms": 26670
+    },
+    "IMP1-2126": {
+     "to_readback_ms": 37601,
+     "to_ready_ms": 20863
+    },
+    "IMP1-2127": {
+     "to_readback_ms": 42644,
+     "to_ready_ms": 23773
+    },
+    "IMP1-2128": {
+     "to_readback_ms": 35195,
+     "to_ready_ms": 12636
+    },
+    "IMP1-2129": {
+     "to_readback_ms": 33355,
+     "to_ready_ms": 11148
+    },
+    "IMP1-2130": {
+     "to_readback_ms": 35408,
+     "to_ready_ms": 12295
+    },
+    "IMP1-2131": {
+     "to_readback_ms": 33806,
+     "to_ready_ms": 11775
+    },
+    "IMP1-2132": {
+     "to_readback_ms": 35102,
+     "to_ready_ms": 11534
+    },
+    "IMP1-2133": {
+     "to_readback_ms": 27903,
+     "to_ready_ms": 10945
+    },
+    "IMP1-2134": {
+     "to_readback_ms": 71957,
+     "to_ready_ms": 55470
+    },
+    "IMP1-2135": {
+     "to_readback_ms": 29841,
+     "to_ready_ms": 12443
+    },
+    "IMP1-2136": {
+     "to_readback_ms": 29464,
+     "to_ready_ms": 12718
+    },
+    "IMP1-221": {
+     "to_readback_ms": 26471,
+     "to_ready_ms": 11207
+    },
+    "IMP1-222": {
+     "to_readback_ms": 29786,
+     "to_ready_ms": 14878
+    },
+    "IMP1-2223": {
+     "to_readback_ms": 25846,
+     "to_ready_ms": 10952
+    },
+    "IMP1-2225": {
+     "to_readback_ms": 28415,
+     "to_ready_ms": 12161
+    },
+    "IMP1-2226": {
+     "to_readback_ms": 39791,
+     "to_ready_ms": 22436
+    },
+    "IMP1-2227": {
+     "to_readback_ms": 28942,
+     "to_ready_ms": 12108
+    },
+    "IMP1-223": {
+     "to_readback_ms": 41946,
+     "to_ready_ms": 24581
+    },
+    "IMP1-224": {
+     "to_readback_ms": 36358,
+     "to_ready_ms": 21752
+    },
+    "IMP1-235": {
+     "to_readback_ms": 25720,
+     "to_ready_ms": 10751
+    },
+    "IMP1-3101": {
+     "to_readback_ms": 28280,
+     "to_ready_ms": 11157
+    },
+    "IMP1-3102": {
+     "to_readback_ms": 28845,
+     "to_ready_ms": 12154
+    }
+   },
+   "summary": {
+    "to_readback_ms": {
+     "median_ms": 34956,
+     "n": 82,
+     "total_ms": 3492531
+    },
+    "to_ready_ms": {
+     "median_ms": 14878,
+     "n": 82,
+     "total_ms": 2088828
+    }
+   },
+   "to_readback_ms": [
+    28936,
+    27782,
+    28909,
+    28999,
+    35669,
+    31148,
+    34687,
+    29641,
+    31438,
+    71161,
+    34811,
+    32132,
+    47732,
+    45152,
+    35660,
+    43953,
+    88710,
+    40906,
+    41439,
+    37162,
+    26471,
+    41423,
+    29786,
+    44575,
+    41946,
+    342260,
+    36358,
+    35951,
+    35547,
+    35972,
+    38462,
+    38061,
+    30202,
+    33556,
+    32372,
+    41937,
+    161450,
+    39039,
+    25720,
+    30805,
+    31057,
+    25332,
+    29474,
+    27346,
+    29009,
+    30971,
+    26373,
+    24814,
+    26947,
+    34515,
+    31280,
+    29009,
+    93230,
+    41943,
+    42236,
+    40121,
+    39440,
+    34042,
+    32374,
+    88238,
+    38880,
+    44723,
+    40047,
+    25846,
+    37851,
+    42964,
+    28415,
+    37601,
+    39791,
+    42644,
+    28942,
+    35195,
+    33355,
+    35408,
+    33806,
+    35102,
+    27903,
+    71957,
+    29841,
+    29464,
+    28280,
+    28845
+   ],
+   "to_ready_ms": [
+    11616,
+    12807,
+    12150,
+    12373,
+    18593,
+    16224,
+    17598,
+    12713,
+    13130,
+    56591,
+    15527,
+    12624,
+    30055,
+    28120,
+    21451,
+    25819,
+    74712,
+    25596,
+    25924,
+    21627,
+    11207,
+    26238,
+    14878,
+    27321,
+    24581,
+    325013,
+    21752,
+    12762,
+    12808,
+    13552,
+    14682,
+    20359,
+    13414,
+    14033,
+    14879,
+    27455,
+    147508,
+    23468,
+    10751,
+    12364,
+    14170,
+    11196,
+    12989,
+    12672,
+    13982,
+    13757,
+    10970,
+    10948,
+    10877,
+    17424,
+    13351,
+    11859,
+    75123,
+    25505,
+    25152,
+    23096,
+    21584,
+    20552,
+    18222,
+    72172,
+    22402,
+    27227,
+    24892,
+    10952,
+    21193,
+    26670,
+    12161,
+    20863,
+    22436,
+    23773,
+    12108,
+    12636,
+    11148,
+    12295,
+    11775,
+    11534,
+    10945,
+    55470,
+    12443,
+    12718,
+    11157,
+    12154
+   ]
+  },
+  "resumed_after_paypal_error": {
+   "members": {
+    "IMP1-2224": {
+     "arm": "B_hard",
+     "to_readback_ms": 32617,
+     "to_ready_ms": 15585
+    }
+   },
+   "note": "PayPal answered 5xx on a read and the member was resumed once on the same package; their time per case is listed here, apart from the medians"
+  }
+ }
+}

@@ -271,7 +271,9 @@ def test_counts_sentence_line_sits_under_the_checks_heading_and_equals_the_row_s
     total = sum(1 for s in states if s != "not_applicable")
     assert total > 0
     noun = "check" if total == 1 else "checks"
-    assert re.sub(r"\s+([;.])", r"\1", text) == f"{verified} of {total} {noun} verified; {cannot} cannot be checked."
+    # v1.1.2: the fold uses the verdict sentence of the head of the page, never the old "n of m" form
+    assert text.startswith(f"{verified} {'check' if verified == 1 else 'checks'} verified.") and f"of {total} {noun}" not in text
+    assert (f"{cannot} cannot be checked." in text) == (cannot > 0)
     # it is the first element after the Checks heading, and the Checks table follows it
     main = dom.find("main")
     order = [n for n in main.walk() if n.tag in ("h2", "p", "table") and (n.attrs.get("id") == "checks"
@@ -912,9 +914,9 @@ def test_the_counts_sentence_pluralises_and_is_absent_when_nothing_counts():
         return Check(id=i, label_for_seller=i, state=state, basis="case_request", basis_ref="r", sources=[],
                      action="none", risk=False, seller_message="m")
     one = routes_package._checks_count([check("a", "verified")])
-    assert one["line"] == "1 of 1 check verified; 0 cannot be checked."
+    assert one["line"] == "1 check verified."
     many = routes_package._checks_count([check("a", "verified"), check("b", "present_unverifiable"), check("c", "missing")])
-    assert many["line"] == "1 of 3 checks verified; 1 cannot be checked."
+    assert many["line"] == "1 check verified. 1 missing. 1 cannot be checked."
     assert routes_package._checks_count([check("a", "not_applicable")]) is None and routes_package._checks_count([]) is None
 
 

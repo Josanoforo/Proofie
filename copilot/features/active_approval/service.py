@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from copilot.core.attempt_store import SQLiteAttemptStore
 from copilot.core.checklist import ACKNOWLEDGEABLE_DATE_CHECKS, UnknownCountryError, evaluate
 from copilot.core.checklist_input import cached_rules, docs_for_dispute, extracted_docs_for
-from copilot.core.context import Field, SRC_DISPUTE
+from copilot.core.context import Field, SRC_DISPUTE, SRC_ORDER, SRC_SEARCH
 from copilot.core.disputes import normalize
 from copilot.core.own_tracker import OwnTrackerMask, sent_tracking_numbers, tracker_numbers
 from copilot.core.evidence_model import (find_delivery_claims_citing_conflicting_sources,
@@ -225,7 +225,8 @@ def read(client, db_path, dispute_id: str, package_id: int) -> Review:
                 baseline = []
             if isinstance(baseline, list) and all(isinstance(v, str) for v in baseline):
                 # our own send made PayPal register the tracking we sent: not an edit of what was approved
-                mask_client = OwnTrackerMask(client, sent_tracking_numbers(request_input), baseline)
+                mask_client = OwnTrackerMask(client, sent_tracking_numbers(request_input), baseline,
+                                             approved_status=approved_case.get("tracker_status"))
     try:
         # what the seller sees (checks, statements, blocks, notices) is computed from PayPal's real answer.
         # The mask below only shapes the digest, which decides whether the approval still stands.
@@ -250,6 +251,9 @@ def read(client, db_path, dispute_id: str, package_id: int) -> Review:
         if tracking_number and carrier_missing(carrier):
             blocked.append(MESSAGE)
     blocked_details = _blocked_details(db_path, dispute_id, rows, unsupported)
+    if any(a["excluded"] for a in repo.list_attachments(db_path, package_id)):
+        from copilot.core.send_service import LEFT_OUT_ATTACHED_BLOCK
+        blocked.append(LEFT_OUT_ATTACHED_BLOCK)
     if unsupported:
         blocked.append("A statement asserts delivery, signature or receipt without a trusted matching source. Edit it first.")
     if any(c.state == "conflict" and c.id not in ACKNOWLEDGEABLE_DATE_CHECKS for c in checks):
@@ -273,12 +277,21 @@ def read(client, db_path, dispute_id: str, package_id: int) -> Review:
                 fields.pop(key, None)
         digest_context = replace(digest_context, fields=fields)
         digest_checks = evaluate(digest_context, extracted, cached_rules())
+    # PayPal's transaction report lags a new sale: until it holds the row, the amount, the date and the address are read
+    # from the sale itself (context._order) and carry their own source label. The approval binds the facts, not which of
+    # PayPal's two records supplied them: in the digest those fields carry the report's label, so the report gaining the
+    # row later (same values) is not a change. A different value is still a change. What the seller sees is untouched.
+    order_sourced = any(f.source == SRC_ORDER for f in digest_context.fields.values())
+    if order_sourced:
+        digest_context = replace(digest_context, fields={k: Field(f.value, SRC_SEARCH) if f.source == SRC_ORDER else f
+                                                         for k, f in digest_context.fields.items()})
+        digest_checks = evaluate(digest_context, extracted, cached_rules())
     # The notices bound into the digest come from the same (masked) checks as the rest of the digest.
     digest_flags = [*open_flags, *_date_difference_flags(digest_checks)]
     # Current checks/claims remain visible; the verified outcome mask belongs
     # only to source-binding computation, not to the seller's current readback.
     digest_claims = (compose(db_path, dispute_id, package_id, digest_checks, digest_norm)
-                     if digest_norm is not norm or mask_client is not None else claims)
+                     if digest_norm is not norm or mask_client is not None or order_sourced else claims)
     claim_snapshot = snapshot(digest_claims)
     stable_facts = {k: norm.get(k) for k in ("dispute_id", "amount_cents", "currency", "reason")}
     for claim in claim_snapshot:
@@ -315,6 +328,9 @@ def read(client, db_path, dispute_id: str, package_id: int) -> Review:
                   {**{k: list(digest_norm.get(k) or []) for k in evidence_keys},
                    "trackers": list(context.get("tracking_numbers_all") or
                                     ([context.get("tracking_number")] if context.get("tracking_number") else [])),
+                   # the status PayPal showed for the tracker the checks read (own_tracker.py: PayPal resets it on our send)
+                   **({"tracker_status": {context.get("tracking_number"): context.get("tracking_status")}}
+                      if context.get("tracking_number") and context.get("tracking_status") else {}),
                    "entries": [{"sha256":digest(e), "replaceable_requested":
                                 e.get("source") == "REQUESTED_FROM_SELLER" and
                                 e.get("evidence_type") in {r["evidence_type"] for r in (request_input or {}).get("evidences",[])},
@@ -435,6 +451,7 @@ def send_guard(client, db_path, dispute_id, package_id, approval_id):
     import copy
     initial_evidences = []
     initial_trackers = []
+    initial_tracker_status = {}
     evidence_changed = [False]
     class ReviewClient:
         def __init__(self, after=False):
@@ -444,10 +461,13 @@ def send_guard(client, db_path, dispute_id, package_id, approval_id):
             if op == "context_tracking":
                 if not self.after:
                     initial_trackers[:] = tracker_numbers(result)
+                    initial_tracker_status.update({t["tracking_number"]: t.get("status") for t in (result.get("trackers") or [])
+                                                   if isinstance(t, dict) and t.get("tracking_number")}
+                                                  if isinstance(result, dict) else {})
                 else:
                     # PayPal registers the tracking we sent as a tracker; see OwnTrackerMask for the one field excluded
                     result = OwnTrackerMask(_Fixed(result), sent_tracking_numbers(review.request_input),
-                                            initial_trackers).call(method, path, op)
+                                            initial_trackers, approved_status=initial_tracker_status).call(method, path, op)
                 return result
             if op == "show_dispute" and isinstance(result, dict):
                 if not self.after:

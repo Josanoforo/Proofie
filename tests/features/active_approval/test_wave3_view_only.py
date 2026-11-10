@@ -58,7 +58,7 @@ def test_cleared_approval_view_names_changed_statement_and_file_hash(prepared_ho
     assert page.status_code == 200
     assert "What changed since you approved" in page.text
     assert "Shipment is in transit." in page.text and "demo.pdf" in page.text
-    assert "stored hash differs" in page.text
+    assert "this file changed since you approved it" in page.text and "hash differs" not in page.text
     assert current.review_sha256 == stale_digest
     assert repo.get_latest_valid_approval(db, package) is None
     assert all(method == "GET" for method, _, _ in fake.calls)

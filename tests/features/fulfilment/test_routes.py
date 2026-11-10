@@ -435,7 +435,7 @@ def test_rc4_sale_policy_uses_rule_lines_and_integer_signature_limit(web_mode, m
         assert "PayPal also requires (Proofie does not check this)" in text
         for line in rules.raw["basic_requirements_not_checked_by_app"]:
             assert line in text
-    assert len(fake.calls) == 2 and all(row[0] == "GET" for row in fake.calls)
+    assert len(fake.calls) == (3 if total is None else 2) and all(row[0] == "GET" for row in fake.calls)      # v1.1.2 O: with no amount from the report, the sale itself is asked once (a read-only GET)
 
 
 def test_rc4_sale_policy_remains_on_validation_error_without_another_read(web_mode, monkeypatch):

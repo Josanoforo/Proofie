@@ -67,6 +67,20 @@ def _set(fields: dict, name: str, value: str | None, label_found: bool = False, 
         fields[name] = {"value": None, "confidence": "illegible"}
 
 
+_AMOUNT = re.compile(r"(?P<cur>[A-Z]{3})?\s*\$?\s*(?P<num>\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)\s*(?P<cur2>[A-Z]{3})?", re.IGNORECASE)
+
+
+def _money_cents(raw: str) -> tuple[int | None, str | None]:
+    """"4,500.00 MXN" / "MXN 4500" / "$4,500.50" -> (cents as int, currency or None). Pure string work, no floats,
+    no currency conversion. (None, None) when no amount can be read."""
+    m = _AMOUNT.search(raw or "")
+    if not m:
+        return None, None
+    whole, _, frac = m.group("num").replace(",", "").partition(".")
+    cur = (m.group("cur") or m.group("cur2") or "").upper() or None
+    return int(whole) * 100 + int((frac + "00")[:2]), cur
+
+
 def _extract_carrier(raw_text: str) -> str | None:
     for alias in sorted(_CARRIER_NAMES, key=len, reverse=True):
         m = re.search(re.escape(alias).replace(r"\ ", r"\s+"), raw_text, re.IGNORECASE)
@@ -141,6 +155,15 @@ def extract_fields(raw_text: str | None) -> dict:
     elif sig_found:
         _set(fields, "signature", None, label_found=True)   # labelled but blank: _classify_signature
                                                              # would call "none"; illegible is more honest
+    value, found = _line_value(raw_text, r"invoice total", r"total de la factura", r"total factura",
+                               r"importe total de la factura")
+    cents, cur = _money_cents(value) if value else (None, None)
+    if cents is not None:
+        fields["invoice_total_cents"] = {"value": cents, "confidence": "read"}
+        if cur:
+            fields["invoice_currency"] = {"value": cur, "confidence": "read"}
+    elif found:
+        fields["invoice_total_cents"] = {"value": None, "confidence": "illegible"}
     carrier = _extract_carrier(raw_text)
     if carrier:
         _set(fields, "carrier", carrier)

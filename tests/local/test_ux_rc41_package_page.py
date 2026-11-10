@@ -43,7 +43,7 @@ def test_approved_and_sendable_has_exactly_one_send_form_inside_the_panel(env):
     assert "btn-primary" in button.attrs["class"].split() and button.text() == "Send evidence to PayPal"
     assert [n.text() for n in lint.primaries(html)] == ["Send evidence to PayPal"]
     note = state(dom, "send-note")
-    assert note.text() == "Sends package v1 (2 statements, 1 file) to PayPal sandbox once. Proofie cannot withdraw it."
+    assert note.text() == "Sends package v1 (2 statements, 1 file) to PayPal once. Proofie cannot withdraw it."
     # the panel precedes the shipment details
     assert html.index('id="next-step"') < html.index('id="shipment-details"')
 

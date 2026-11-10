@@ -269,7 +269,7 @@ def test_c5_the_send_note_appears_above_the_send_button_when_there_is_something_
     pkg_id = _approved_package_with_tracking(c, db_path, token)
     r = c.get(f"/disputes/{DID}/packages/{pkg_id}")
     t = _text(r)
-    note = "Sends package v1 (0 statements, 0 files) to PayPal sandbox once. Proofie cannot withdraw it."
+    note = "Sends package v1 (0 statements, 0 files) to PayPal once. Proofie cannot withdraw it."
     assert note in t and 'data-state="send-note"' in r.text
     assert r.text.index("Send evidence to PayPal") < r.text.index("send-note")  # the note sits directly under the button
 

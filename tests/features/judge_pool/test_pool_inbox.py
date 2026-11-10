@@ -41,7 +41,7 @@ class FakePayPal:
 
     def call(self, method, path, op, **kw):
         self.calls.append((method, path, op))
-        if path == "/v1/customer/disputes":
+        if path.split("?")[0] == "/v1/customer/disputes":
             return {"items": [json.loads(json.dumps(c)) for c in self.cases.values()], "links": []}
         did = path.split("/")[4]
         if method == "GET" and did in self.cases:

@@ -35,7 +35,7 @@
   {% for d in conflict_form.documents %}
   {{ post_button('/disputes/' ~ conflict_form.dispute_id ~ '/documents/' ~ d.id ~ '/exclude', 'Leave ' ~ d.filename ~ ' out of the checks', conflict_form.csrf_token, kind='link', fields=(('return_to', 'package:' ~ conflict_form.package_id),)) }}
   {% endfor %}
-  <p class="action-note">If this file is attached to your response, it is still sent. Remove it from the response on the package page.</p>
+  <p class="action-note">A file you leave out of the checks is also taken out of your response: it is not sent to PayPal.</p>
   {% endif %}
   <h2>3. Approve with a note</h2>
   <form method="post" action="{{ package_url }}/approve" novalidate>

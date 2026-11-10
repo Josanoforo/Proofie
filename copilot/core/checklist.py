@@ -34,7 +34,7 @@ import copilot.core.disputes  # noqa: F401  (puts pilot/ on sys.path)
 from step3_dispute import MX_TZ  # noqa: E402
 
 from copilot.core.carriers import map_carrier
-from copilot.core.context import SRC_DISPUTE, SRC_SELLER, TransactionContext
+from copilot.core.context import SRC_DISPUTE, SRC_SEARCH, SRC_SELLER, TransactionContext
 
 STATES = ("verified", "missing", "present_unverifiable", "conflict", "not_applicable")
 BASES = ("case_request", "published_policy", "app_quality_rule")
@@ -266,6 +266,7 @@ def evaluate(context: TransactionContext, extracted_docs: list, rules: RuleSet,
     _delivery_status(b, context, docs)
     _delivery_date(b, context, docs)
     _dates_coherent(b, docs)
+    _invoice_amount(b, context, docs)
     _destination(b, context, docs)
     _full_address(b, context, docs)
     _signature(b, context, docs, rules)
@@ -441,6 +442,54 @@ def _dates_coherent(b, docs):
               _srcs([x[0] for x in s + d]))
 
 
+def _invoice_amount(b, ctx, docs):
+    """Proofie's own check: the invoice total in the documents equals the PayPal transaction amount (same currency,
+    integer cents, never converted). A difference against the sale's own amount (PayPal's record of the transaction)
+    is a conflict. When PayPal's record of the sale is not available, only the amount in dispute is known, and that may
+    be part of the sale: a difference against it is a caution row that names the source and never blocks."""
+    read, ill = _obs(docs, "invoice_total_cents")
+    if not read and not ill:
+        b.add("invoice_amount", "not_applicable", "No invoice total found in the documents.", [], "none")
+        return
+    if not read:
+        b.add("invoice_amount", "present_unverifiable", "An invoice total is shown but could not be read. Type it "
+              "in or upload a clearer copy.", _srcs(ill), "fix_value")
+        return
+    if len({int(o.value) for o in read}) > 1:
+        b.add("invoice_amount", "conflict", "Your documents show different invoice totals.", _srcs(read),
+              "review_difference")
+        return
+    total, cur = ctx.get("total_amount_cents"), ctx.get("total_currency")
+    if total is None or not cur:
+        b.add("invoice_amount", "present_unverifiable", "PayPal gave no amount for this sale, so the "
+              "invoice total could not be compared.", _srcs(read), "none")
+        return
+    from_sale = ctx.source_of("total_amount_cents") != SRC_DISPUTE
+    what = "PayPal transaction amount" if from_sale else "amount in dispute at PayPal"
+    inv = int(read[0].value)
+    cur_obs, _ = _obs(docs, "invoice_currency")
+    inv_cur = str(cur_obs[0].value).upper() if cur_obs else None
+    units = 2
+    if not from_sale and ((inv_cur and inv_cur != str(cur).upper()) or inv != int(total)):
+        shown = f"{_minor_str(inv, units)} {inv_cur or cur}"
+        b.add("invoice_amount", "present_unverifiable", f"The invoice total {shown} differs from the {what} "
+              f"{_minor_str(int(total), units)} {cur}. PayPal's record of the sale was not available, so the invoice "
+              f"could not be compared with the sale itself; a dispute can cover part of a sale. Check it yourself.",
+              _srcs(read, [ctx.source_of("total_amount_cents")]), "none", risk=True)
+    elif inv_cur and inv_cur != str(cur).upper():
+        b.add("invoice_amount", "conflict", f"The invoice is in {inv_cur} and the PayPal transaction is in {cur}. "
+              f"Proofie never converts currencies; review the difference.",
+              _srcs(read, cur_obs, [ctx.source_of("total_amount_cents")]), "review_difference")
+    elif inv != int(total):
+        b.add("invoice_amount", "conflict", f"The invoice total {_minor_str(inv, units)} {cur} differs from the "
+              f"{what} {_minor_str(int(total), units)} {cur}. The document may belong to "
+              f"another order (Proofie's own consistency check, not a PayPal requirement).",
+              _srcs(read, [ctx.source_of("total_amount_cents")]), "review_difference")
+    else:
+        b.add("invoice_amount", "verified", f"The invoice total equals the {what} "
+              f"({_minor_str(inv, units)} {cur}).", _srcs(read, [ctx.source_of("total_amount_cents")]))
+
+
 def _doc_location(docs):
     pc, pc_i = _obs(docs, "postal_code")
     city, city_i = _obs(docs, "city")
@@ -482,8 +531,7 @@ def _destination(b, ctx, docs):
         declared = bool(addr)
     if not addr:
         b.add("destination", "present_unverifiable", "PayPal returned no shipping address for this "
-              "transaction, so the delivery place could not be compared. You can declare the address; it "
-              "will be labelled as yours, not PayPal's.", doc_srcs, "fix_value")
+              "transaction, so the delivery place could not be compared.", doc_srcs, "fix_value")
         return
     d_pc = _postal(pc[0].value) if pc else ""
     p_pc = _postal(addr.get("postal_code", ""))
@@ -514,6 +562,10 @@ def _destination(b, ctx, docs):
         b.add("destination", "present_unverifiable", f"Delivered at a branch, so the postal code is the "
               f"branch's and cannot be matched to the buyer's address ({detail}).", srcs, "review_difference",
               risk=True)
+    elif d_pc and p_pc and not declared:
+        # each value named by where it comes from, in the seller's words
+        b.add("destination", "conflict", f"Your receipt says {d_pc}. PayPal says {p_pc}. The document may "
+              f"belong to another order.", srcs, "review_difference")
     else:
         b.add("destination", "conflict", f"Does not match {who} ({detail}). The document may "
               f"belong to another order.", srcs, "review_difference")

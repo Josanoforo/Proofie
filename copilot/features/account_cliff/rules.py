@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 SOURCE_HELP350 = "PayPal Help Center article 350 (read 2026-10-05)"
-FEES_PAGE_DATE = "October 1, 2026"
+FEES_PAGE_DATE = "November 4, 2026"
 SOURCE_FEES_PAGE = f"PayPal US business fees page dated {FEES_PAGE_DATE} (saved copy)"
 SCHEDULE_LIMITATION = (f"Figures from PayPal's US business fees page dated {FEES_PAGE_DATE}; "
                       "your account's schedule may differ. Proofie has no Mexico fee schedule.")

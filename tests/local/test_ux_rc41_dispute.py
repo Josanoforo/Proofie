@@ -440,7 +440,7 @@ def test_package_status_words_per_state():
     cell = dom.find("section", id="package").find("td", data_label="Status")
     assert "Draft: needs attention" in cell.text() and cell.find("span", class_="tag--bad") is not None
     assert dom.find("section", id="package").find("a", href=f"/disputes/{DID}/packages/{draft['id']}").text() == "Open package v1"
-    assert "checks verified;" not in cell.text() or "cannot be checked." in cell.text()
+    assert "checks verified;" not in cell.text()          # v1.1.2: the verdict sentence, never the old "n of m" form
 
 
 def _counted(monkeypatch, states):
@@ -450,8 +450,8 @@ def _counted(monkeypatch, states):
 
 
 @pytest.mark.parametrize("states, line", [
-    (["verified"], "1 of 1 check verified; 0 cannot be checked."),
-    (["verified", "present_unverifiable", "missing", "not_applicable"], "1 of 3 checks verified; 1 cannot be checked."),
+    (["verified"], "1 check verified."),
+    (["verified", "present_unverifiable", "missing", "not_applicable"], "1 check verified. 1 missing. 1 cannot be checked."),
 ])
 def test_the_package_row_counts_checks_like_the_package_page(monkeypatch, states, line):
     _package(config.db_path())

@@ -1,8 +1,8 @@
 {
   "schema": "proofie-export/1",
-  "source_commit": "7aeb1e4b32107d1261304730764ec2ff91520186",
-  "rules_version": "051190de893ca3e02440312abb67a19e3b48efb9bf7b9dffa8808929f31b5294",
-  "tool_sha256": "988523d5d9e7902142a506a57634db1d889d0b54262d02d5e73ef27af0cdf9ee",
+  "source_commit": "c890d36fc7b5996e077df54caf142426732e048a",
+  "rules_version": "c67dcdbf003b42ba41d69d62558a3d6bf87ee75aa9e9a778e3e5a20f51a986cb",
+  "tool_sha256": "745dc9945f284aa93091fcb03cc523312df8d658d1a8594d012e536390224bf9",
   "files": [
     {
       "path": ".env.example",
@@ -12,7 +12,7 @@
     {
       "path": ".gitattributes",
       "action": "copied",
-      "sha256": "69ed04be11a4476161a193cb0e9cca37a8e52a43b9346a23baf505b840d8f823"
+      "sha256": "f0706cf7b5f6bed277add4e0880e997aba9b758bba08e52e377f63ef0e157a94"
     },
     {
       "path": ".gitignore",
@@ -27,7 +27,7 @@
     {
       "path": "EVIDENCE-INDEX.md",
       "action": "generated",
-      "sha256": "563b0930d945494464d2e0262896c068134a641737caf9a0140982b9b125b174"
+      "sha256": "03c0bb280bf607a3633a73fddd36c65d6b437b88acc30d32977bcf4a7e200f02"
     },
     {
       "path": "LICENSE",
@@ -37,7 +37,7 @@
     {
       "path": "README.md",
       "action": "copied",
-      "sha256": "49b8859c3db06e57491fbcdbcc1bc18c61cb54d09fde82c8918b7adcec1e2ddb"
+      "sha256": "20546cecfb5c0b16f6c506f93c91c6e5103b5f06fc93591ac6d7bdb5651bc0e2"
     },
     {
       "path": "THIRD-PARTY.md",
@@ -57,12 +57,12 @@
     {
       "path": "copilot/app.py",
       "action": "copied",
-      "sha256": "2e7cc5563fd09414f05c8a3c42ee6fbc4786651642505fbf2e63d4a5880fdc3a"
+      "sha256": "b6afe9d686e996fca0b25fe7e59d68a02a984732bf6d4c35418afee75dc10a50"
     },
     {
       "path": "copilot/config.py",
       "action": "copied",
-      "sha256": "2afd4b042713a83605961f79b5c772180565d68ad2dda712edb19b5ed9b9041f"
+      "sha256": "bf19836a5c112e1c6987b06f7a68d8caed68856da73bbd94017894ff8bfc870b"
     },
     {
       "path": "copilot/core/__init__.py",
@@ -77,7 +77,7 @@
     {
       "path": "copilot/core/auto_prep.py",
       "action": "copied",
-      "sha256": "ba42e26f4e08539cf5ba94547eaef74fea165c75f8db14118cc45922bbc7bd0b"
+      "sha256": "b5d5e48b1f76bf48413acb0f9890bbc6a2e87e2452869d689ef95f75bbd07dca"
     },
     {
       "path": "copilot/core/carriers.py",
@@ -87,7 +87,7 @@
     {
       "path": "copilot/core/checklist.py",
       "action": "copied",
-      "sha256": "fbf50532b0e48650c5385c560d3d1e18c6954674acdc834d7a62e5b62b775832"
+      "sha256": "910805bb88236857ea824f8aa49f6fcde465d71b22232468f859685d07c3aff5"
     },
     {
       "path": "copilot/core/checklist_input.py",
@@ -102,12 +102,12 @@
     {
       "path": "copilot/core/context.py",
       "action": "copied",
-      "sha256": "c3382f87a47f41834b643314423546599765283378c3d7451bf3560fcb19470f"
+      "sha256": "11cf130d77a9e11c9ae042c3a00e64a179739ec7cd7303879b16855ed129fd14"
     },
     {
       "path": "copilot/core/disputes.py",
       "action": "copied",
-      "sha256": "2b6b8df1ae9db993e3eb60627ebed30476b8f059dfcd1a0df954f61afb7bd7c9"
+      "sha256": "c5f04bf27d114c9b8ffe7aa6f669d4cfd54f18955958defcbb0266bd598f1eaa"
     },
     {
       "path": "copilot/core/document_ingest.py",
@@ -127,12 +127,12 @@
     {
       "path": "copilot/core/field_extraction.py",
       "action": "copied",
-      "sha256": "f3ccc8192ea0dd845a513fd70344c45251f650e99abda218c68932bf5944e9be"
+      "sha256": "f6ff6dafdc242854c0e018dbebe62f0301a8956bc4206813c504143de0da3a2a"
     },
     {
       "path": "copilot/core/own_tracker.py",
       "action": "copied",
-      "sha256": "d44072cf21847285383dd6d9ec220dc74e28db53058f2bea05920ac3970a1b00"
+      "sha256": "219b057b052af6e295580e3eb95e317752a673068dd6de7391ceac237f43bc9a"
     },
     {
       "path": "copilot/core/paypal_words.py",
@@ -162,7 +162,7 @@
     {
       "path": "copilot/core/send_service.py",
       "action": "copied",
-      "sha256": "5d8165335a80ec0860651c97a72470a147f0e073a27842ca54717869e6867994"
+      "sha256": "ff6afa3710e34fbb3c3f70f0cb42ff1dcc44cde8d03604f3e553a9e21e53ae49"
     },
     {
       "path": "copilot/core/vision_model.py",
@@ -232,12 +232,12 @@
     {
       "path": "copilot/features/account_cliff/routes.py",
       "action": "copied",
-      "sha256": "32677d2626af6c4bf6b4337b78e09cd31d83fc072cd7cf1aac2775914263d29d"
+      "sha256": "695930cd69dcf8945b181d4c5a1c8eb9f0ad7b32e45362f71a538d9e922af9ac"
     },
     {
       "path": "copilot/features/account_cliff/rules.py",
       "action": "copied",
-      "sha256": "ba24deddef796875d743d5b37a687843467e58f2e488ee020a5db7ac317a2691"
+      "sha256": "612894ee555500aa139040c3810630b3d95e35dcf0623df8005f7cd84140ab37"
     },
     {
       "path": "copilot/features/account_cliff/service.py",
@@ -282,7 +282,7 @@
     {
       "path": "copilot/features/active_approval/routes.py",
       "action": "copied",
-      "sha256": "e2418516af2d76d172418ed37298d024f48bce7286efba0663cb73919b55e681"
+      "sha256": "be8b5f8beed2ec88b97800bab933f7b18c1a2e01f6fc24b9467708145df59e88"
     },
     {
       "path": "copilot/features/active_approval/rules.py",
@@ -292,7 +292,7 @@
     {
       "path": "copilot/features/active_approval/service.py",
       "action": "copied",
-      "sha256": "3f39389a2e9916464bc64ff8f1ea2ac0cf17fa3e7291c9521edf64c59037a84e"
+      "sha256": "4d91b085d9509f39610bd5be60be34bde5f0f703fa1a5bd0094a1e4edd78c94e"
     },
     {
       "path": "copilot/features/active_approval/store.py",
@@ -567,12 +567,12 @@
     {
       "path": "copilot/features/deadlines/routes.py",
       "action": "copied",
-      "sha256": "066cdfdea0058bd9591f4ad56b61050985e05c742cc23189af6261514c83fc45"
+      "sha256": "bc3d65a0def7d6578884384fab392969001d649d9f8f7d11859443d1c909cb3e"
     },
     {
       "path": "copilot/features/deadlines/service.py",
       "action": "copied",
-      "sha256": "5faaa3992736717f3f8fe19b6eda7b2d529f7aa883fb7f1d41454fc92047d3b1"
+      "sha256": "41fd5ce49fe561c81b73208d374b23972c88ac036ffdff4e7611ee647b77a7fe"
     },
     {
       "path": "copilot/features/declared_limits/__init__.py",
@@ -757,12 +757,12 @@
     {
       "path": "copilot/features/explainable_queue/service.py",
       "action": "copied",
-      "sha256": "80f029b649e31c9f8c6df94cdc5d3278301222851e497c8daff4f4a0685b543b"
+      "sha256": "36e5a6510a1f7fa70db6d158309bd476e1b2c06bbc0852c1dad8b081064012a1"
     },
     {
       "path": "copilot/features/explainable_queue/watch.py",
       "action": "copied",
-      "sha256": "2f5a467f3275a86d22b017d8f4b490c2085ab86274d2e581ecc09cef03ddc546"
+      "sha256": "2fa30215f5862a8b37170241a75f50dce9add98123c58398a31a92fa174f886b"
     },
     {
       "path": "copilot/features/first_dispute_guide/__init__.py",
@@ -1060,6 +1060,16 @@
       "sha256": "5bdf73be542b3d9e6caad7a92c240ba22e6f8732787969a507ee6eeb737079ec"
     },
     {
+      "path": "copilot/features/outcome/checked.py",
+      "action": "copied",
+      "sha256": "ab611ebdf53f30a11f0850a4a8206b8ab743c5795516b76434c3340488ea468b"
+    },
+    {
+      "path": "copilot/features/outcome/checked_routes.py",
+      "action": "copied",
+      "sha256": "fb4c70e664a84fd8e5a4699695bf8e1c4e9bb01a15efad2eaa922af4d35ed34e"
+    },
+    {
       "path": "copilot/features/outcome/file.py",
       "action": "copied",
       "sha256": "3618c88c038618051f1146c0116335e4aa09e6efb546ca1222f68b2766f59a32"
@@ -1068,6 +1078,16 @@
       "path": "copilot/features/outcome/gaps.py",
       "action": "copied",
       "sha256": "dcfc865636a36a099c600ce123e73b8a87dd217d165b7fcbfdf7ef19c4af7c3e"
+    },
+    {
+      "path": "copilot/features/outcome/money.py",
+      "action": "copied",
+      "sha256": "a8df5c502a74609ac57eb007810c76d99c62ba6d73f0ecd4e017c52a185f8814"
+    },
+    {
+      "path": "copilot/features/outcome/money_routes.py",
+      "action": "copied",
+      "sha256": "74b04194c4992a9005bf6a98dd2cf2347b92018a3883424ca0b2b071b8a85c0e"
     },
     {
       "path": "copilot/features/outcome/read.py",
@@ -1567,7 +1587,7 @@
     {
       "path": "copilot/mcp_server.py",
       "action": "copied",
-      "sha256": "08053dbc297af7c375afc47d2abe2b00d05beb10e53f3acca648e917ae0443bf"
+      "sha256": "8efa793209f6454b57afb153ab072dd856a8cfda0a933e840d7140d9ab663fb1"
     },
     {
       "path": "copilot/rules/README.md",
@@ -1577,12 +1597,12 @@
     {
       "path": "copilot/rules/mx_seller_protection_2025-01-13.json",
       "action": "copied",
-      "sha256": "d8df740cecab8f84276c8cbcb427bd80907ee5826b002dda2ab8909820f3fcc0"
+      "sha256": "cceb0ac663ce0a37cd277d5b2c047335ec3d2479b2f489a6da8a33645dd9228d"
     },
     {
       "path": "copilot/rules/us_seller_protection_2026-01-26.json",
       "action": "copied",
-      "sha256": "bdb4ee3d65775a9ba0769ec25a1818e5a0a41a64b6ca0734d2a16df77f49d4fc"
+      "sha256": "6dd73b664da119570f30040234e04ead116b0e4b846a94b007ba536cdd9bb058"
     },
     {
       "path": "copilot/verify.py",
@@ -1632,27 +1652,27 @@
     {
       "path": "copilot/web/next_step.py",
       "action": "copied",
-      "sha256": "54d95137794f74780fe427ebbc4359760d61ae1b07b3a0aeed421da15a0f4b44"
+      "sha256": "7b7f5262d4df6ba6b2363798420ed5b57e2bb209f1ad35d7fd2922b4322bbb27"
     },
     {
       "path": "copilot/web/presentation.py",
       "action": "copied",
-      "sha256": "03f01dabfd32cc7921487fa2b5defc6e765d073e8f8f485152802225f0e3369b"
+      "sha256": "b6915f067e4345408917e922ef867416a73e02f564eae44818fa38661b25b7ca"
     },
     {
       "path": "copilot/web/routes_disputes.py",
       "action": "copied",
-      "sha256": "55dbdc0b1e150ec82630178f04e2ad95bbc0e0e5049df021c404614ed38a09a6"
+      "sha256": "dc2c65c85a3b04d66e61cc19655f9f2cd7286e6d33ccc4ee3883ee2cf66c8c26"
     },
     {
       "path": "copilot/web/routes_documents.py",
       "action": "copied",
-      "sha256": "d12e8e352e37274810813600da8d618457b25a787777cf470384a8ced7daf78e"
+      "sha256": "1f85c1ffa40c54af580911500b59081e4acc27e8415e49bfbfb70f74caf84ff6"
     },
     {
       "path": "copilot/web/routes_package.py",
       "action": "copied",
-      "sha256": "860b6f76bcafa26b006b50d7609b18836223d346b39fcc18682330db7d4ceaa1"
+      "sha256": "12d0e851e751df7cbe4fb1480c2fce429264ea7ff6d431835e7a3bd887713ee9"
     },
     {
       "path": "copilot/web/routes_send.py",
@@ -1727,7 +1747,7 @@
     {
       "path": "copilot/web/templates/_components.html",
       "action": "copied",
-      "sha256": "2795507fec7b4296fad75494243a638b9880d195c53e50ec3762bb663c607acb"
+      "sha256": "6e4f9f4ab685f10335efad173525bd08366f068a6813b07f7a6c2b848b740e1b"
     },
     {
       "path": "copilot/web/templates/_form_fields.html",
@@ -1837,12 +1857,12 @@
     {
       "path": "copilot/web/templates/disputes_list.html",
       "action": "copied",
-      "sha256": "795ef7c22ce480245f1b0e4e851d99bbc7f98df7996069e15f04f04c923b5c60"
+      "sha256": "37328af4d7f2af5d0ade9220115a185fd340a6c8595cc91fa873aa20cdabe09b"
     },
     {
       "path": "copilot/web/templates/error.html",
       "action": "copied",
-      "sha256": "423faa32c686188756b51eaedc34388ffa518e73b38570c2862fd2a042d17eed"
+      "sha256": "021c20dd3c8f01d0c372e40def218df5dd0b2c68f5cec81c2b5d6f478eb95a0b"
     },
     {
       "path": "copilot/web/templates/features/accept_claim/check.html",
@@ -1882,7 +1902,7 @@
     {
       "path": "copilot/web/templates/features/active_approval/review.html",
       "action": "copied",
-      "sha256": "0de57046a0f277fdfba083f38b846e4288c40adbae5f8e66b9f631c293e84caf"
+      "sha256": "8bccbf94035e013dfa18886dac1355fe8b8be05b810db728a876d1679bbf71ba"
     },
     {
       "path": "copilot/web/templates/features/appeal_workspace/_recovery.html",
@@ -2002,7 +2022,7 @@
     {
       "path": "copilot/web/templates/features/deadlines/watch.html",
       "action": "copied",
-      "sha256": "8bdd9b766a35d21d39a5c50d0fcb3193fb8f4d2bfb934319dcff27518d0eb0dc"
+      "sha256": "9a6e49c97ae2d47d3a1f30fb8f155b81b8fcadaa87405afa7dd9fd5bedccb209"
     },
     {
       "path": "copilot/web/templates/features/declared_limits/page.html",
@@ -2172,7 +2192,7 @@
     {
       "path": "copilot/web/templates/features/local_autopilot/_preparation.html",
       "action": "copied",
-      "sha256": "9e29848082d5c9e0220060026055d2a588f34043511ac99066a708bf6f95d561"
+      "sha256": "861587c37578583f0ec2c5e7e676669c3e77d360e01d21251a86696a5e49e870"
     },
     {
       "path": "copilot/web/templates/features/local_autopilot/index.html",
@@ -2222,7 +2242,7 @@
     {
       "path": "copilot/web/templates/features/outcome/_gaps.html",
       "action": "copied",
-      "sha256": "9d8f0d3c4fe3b049d5babdb389408764f121d6622ceacb093a2242d6afa404ee"
+      "sha256": "815e487d07b565b0d023db66e38acd65f05c7eb3b5a7fb4ca80631e3ac6301b2"
     },
     {
       "path": "copilot/web/templates/features/outcome/_review_notice.html",
@@ -2235,9 +2255,24 @@
       "sha256": "9bbcf8d57cfe87bf1096d54507d07270ad6be7fb72260d68a5a2223e65f011ec"
     },
     {
+      "path": "copilot/web/templates/features/outcome/checked.html",
+      "action": "copied",
+      "sha256": "1d2b1224db1dd449cfcaf24eb5d0adbacf5a8f1bfcd0944bb98f2803f00e7e46"
+    },
+    {
+      "path": "copilot/web/templates/features/outcome/money.html",
+      "action": "copied",
+      "sha256": "311a5e1dee4650f150dde9536cf02c90f81ffd96dd05306a532665cdaa7896c7"
+    },
+    {
+      "path": "copilot/web/templates/features/outcome/money_case.html",
+      "action": "copied",
+      "sha256": "84d89537d9c0c8f7d3c5671ebcf0573d7a95c6d492e4db8091941404ccbb6e4b"
+    },
+    {
       "path": "copilot/web/templates/features/outcome/outcome.html",
       "action": "copied",
-      "sha256": "e1761845a21e9a0b80cb6109dc91f4e957426e24f190d479e39a543ee69bc369"
+      "sha256": "14984d5b3b5e8da4ff0f3491d30c854aa625f4e0cfae98ab9b2c6c67d182d2f6"
     },
     {
       "path": "copilot/web/templates/features/package_insert/_entry.html",
@@ -2257,7 +2292,7 @@
     {
       "path": "copilot/web/templates/features/package_print/print.html",
       "action": "copied",
-      "sha256": "691ddfa4db72ee8ff4e6f09abd63222ee8bde3a777e38e37bef0ada2b0a4868f"
+      "sha256": "681de6b42fccf44af79693d1110f9905efb24007a4d3b4e1dfd624fa31c3de5a"
     },
     {
       "path": "copilot/web/templates/features/presentation_mode/page.html",
@@ -2467,12 +2502,12 @@
     {
       "path": "copilot/web/templates/package_review.html",
       "action": "copied",
-      "sha256": "7dd4e547b5ee3d7a45fc8c0e382105ac020a8ee53fb3268176f54281c80e6341"
+      "sha256": "c5dd92db1198a8ae205870f74a4f4319f99b47880ffc4ffff59b92e57d393a94"
     },
     {
       "path": "copilot/web/templates/result.html",
       "action": "copied",
-      "sha256": "3c0b74422fdce6aabed8a2981c9db54b993ea351b499c37e01702dd904ae225b"
+      "sha256": "c006f6792f4a3eb40d17045e42d4baefbb71e265b8b3d8e14bacc050c3f4a22d"
     },
     {
       "path": "copilot/web/timefmt.py",
@@ -2547,7 +2582,7 @@
     {
       "path": "docs/JUDGE-RUN.md",
       "action": "copied",
-      "sha256": "f93442fbfbe01c4cb5101be3a3ba81b3b67660e6b604f708159c592e872a4665"
+      "sha256": "f4f65a652b1a138494563e9c419cea9fad4d1cb7ba629b38aef83ff4f871f38b"
     },
     {
       "path": "docs/MCP.md",
@@ -2623,6 +2658,31 @@
       "path": "docs/brand/proofie-social-preview.svg",
       "action": "copied",
       "sha256": "31840a3f60a1a7f2f67df2b2591c3bada789322442a1199f531c19e80d9a99f0"
+    },
+    {
+      "path": "docs/impact-1/README.md",
+      "action": "copied",
+      "sha256": "8b0efc3068a44a07ea841d5dabb3e7617b0c4a46806f7a89895334aa05ae9576"
+    },
+    {
+      "path": "docs/impact-1/results-fields.json",
+      "action": "copied",
+      "sha256": "5c6d7e89ddf051c84c2f1c4dd1e00274ad6e8768cd68ba1d6f94aaff2231bf95"
+    },
+    {
+      "path": "docs/impact-1/results-fields.md",
+      "action": "copied",
+      "sha256": "248b575cc6ec4fee623d355c30b60db33178059597573f2a0fc34a713f80cec6"
+    },
+    {
+      "path": "docs/impact-1/score.json",
+      "action": "copied",
+      "sha256": "fe474adabc26f8755262359b3a45adca90793371904e9125afb46ff6d7fe88e7"
+    },
+    {
+      "path": "docs/impact-1/score.md",
+      "action": "copied",
+      "sha256": "74778c55fa7341cf27d7369ed2623561e043c33d310cd0ce57296e388b518a74"
     },
     {
       "path": "pilot/client.py",
@@ -3312,7 +3372,7 @@
     {
       "path": "tests/features/account_cliff/test_fetch.py",
       "action": "copied",
-      "sha256": "de81f5acd9202e795b310a6de1c33558088542dcb20bcab526a6763d3cdfd437"
+      "sha256": "a6c8972b03a3c3cb8a7d690f18e3d5b856f833c38c1da1cf80052626e89cc532"
     },
     {
       "path": "tests/features/account_cliff/test_lazy_import.py",
@@ -3387,7 +3447,7 @@
     {
       "path": "tests/features/active_approval/fixtures/package_review-frozen-3-delta.json",
       "action": "copied",
-      "sha256": "7f5db59a2e2fb59ede396b41870494733198289e90818a482a1395f0be810956"
+      "sha256": "b50498544fc56462614e5b99d706fb9e31ee050dbe72b6da44081a0dc4869c06"
     },
     {
       "path": "tests/features/active_approval/fixtures/package_review-frozen-3.html",
@@ -3407,7 +3467,7 @@
     {
       "path": "tests/features/active_approval/test_a4_send_restates.py",
       "action": "copied",
-      "sha256": "436be61a0b3e37b7d5e177f93cf39b42269718087f9f091fcd790d1cd461cd0e"
+      "sha256": "30d6fd690c76e43ff568694cb1051591d1e0b0825bfa7dbbca21902fc87eb2a4"
     },
     {
       "path": "tests/features/active_approval/test_carrier_gate_integration.py",
@@ -3418,6 +3478,11 @@
       "path": "tests/features/active_approval/test_contention.py",
       "action": "copied",
       "sha256": "173ff2a05c68f36aa63da7330090e355e4d680262f2b2d2d8fb329ad2a714eb5"
+    },
+    {
+      "path": "tests/features/active_approval/test_copy6_conflict_consequence.py",
+      "action": "copied",
+      "sha256": "25a7030c7e31f8a54c09650281dc390e305518ed71c8f216db2dbde6da73cfa3"
     },
     {
       "path": "tests/features/active_approval/test_fix_state_rc41.py",
@@ -3440,19 +3505,34 @@
       "sha256": "ed41030723d9c0a5c60890c014ffced2278338a5c2ebc20726d4f72eb06c3401"
     },
     {
+      "path": "tests/features/active_approval/test_left_out_file_is_not_sent.py",
+      "action": "copied",
+      "sha256": "9206aae90a9387c0730cc14fc721a8fb272641f6551ee0403226ce29b49823dd"
+    },
+    {
       "path": "tests/features/active_approval/test_own_send_clears_every_request.py",
       "action": "copied",
       "sha256": "1032ea60b98a79a691a13ff3fae8fe8277784b74a78394e7a8d8fa7afb4daee5"
     },
     {
+      "path": "tests/features/active_approval/test_own_send_resets_existing_tracker.py",
+      "action": "copied",
+      "sha256": "fde63f23197bb4acf4462073f9eb944d0e45d1805270bef5955742e49757b466"
+    },
+    {
       "path": "tests/features/active_approval/test_own_tracker_delivery.py",
       "action": "copied",
-      "sha256": "bd33721771fac99ebd7647f54d1bf9cb1057bdd1c3b822e6e48e01b1df737f22"
+      "sha256": "7e2179de1beab95e53f67da9956aed7086125398b254f42cb299e34bdcf6b461"
     },
     {
       "path": "tests/features/active_approval/test_post_integ3.py",
       "action": "copied",
       "sha256": "928787f0ca944705241f59dbfb896e6afac641704de6ac2436fa165bf2024bce"
+    },
+    {
+      "path": "tests/features/active_approval/test_proof_missing_named.py",
+      "action": "copied",
+      "sha256": "86f08c541241029724f41a939cd37c1d9be86002bd56113e3df25373e230c844"
     },
     {
       "path": "tests/features/active_approval/test_rc42_approval.py",
@@ -3462,12 +3542,17 @@
     {
       "path": "tests/features/active_approval/test_rc44_golden_extension.py",
       "action": "copied",
-      "sha256": "bb808b4d616d0d8d5112264ed54c197d7fed3a2cf1a8e586d526350a5cdc3953"
+      "sha256": "9fe29b2a27939d0d6333a6f02b1982b60b7187db6a66552fbf44b138f384905d"
     },
     {
       "path": "tests/features/active_approval/test_reapproval_callout.py",
       "action": "copied",
       "sha256": "f4ce90113c715b0d953cbc6623769d91cf44c4a7787cb906fb8200620a7473a6"
+    },
+    {
+      "path": "tests/features/active_approval/test_report_catches_up_after_send.py",
+      "action": "copied",
+      "sha256": "f9a96afb43253dba5db1226216be352d3514359652704ac5d94f21cb6bca21df"
     },
     {
       "path": "tests/features/active_approval/test_reservation.py",
@@ -3477,7 +3562,7 @@
     {
       "path": "tests/features/active_approval/test_review.py",
       "action": "copied",
-      "sha256": "d03c99586d2e07927e95d7d6020879cba9859fd9499f05559a5908f1e4f11150"
+      "sha256": "8a58c961f4baf3941b5af65c6ae54ea88b29314579a76043584c18b54e5109c2"
     },
     {
       "path": "tests/features/active_approval/test_s03d_carrier_pairing.py",
@@ -3507,7 +3592,7 @@
     {
       "path": "tests/features/active_approval/test_ux_rc41_approval_send.py",
       "action": "copied",
-      "sha256": "0fc6bd470b6dfc7bbd440ca058909378976d2a91776a37d0f319f0a06f3f879c"
+      "sha256": "3e638874b7351ece6aa501450d41552cd519d1230a62063fb5490fa37a6c09a4"
     },
     {
       "path": "tests/features/active_approval/test_ux_rc41_fix2_state2_approval.py",
@@ -3522,7 +3607,7 @@
     {
       "path": "tests/features/active_approval/test_wave3_view_only.py",
       "action": "copied",
-      "sha256": "5a45ddcd9222d3034ed32274f0318b454962aa22042f1fbc6cb7165d02b1dcd7"
+      "sha256": "22599bde136ec963dbd99841a571de92378eea1b3f41c58fa4eb51045265f769"
     },
     {
       "path": "tests/features/appeal_workspace/test_appeal_workspace_lazy_import.py",
@@ -3882,7 +3967,7 @@
     {
       "path": "tests/features/draft/test_ux_rc41_assistant.py",
       "action": "copied",
-      "sha256": "bd05c70cdc93b8436b359160b2f80890398d6278da843e79a3b12d97b864608e"
+      "sha256": "0f4e41eb98e11a876d2db4cfffc44f621822748b45feb796d1dae38a41e90dc0"
     },
     {
       "path": "tests/features/draft/test_ux_rc41_draft_integration.py",
@@ -4020,6 +4105,11 @@
       "sha256": "f5c8cd2856f366463e4d854ca6cfe9d2518389deadab5d6f8e17e477b4e82a6b"
     },
     {
+      "path": "tests/features/explainable_queue/test_q_explain_bound.py",
+      "action": "copied",
+      "sha256": "30b6e8d3b81509a65f11372689681d347139200afb5892c68bcbbd35a35d8825"
+    },
+    {
       "path": "tests/features/explainable_queue/test_queue.py",
       "action": "copied",
       "sha256": "65ba95abc6a0f3e921f60bccb0fe1be6714445003891311d9c323442c2f376b9"
@@ -4077,7 +4167,7 @@
     {
       "path": "tests/features/fulfilment/test_routes.py",
       "action": "copied",
-      "sha256": "da430f1144d7c995b5f8f82bd71dec39754d614e6a30f440339c142ec44089a1"
+      "sha256": "ccc7154e52c958d9c9592607fdd1e863e9ec49eb2a848933142aee7d5a711943"
     },
     {
       "path": "tests/features/fulfilment/test_send_once_tracking.py",
@@ -4127,7 +4217,7 @@
     {
       "path": "tests/features/judge_pool/test_pool_inbox.py",
       "action": "copied",
-      "sha256": "df70023414b085c518872bdec30339de8e00ee2a02643a7a32797f722aa6503f"
+      "sha256": "512af38f359bbc2cc5dc3c79730f3fd18d348e2e247ade9a9631797b7ac4a76e"
     },
     {
       "path": "tests/features/judge_pool/test_rearm_without_receipt.py",
@@ -4248,6 +4338,11 @@
       "path": "tests/features/local_autopilot/test_plan_consumption.py",
       "action": "copied",
       "sha256": "3af98d034a3135b0dbd5ca78c75ca557c2b3fcec63837c171ad2cd59ba02e7d5"
+    },
+    {
+      "path": "tests/features/local_autopilot/test_preparation_button_needs_input.py",
+      "action": "copied",
+      "sha256": "fdfcba7a6cedac4d661ada2b3ed445490702800129a041afa653173fa6b5159f"
     },
     {
       "path": "tests/features/local_autopilot/test_prepare_disclosure.py",
@@ -4420,6 +4515,11 @@
       "sha256": "f9421e1c9a7384eada2645a5a284ff7147edc47b64770cd86e2a34835839fee0"
     },
     {
+      "path": "tests/features/outcome/test_checked.py",
+      "action": "copied",
+      "sha256": "b1e4331767aa79a4e61599618011a99133e8c8bfbb98854b2304a0fbb0c5fcd3"
+    },
+    {
       "path": "tests/features/outcome/test_file.py",
       "action": "copied",
       "sha256": "512ef8fdf10161a97e1d61dcebb9bc1b8b40e05ae392df34e4caec48b13bd83e"
@@ -4428,6 +4528,11 @@
       "path": "tests/features/outcome/test_gaps.py",
       "action": "copied",
       "sha256": "e93e36bfc71b45afdf58c13cca2bb35fc532b2b6e9023c393e27f1cf316a6412"
+    },
+    {
+      "path": "tests/features/outcome/test_money.py",
+      "action": "copied",
+      "sha256": "ff1bedf5e238420889b3660fdbddad9bb0b06a55a92de23eb17389d4641762d9"
     },
     {
       "path": "tests/features/outcome/test_outcome_routes.py",
@@ -4497,7 +4602,7 @@
     {
       "path": "tests/features/package_print/test_print.py",
       "action": "copied",
-      "sha256": "ce34602f01dd51c778f806ba3d959dd39023acf72d237f5006b2f6d9e4de27ad"
+      "sha256": "fecf1cf7787299567ff1f4aa55c007ef9f38c7e13b8af621a068dec4c782b325"
     },
     {
       "path": "tests/features/package_print/test_rc42_print.py",
@@ -4855,6 +4960,11 @@
       "sha256": "c13eeacf871ec0196663eac214b8fdcd8911def9b1343e8a82c20fdb2d29e942"
     },
     {
+      "path": "tests/local/test_auto_prep_keeps_seller_package.py",
+      "action": "copied",
+      "sha256": "13170510a027c32221de116d1d1fd7d171872e38ebafc7ad4c113cfa17b924fd"
+    },
+    {
       "path": "tests/local/test_b_fidelity_visual.py",
       "action": "copied",
       "sha256": "14ba6aea8f10ff718ba0a732ef5aa9fbf86efc19b17b4a7d9d3b569213ae9952"
@@ -4913,6 +5023,11 @@
       "path": "tests/local/test_context.py",
       "action": "copied",
       "sha256": "3674e4a0ae2f1af77695c5340ffa14746ea52c4096ceda628abac21b97ee2892"
+    },
+    {
+      "path": "tests/local/test_context_order_fallback.py",
+      "action": "copied",
+      "sha256": "f0c99ac6f47568ec04ad594ade8fd12c202e1a3342de18c07225aa05065a46bb"
     },
     {
       "path": "tests/local/test_copy_pins.py",
@@ -5067,7 +5182,7 @@
     {
       "path": "tests/local/test_hosted_gate.py",
       "action": "copied",
-      "sha256": "da9d3168dda3ebf2308a8612b21a76b16e681e58e19ad7227b7274037101b8af"
+      "sha256": "826461346d519f4bc1a643b4373409a8b54afa57f689ba6b18553af91f82abc0"
     },
     {
       "path": "tests/local/test_hosted_model_guard.py",
@@ -5093,6 +5208,11 @@
       "path": "tests/local/test_integral_review.py",
       "action": "copied",
       "sha256": "ea3a3e6edb2df47c224891a8209bde3abfe00d75625f796f0b77d7ad0537f03e"
+    },
+    {
+      "path": "tests/local/test_invoice_amount.py",
+      "action": "copied",
+      "sha256": "d9ddfb75697bbd76a99a5d4beaa7226eaa354daa123f2a0c56e70cf75527bda7"
     },
     {
       "path": "tests/local/test_link_fix2.py",
@@ -5125,6 +5245,11 @@
       "sha256": "43c7c25676bd40a99cbae0595dbb5be64decf4401ae1c7ffb70a6651506d3322"
     },
     {
+      "path": "tests/local/test_next_step_conflict_blocks.py",
+      "action": "copied",
+      "sha256": "cf3040f8fec0d071c6d15ee991a73ba50019f8dd8793d1d90dd6ed9051cc8a45"
+    },
+    {
       "path": "tests/local/test_no_credentials_rows.py",
       "action": "copied",
       "sha256": "761723d1eea35dcb48e2587a956785214baf9d682a33d72f76368c84d37f7778"
@@ -5138,6 +5263,11 @@
       "path": "tests/local/test_proofie_name.py",
       "action": "copied",
       "sha256": "414250681568565fe426154c876dd2a465b5e9beab38be2b15c5d4acda0ce35d"
+    },
+    {
+      "path": "tests/local/test_q_big_account.py",
+      "action": "copied",
+      "sha256": "ca8c784586bd24ae7e9b9083c6ea6d0bdd92a6b2a335d088c953dd86b0059019"
     },
     {
       "path": "tests/local/test_rc42_dispute_copy.py",
@@ -5157,12 +5287,12 @@
     {
       "path": "tests/local/test_rc42_package.py",
       "action": "copied",
-      "sha256": "585d98a037d2b681c010d505288882b1360d72de94fdfd15431252b12fe504f4"
+      "sha256": "cf01a80ab615c06f061360943b55fe7929b80b9e54996a1318ebb065ea248d5d"
     },
     {
       "path": "tests/local/test_rc42_package_checklist.py",
       "action": "copied",
-      "sha256": "dc94e42485c6866c5af489edc775f3c74aa4f77730bda6ae716a220f9b9d3669"
+      "sha256": "7f2bf388c364a0aebb337b1594450ee444a4a8ab8eb54bf57bca5aecb76fd41c"
     },
     {
       "path": "tests/local/test_rc42_reading_copy.py",
@@ -5260,6 +5390,11 @@
       "sha256": "020219eabc5dfcaed85eca5d1e4eeb4c62faae9b4185f7f499198d3a8c2f0127"
     },
     {
+      "path": "tests/local/test_rules_country_from_env_file.py",
+      "action": "copied",
+      "sha256": "114586620d810db1f9df04696dcc37873662cdcbee0f1f4c8eb1c482944198f5"
+    },
+    {
       "path": "tests/local/test_rules_us1_eligibility.py",
       "action": "copied",
       "sha256": "ed75347ab7dc33884cba18e139103e870d2d4c0ec9b1c83225b63b7db7697977"
@@ -5322,7 +5457,7 @@
     {
       "path": "tests/local/test_uic1_copy.py",
       "action": "copied",
-      "sha256": "5faadc03934f9b052a53e1c5a05c4456f0f2e2a50c0dba81aa1612859a24d6f0"
+      "sha256": "787cf6ded7319d67a0c6d9193eca3478b8a0ae84b72e66ae609799b13e712414"
     },
     {
       "path": "tests/local/test_uic2_copy.py",
@@ -5347,7 +5482,7 @@
     {
       "path": "tests/local/test_ux_rc41_dispute.py",
       "action": "copied",
-      "sha256": "13bedfd51506a521261030a58838498ed54f677dd2bcdc24de54b69c05d84e68"
+      "sha256": "747bbb88f096a658f9ebf64bcffafacadff29e14fd04f1eeb44a2e291475f42e"
     },
     {
       "path": "tests/local/test_ux_rc41_fix2_misc2.py",
@@ -5372,7 +5507,7 @@
     {
       "path": "tests/local/test_ux_rc41_fix3_state3.py",
       "action": "copied",
-      "sha256": "2db725d65868d1110ba68184f35f61813adc681bc8d09cb93823a2e1b862acc9"
+      "sha256": "a3243c550f7f076718295df32a636f33042bcdcdfadc9a518dcc562ba8719432"
     },
     {
       "path": "tests/local/test_ux_rc41_fix4_reclaim.py",
@@ -5392,12 +5527,12 @@
     {
       "path": "tests/local/test_ux_rc41_fix_state.py",
       "action": "copied",
-      "sha256": "1218db72d2468188e3077028249c5fb94a8ee0e73a99b9817156a76e8311b3b0"
+      "sha256": "86eb67b85035b72d1ead3ab9abdc97f49bcf7e333108be7f6c3fe451280bf60c"
     },
     {
       "path": "tests/local/test_ux_rc41_fix_state_status.py",
       "action": "copied",
-      "sha256": "250ab0a0a0941b1c7a74b3b043e847418133def0b1fafc39bdea563011c877ed"
+      "sha256": "6111d5e332d5e8c6b6bf4f99ad7fe77e0ea42913f27e579728018152c4b8910e"
     },
     {
       "path": "tests/local/test_ux_rc41_gate_jr52.py",
@@ -5417,22 +5552,22 @@
     {
       "path": "tests/local/test_ux_rc41_package.py",
       "action": "copied",
-      "sha256": "9289b5bac35aa80ff169dd722f7626c6c3af16e0cee8d5126213e69fbcf2d170"
+      "sha256": "66c38c7377ba317a0f295d18a3442c3f72d94225ad55ffdd73da16ad3e5b2ff2"
     },
     {
       "path": "tests/local/test_ux_rc41_package_page.py",
       "action": "copied",
-      "sha256": "62bf9f9f0c1dbe399e32b96d56f4ec560d155140f5bfefdfd33a15ca2a875094"
+      "sha256": "d97279946cfb615468c311c6dbb8c46a1f8845b075d35612862ca8998176339e"
     },
     {
       "path": "tests/local/test_ux_rc41_shell.py",
       "action": "copied",
-      "sha256": "1b13438b17b63ae6403ab78e3a272cb8cd7f40bd0226ec4c5f48718cb6edbb96"
+      "sha256": "71591671b060d20056e90c667b9309b1a43772142dce2cf710050d45a4f8aab7"
     },
     {
       "path": "tests/local/test_ux_rulebook_v2_continuation.py",
       "action": "copied",
-      "sha256": "82241018486d22361f0fa3f909b16871dbf69a180beb581a985b9b27878d57b3"
+      "sha256": "2a20ff50c4bab83b3172da3768f5de3f7e279284c515d9c726bd58900a8841eb"
     },
     {
       "path": "tests/local/test_ux_states.py",
@@ -5512,7 +5647,7 @@
     {
       "path": "tools/export_public.py",
       "action": "copied",
-      "sha256": "988523d5d9e7902142a506a57634db1d889d0b54262d02d5e73ef27af0cdf9ee"
+      "sha256": "745dc9945f284aa93091fcb03cc523312df8d658d1a8594d012e536390224bf9"
     },
     {
       "path": "tools/hosts_contacted.py",
@@ -5597,7 +5732,7 @@
     {
       "path": "tools/test_export_public.py",
       "action": "copied",
-      "sha256": "0914541a1ff03a2a4c354e51610e38c3e08a7f120c86d50da41346ffb54a25c1"
+      "sha256": "c84cca0cb952316d6092282dfb35a753c02de07efd0353378202386b70010eea"
     },
     {
       "path": "tools/test_hosts_contacted.py",
@@ -5651,17 +5786,18 @@
     }
   ],
   "excluded": {
-    "count": 6761,
+    "count": 6918,
     "by_rule": {
       "docs:not-public": 12,
       "exclude:.claude/**": 21,
       "exclude:AGENTS.md": 1,
       "exclude:CLAUDE.md": 1,
       "exclude:REVIEW.md": 1,
+      "exclude:data/**": 17,
       "exclude:docs/brand/preview.html": 1,
       "exclude:docs/evidence-claims.json": 1,
-      "exclude:evidence/**": 4,
-      "exclude:internal/**": 6655,
+      "exclude:evidence/**": 9,
+      "exclude:internal/**": 6782,
       "exclude:pilot/step1_auth.py": 1,
       "exclude:render.yaml": 1,
       "exclude:research/**": 8,
@@ -5704,6 +5840,11 @@
       "exclude:tools/flags_on_matrix.py": 1,
       "exclude:tools/hooks/**": 2,
       "exclude:tools/hosted_smoke.py": 1,
+      "exclude:tools/impact_decide.py": 1,
+      "exclude:tools/impact_docs.py": 1,
+      "exclude:tools/impact_fake.py": 1,
+      "exclude:tools/impact_run.py": 1,
+      "exclude:tools/impact_seed.py": 1,
       "exclude:tools/pre-push": 1,
       "exclude:tools/test_auto_run_d101_b3.py": 1,
       "exclude:tools/test_auto_run_d101_p1.py": 1,
@@ -5711,10 +5852,13 @@
       "exclude:tools/test_auto_run_d101_seller.py": 1,
       "exclude:tools/test_check_pending.py": 1,
       "exclude:tools/test_estimate_narration.py": 1,
+      "exclude:tools/test_impact_decide.py": 1,
+      "exclude:tools/test_impact_run.py": 1,
+      "exclude:tools/test_impact_seed.py": 1,
       "exclude:tools/vendor/axe-core-4.10.2/**": 3,
       "exclude:tools/video/**": 2
     },
-    "sha256": "a161e33f7acc766d68e881e6f9487620d7f48010f55524b5883d5a7beaf865b2"
+    "sha256": "377c677c74857a3804a449cce17809a2a85fa433a95ff6d0f8f9785bb508bf90"
   },
   "scan": {
     "patterns": [

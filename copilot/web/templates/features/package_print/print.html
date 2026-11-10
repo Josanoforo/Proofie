@@ -73,7 +73,7 @@ summary { cursor: pointer; }
 <h2>Exhibit {{ page.number }}</h2><details open><summary>Technical details</summary><p class="hash">SHA256 {{ page.sha256 }}</p></details>
 {% if page.late %}<p class="notice" data-state="added-after-send">Added after the response was sent; not in PayPal.</p>
 {% elif page.unlisted %}<p class="notice" data-state="sent-not-listed">Sent with the response; PayPal does not list it.</p>
-{% elif page.excluded_sent %}<p class="notice" data-state="excluded-sent">{% if page.sent %}Attached to the response and sent to PayPal, but left out of the checks.{% else %}Attached to the response (it is sent with it), but left out of the checks.{% endif %}</p>{% endif %}
+{% elif page.excluded_sent %}<p class="notice" data-state="excluded-sent">{% if page.sent %}Attached to the response and sent to PayPal, but left out of the checks.{% else %}Attached to the response, but left out of the checks: it must be removed from the response before it can be approved or sent.{% endif %}</p>{% endif %}
 <p>The saved file matches this fingerprint. A matching fingerprint shows the file is unchanged; it does not show that what it says is true.</p>
 {% else %}<p>No statements or local exhibits are stored in this package.</p>{% endif %}
 {% if loop.last and hosted_demo() %}<div class="hosted-demo-note" data-state="hosted-demo">{{ (request.app.state.hosted_demo_sentence if request is defined and request.scope is defined and "app" in request.scope and request.app.state.hosted_demo_sentence else hosted_demo_sentence)|note_lines }}</div>{% endif %}

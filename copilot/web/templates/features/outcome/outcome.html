@@ -14,6 +14,7 @@
   <tr><th scope="row">Amount refunded</th><td class="num">{{ read.refunded_text or "Not returned by PayPal" }}</td></tr>
   <tr><th scope="row">Seller response due</th><td>{% if not read.seller_response_due_date %}Not returned by PayPal{% elif (read.seller_response_due_date|when_text) == "Not available" %}No verified deadline available{% else %}{{ read.seller_response_due_date|when }}{% endif %}</td></tr>
 </table>
+<p data-state="money-link"><a href="/disputes/{{ dispute_id }}/outcome/money">Money in this case: kept, lost or still held</a></p>
 <details><summary>Technical details</summary><p>Stage {{ read.stage or "not returned" }}; status {{ read.status }}; outcome {{ read.outcome_code or "none" }}; links {{ read.links|join(", ") or "none" }}.</p></details>
 {% endif %}
 {% if view.appeal_sentence %}<p data-state="appeal-sentence">{{ view.appeal_sentence }}</p>{% endif %}

@@ -35,6 +35,7 @@
 {% endif %}
 {# The one "what do I do now" panel. The single Send form of the page lives here (key send); the legacy approve form
    (feature flag off) renders in its caller block. A blocked step is a list of fixes, never an inert button. #}
+{% if checks_count and checks_count.line %}<p class="checks-count" data-state="verdict-line">{{ checks_count.line }} <a href="#checks-fold">Review checks</a></p>{% endif %}
 {% call next_step_panel(step, csrf_token, 'Open approval review' if step.key == 'review_approve' and step.action and not step.action.post else none) %}
   {% if step.key == 'approve_here' %}
   <form method="post" action="{{ package_path }}/approve" class="approve-form" novalidate>
@@ -370,7 +371,7 @@
 
 <h2 id="checks">Checks</h2>
 <details class="dossier-fold" id="checks-fold" data-state="fold-checks"><summary>Show the checks and where each comes from</summary>
-{% if checks_count %}<p class="checks-count" data-state="checks-count">{% if checks_count.first_verified %}<a href="#check-{{ checks_count.first_verified }}">{{ checks_count.verified }} of {{ checks_count.total }} {{ checks_count.noun }} verified</a>{% else %}{{ checks_count.verified }} of {{ checks_count.total }} {{ checks_count.noun }} verified{% endif %}; {% if checks_count.first_cannot %}<a href="#check-{{ checks_count.first_cannot }}">{{ checks_count.cannot }} cannot be checked</a>{% else %}{{ checks_count.cannot }} cannot be checked{% endif %}.</p>{% endif %}
+{% if checks_count %}<p class="checks-count" data-state="checks-count">{{ checks_count.line }}{% if checks_count.first_verified %} <a href="#check-{{ checks_count.first_verified }}">First verified check</a>{% endif %}{% if checks_count.first_cannot %} <a href="#check-{{ checks_count.first_cannot }}">First check that cannot be checked</a>{% endif %}</p>{% endif %}
 {% if no_rule_set_line %}<p data-state="no-rule-set">{{ no_rule_set_line }}</p>
 {% else %}<p class="checked-at">Rules: <a href="{{ rules_source_url }}">{{ rules_source_title|mark_spanish }}</a></p>{% endif %}
 {% include "_rule_source.html" %}

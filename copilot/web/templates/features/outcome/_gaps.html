@@ -1,10 +1,10 @@
 {% from "_components.html" import tag, limitation_text %}
 {#- After a confirmed send the checks are information, not problems: neutral words, no red. If PayPal lists provide-evidence again the normal problem styling returns. -#}
 {% set after_send = (file.send_attempts | selectattr('state', 'equalto', 'confirmed') | list | length > 0) and ('provide-evidence' not in read.links) %}
-{% set check_words = {'tracking_number': 'Tracking number', 'carrier': 'Carrier', 'delivery_status': 'Delivery status',
-   'delivery_date': 'Delivery date', 'destination': 'Delivery place', 'full_address': 'Full street address',
+{% set check_words = {'tracking_number': "The tracking number is this order's", 'carrier': 'Carrier', 'delivery_status': 'The proof PayPal asks for: delivered',
+   'delivery_date': 'The proof PayPal asks for: delivery date', 'destination': 'The delivery address matches the sale in PayPal', 'full_address': 'Full street address',
    'signature': 'Signed proof of delivery', 'receiver_name': 'Who received the shipment',
-   'capture_date': 'Date the proof was captured', 'dates_coherent': 'Ship date before delivery date',
+   'capture_date': 'Date the proof was captured', 'dates_coherent': 'Ship date before delivery date', 'invoice_amount': 'Invoice total equals the PayPal amount',
    'branch_pickup': 'Delivered at a branch', 'document_integrity': 'Documents are readable', 'case_request': 'Evidence PayPal asked for'} %}
 {% set neutral_words = {'missing': 'not found in your documents', 'conflict': "does not match PayPal's data"} %}
 <h2>{% if rc3_reviewing|default(false) %}Evidence checks made by Proofie{% elif after_send %}Checked again after sending (for information){% else %}What was missing, and what can be added{% endif %}</h2>

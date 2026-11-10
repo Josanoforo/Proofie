@@ -201,7 +201,7 @@ INCLUDE = [
 
 # T17: R9, the ONLY way into docs/. Any other docs/ path is excluded as `docs:not-public`.
 PUBLIC_DOCS = ["docs/AI-USAGE.md", "docs/JUDGE-RUN.md", "docs/MCP.md", "docs/ARCHITECTURE.md", "docs/DESIGN.md",
-               "docs/brand/**", "docs/DECISIONS.md", "docs/CONFORMANCE.md"]
+               "docs/brand/**", "docs/DECISIONS.md", "docs/CONFORMANCE.md", "docs/impact-1/**"]
 
 # The sanitised-derivative mechanism is kept and UNUSED (empty) since D-2026-10-05-11. A path listed here (and not
 # removed by EXCLUDE) is published as a sanitised derivative through sanitize() at the exported commit.
@@ -239,6 +239,9 @@ EXCLUDE = [
     ("tools/auto_run_d101_seed.py", []), ("tests/tools/test_auto_run_d101_seed.py", []),
     ("tests/tools/test_auto_run_d101_vault.py", []),
     ("tools/check_pending.py", []), ("tools/test_check_pending.py", []),          # it reads files that are not published
+    # IMPACT-1 run tools (the measured-contrast harness): internal run tooling, not part of the judge route; they import feature packages
+    ("tools/impact_run.py", []), ("tools/impact_decide.py", []), ("tools/impact_docs.py", []), ("tools/impact_fake.py", []), ("tools/impact_seed.py", []),
+    ("tools/test_impact_run.py", []), ("tools/test_impact_decide.py", []), ("tools/test_impact_seed.py", []),
     ("pilot/step1_auth.py", []), ("docs/brand/preview.html", []), ("render.yaml", []),
     # feature namespaces that are not published yet (they win over the public roots)
     ("copilot/features/**", []), ("copilot/web/templates/features/**", []), ("tests/features/**", []),

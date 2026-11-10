@@ -18,9 +18,10 @@ Sources: "paypal_dispute" | "paypal_transaction_search" | "paypal_tracking" | "s
 """
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta, timezone
-from urllib.parse import urlencode, urlparse
+from urllib.parse import quote, urlencode, urlparse
 
 import httpx
 
@@ -31,10 +32,12 @@ from step3_dispute import money_to_minor, parse_utc  # noqa: E402
 SRC_DISPUTE = "paypal_dispute"
 SRC_SEARCH = "paypal_transaction_search"
 SRC_TRACKING = "paypal_tracking"
+SRC_ORDER = "paypal_order"            # the sale's own capture and order, read when the transaction report has no row yet
 SRC_SELLER = "seller_statement"
 
 ALLOWED_HOST = "api-m.sandbox.paypal.com"
-ALLOWED_PATH_PREFIXES = ("/v1/reporting/transactions", "/v1/shipping/trackers")
+ALLOWED_PATH_PREFIXES = ("/v1/reporting/transactions", "/v1/shipping/trackers", "/v2/payments/captures/",
+                         "/v2/checkout/orders/")
 _WINDOW_DAYS = 30           # Transaction Search allows <= 31 days per request
 _MAX_WINDOWS = 3            # look back up to ~90 days before the dispute was opened
 
@@ -227,6 +230,66 @@ def _tracking(client, txn_id: str, fields: dict, limits: list) -> None:
         fields["tracking_numbers_all"] = Field([x["tracking_number"] for x in items], SRC_TRACKING)
 
 
+def _log_optional_read_failed(what: str, exc: Exception) -> None:
+    """One line when the optional read of the sale fails, so a silent miss can be seen afterwards. Class and status only:
+    never the message, which can carry an id or a body."""
+    logging.getLogger("copilot.context").warning("optional read of the sale's %s failed: %s status=%s", what,
+                                                 type(exc).__name__, getattr(exc, "status", None))
+
+
+_REPORT_GAPS = ("PayPal returned no transaction details", "PayPal returned no shipping address")
+
+
+def _order(client, txn_id: str, fields: dict, limits: list) -> None:
+    """PayPal's transaction report lags new sales (hours): until it holds the sale, the amount, the payment date and the
+    shipping address are read from the sale itself, the capture and its order (two read-only GETs), and labelled with
+    their own source. Only fills what the report did not give. This read is an extra: whatever goes wrong in it (PayPal
+    refuses, times out, answers something else) adds nothing and changes nothing, and the page shows what it showed before.
+    The allowlist is checked outside the try, so a path that is not allowed is still a programming error."""
+    capture_path = f"/v2/payments/captures/{quote(str(txn_id), safe='')}"
+    _guard("GET", capture_path)
+    try:
+        capture = client.call("GET", capture_path, "context_capture")
+    except Exception as exc:  # noqa: BLE001 - optional read, see the docstring
+        _log_optional_read_failed("capture", exc)
+        return
+    if not isinstance(capture, dict) or capture.get("id") != txn_id:
+        return
+    cents, cur = _money(capture.get("amount"))
+    if cents is not None and cur and "total_amount_cents" not in fields:
+        fields["total_amount_cents"] = Field(cents, SRC_ORDER)
+        fields["total_currency"] = Field(cur, SRC_ORDER)
+    if "payment_date" not in fields:
+        _put(fields, "payment_date", _fmt(d) if (d := _parse_paypal_time(capture.get("create_time"))) else None, SRC_ORDER)
+    related = (capture.get("supplementary_data") or {}).get("related_ids") or {}
+    order_id = related.get("order_id") if isinstance(related, dict) else None
+    if "shipping_address" in fields or not isinstance(order_id, str) or not order_id:
+        return
+    order_path = f"/v2/checkout/orders/{quote(order_id, safe='')}"
+    _guard("GET", order_path)
+    try:
+        order = client.call("GET", order_path, "context_order")
+    except Exception as exc:  # noqa: BLE001 - optional read
+        _log_optional_read_failed("order", exc)
+        return
+    units = [u for u in (order.get("purchase_units") or []) if isinstance(u, dict)] if isinstance(order, dict) else []
+    mine = [u for u in units if any(isinstance(c, dict) and c.get("id") == txn_id
+                                    for c in ((u.get("payments") or {}).get("captures") or []))]
+    unit = mine[0] if mine else (units[0] if len(units) == 1 else None)
+    ship = (unit or {}).get("shipping") or {}
+    addr = ship.get("address") or {}
+    shipping_address = {k: v for k, v in (
+        ("line1", addr.get("address_line_1")), ("line2", addr.get("address_line_2")), ("city", addr.get("admin_area_2")),
+        ("state", addr.get("admin_area_1")), ("postal_code", addr.get("postal_code")),
+        ("country_code", addr.get("country_code"))) if v}
+    if not shipping_address:
+        return
+    fields["shipping_address"] = Field(shipping_address, SRC_ORDER)
+    _put(fields, "recipient_name", (ship.get("name") or {}).get("full_name"), SRC_ORDER)
+    # the report's gap is filled from the sale itself: its two "not returned" notes no longer describe what the page shows
+    limits[:] = [lim for lim in limits if not (lim.source == SRC_SEARCH and lim.message.startswith(_REPORT_GAPS))]
+
+
 def fetch_context(client, dispute_norm: dict) -> TransactionContext:
     """Never raises for missing scope / 4xx / empty / timeout; those become limitations."""
     fields: dict = {}
@@ -243,6 +306,8 @@ def fetch_context(client, dispute_norm: dict) -> TransactionContext:
                                              "be searched."))
     else:
         _search(client, txn_id, created, fields, limits)
+    if "shipping_address" not in fields or "total_amount_cents" not in fields:
+        _order(client, txn_id, fields, limits)
     _tracking(client, txn_id, fields, limits)
     if "total_amount_cents" not in fields and "dispute_amount_cents" in fields:
         # Fallback, labelled with its real source; the checklist treats it as the disputed amount.
@@ -253,4 +318,4 @@ def fetch_context(client, dispute_norm: dict) -> TransactionContext:
 
 
 __all__ = ["Field", "Limitation", "TransactionContext", "fetch_context", "DisallowedCall",
-           "ALLOWED_HOST", "ALLOWED_PATH_PREFIXES", "SRC_DISPUTE", "SRC_SEARCH", "SRC_TRACKING", "SRC_SELLER"]
+           "ALLOWED_HOST", "ALLOWED_PATH_PREFIXES", "SRC_DISPUTE", "SRC_SEARCH", "SRC_TRACKING", "SRC_SELLER", "SRC_ORDER"]

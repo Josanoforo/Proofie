@@ -178,7 +178,8 @@ def step_caption(n) -> str:
 _DONE = {
     "document_added": "Document added: {filename}. Next: generate the evidence package.",
     "document_added_package": "Document added: {filename}. Next: attach it to the response.",
-    "document_excluded": "{filename} is left out of the checks. You can use it in the checks again from Documents.",
+    "document_excluded": ("{filename} is left out of the checks. It is not sent to PayPal either: it is no longer part of "
+                          "a response you have not sent. You can use it in the checks again from Documents."),
     "document_included": "{filename} is used in the checks again.",
     "statement_added": "Statement {n} added.",
     "statement_saved": "Changes to statement {n} saved.",
@@ -373,3 +374,21 @@ def install(env) -> None:
                        LARGE_LABELS=LARGE_LABELS, READS_ONLY_NOTE=READS_ONLY_NOTE, DELIVERY_WORDS_HINT_HTML=DELIVERY_WORDS_HINT_HTML,
                        CARRIER_OPTIONS=carriers.SELECT_OPTIONS, carrier_display_name=carriers.display_name,
                        BUYER_CLOSED_LABEL=BUYER_CLOSED_LABEL, REVIEWING_NEUTRAL_TEXT=REVIEWING_NEUTRAL_TEXT)
+
+
+def verdict_line(checks) -> str | None:
+    """The one verdict sentence, in the seller's words: what is verified, then what is missing, what does not match and what
+    cannot be checked, each named only when there is one. Counts of what is on the page (not-applicable rows left out), never a
+    prediction of PayPal's decision. None when there is nothing to count."""
+    counted = [c for c in checks or [] if c.state != "not_applicable"]
+    if not counted:
+        return None
+    n = {state: sum(1 for c in counted if c.state == state) for state in ("verified", "missing", "conflict", "present_unverifiable")}
+    line = f"{n['verified']} {'check' if n['verified'] == 1 else 'checks'} verified."
+    if n["missing"]:
+        line += f" {n['missing']} missing."
+    if n["conflict"]:
+        line += f" {n['conflict']} {'does' if n['conflict'] == 1 else 'do'} not match."
+    if n["present_unverifiable"]:
+        line += f" {n['present_unverifiable']} cannot be checked."
+    return line

@@ -145,25 +145,20 @@ def test_a_statement_added_after_removals_gets_a_new_index_and_keeps_its_place(e
     assert request_input(db, pkg)["evidences"][0]["notes"].endswith("C. D. E.")
 
 
-def test_an_attached_but_excluded_file_is_in_the_posted_multipart_and_in_the_attempt(env):
+def test_an_attached_but_excluded_file_stops_the_approval_and_is_never_posted(env):
     c, db, token, fake = env
     pkg = draft(c, db, token, STATEMENT)
     doc = add_file(c, db, token, pkg, "photo.pdf", LABEL_A)
-    assert c.post(f"/disputes/{DID}/documents/{doc}/exclude", data={"csrf_token": token},
-                  follow_redirects=False).status_code == 303
-    assert repo.get_document(db, doc)["excluded"] is True
-    approve_passive(c, token, pkg)
-    fake.post_send_get_bodies = [confirmed_body(db, pkg, ["photo.pdf"])]
+    # v1.1.2: the leave-out route also takes the file out of the response; this state (attached and left out) now comes
+    # only from a file attached while it is left out, so the test sets it directly
+    repo.set_document_excluded(db, doc, True)
+    # v1.1.2 reverses what this test pinned (the left-out file went out with the package): now the approval is refused
+    # while the file is attached, and nothing is posted.
+    r = c.post(f"/disputes/{DID}/packages/{pkg}/approve", data={"csrf_token": token}, follow_redirects=False)
+    assert r.status_code == 400 and "left out of the checks is still attached" in r.text
+    assert repo.get_latest_valid_approval(db, pkg) is None
     r = c.post(f"/disputes/{DID}/packages/{pkg}/send", data={"csrf_token": token}, follow_redirects=False)
-    assert r.status_code == 303 and len(posts(fake)) == 1
-    parts = posts(fake)[0]["multipart"]
-    assert "photo.pdf" in [part[1][0] for part in parts if part[1][0]]               # the file really goes out
-    store = SQLiteAttemptStore(db)
-    try:
-        attempt = store.list_by_dispute(DID)[0]
-    finally:
-        store.close()
-    assert attempt["attachment_filenames"] == ["photo.pdf"] and attempt["state"] == "confirmed"
+    assert posts(fake) == []
 
 
 def test_the_statement_error_summary_links_to_the_textarea_itself(env):

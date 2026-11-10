@@ -1,5 +1,5 @@
 """PayPal dates only; core normalization owns remaining days and missing-date wording."""
-from copilot.core.disputes import fetch_all_disputes, normalize, humanize_deadline, inbox_sort_key
+from copilot.core.disputes import DisputeList, fetch_all_disputes, normalize, humanize_deadline, inbox_sort_key
 from copilot.features.events.rate import ReadClient
 from copilot.web import status, timefmt
 
@@ -35,4 +35,6 @@ def prepare(items, now):
 
 def read(client, now, budget=None):
     items, pages = fetch_all_disputes(ReadClient(client, budget))
-    return prepare(items, now), pages
+    rows = DisputeList(prepare(items, now))
+    rows.cut = bool(getattr(items, "cut", False))      # the page says so in one line (core.disputes.list_cut_line)
+    return rows, pages

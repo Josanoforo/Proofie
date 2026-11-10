@@ -1289,7 +1289,7 @@ def test_t16_blocking_a_copy_of_an_internal_file_fails_the_export_and_writes_not
 def test_t17_the_public_docs_list_is_the_spec_list_with_table_2s_decision():
     # T17; DESIGN.md and brand/** are public (both are on the public-docs list)
     assert ep.PUBLIC_DOCS == ["docs/AI-USAGE.md", "docs/JUDGE-RUN.md", "docs/MCP.md", "docs/ARCHITECTURE.md",
-                              "docs/DESIGN.md", "docs/brand/**", "docs/DECISIONS.md", "docs/CONFORMANCE.md"]
+                              "docs/DESIGN.md", "docs/brand/**", "docs/DECISIONS.md", "docs/CONFORMANCE.md", "docs/impact-1/**"]
 
 
 def test_t17_only_the_listed_docs_are_published_and_any_other_docs_file_is_absent(tmp_path):
@@ -1485,7 +1485,7 @@ def test_rc42_the_publish_set_rows_name_each_removed_file_and_keep_the_decided_o
 
 def test_f5_the_rule_rows_follow_the_folder_rules():
     # The hosted blueprint include, the three draft-evaluation feature-scoped exclusions and the ten publish-set rows compose.
-    assert len(ep.INCLUDE) + len(ep.PUBLIC_DOCS) == 25 and len(ep.EXCLUDE) == 74 and ep.EXCLUDE[0][0] == "internal/**"
+    assert len(ep.INCLUDE) + len(ep.PUBLIC_DOCS) == 26 and len(ep.EXCLUDE) == 82 and ep.EXCLUDE[0][0] == "internal/**"
     assert ep.DRAFT_EVAL_PATHS == ("tools/eval_draft.py", "tools/test_eval_draft.py", "pilot/eval/draft_cases/**")
     assert [row for row in ep.EXCLUDE if row[0] in ep.DRAFT_EVAL_PATHS] == [(path, []) for path in ep.DRAFT_EVAL_PATHS]
     assert [p for p, _ in ep.EXCLUDE if p in ("copilot/features/**", "copilot/web/templates/features/**",

@@ -1,6 +1,6 @@
 # Evidence index
 
-Source commit: `7aeb1e4b32107d1261304730764ec2ff91520186`
+Source commit: `c890d36fc7b5996e077df54caf142426732e048a`
 
 The files listed here are private records of calls made against the PayPal sandbox. They are not published, because the PayPal Developer Agreement (section 11) treats information received through API calls as confidential. The recorded model outputs used by the held-out replay are synthetic-case text only and ship in pilot/eval/draft_cases/recorded/. The author keeps the private files unchanged. This index publishes only hashes, counts and our own words, so that a reviewer shown a file can check it against this list.
 

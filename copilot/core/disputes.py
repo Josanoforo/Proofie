@@ -12,6 +12,8 @@ from pathlib import Path
 
 import re
 
+import httpx
+
 from copilot import config
 from copilot.core import pool_scope
 
@@ -25,17 +27,64 @@ from step3_dispute import normalize as _pilot_normalize  # noqa: E402
 
 __all__ = ["SandboxClient", "PayPalError", "fetch_all_disputes", "normalize", "humanize_status",
           "humanize_reason", "humanize_deadline", "humanize_evidence_type", "readback_audit", "write_audit",
-          "inbox_sort_key", "ScopedClient"]
+          "inbox_sort_key", "ScopedClient", "DisputeList", "LIST_CUT_LINE", "list_cut_line"]
+
+LIST_PAGE_SIZE = 50          # PayPal's maximum page size for GET /v1/customer/disputes (its default is 10)
+LIST_CUT_LINE = "PayPal has more disputes than Proofie read in one go: {n} are shown."
+
+
+class DisputeList(list):
+    """PayPal's dispute list as read. `cut` is True when the read stopped before PayPal's last page (the page cap was
+    reached or a later page failed): the list holds what was read, and the caller says so in one plain line."""
+    cut = False
+
+
+def list_cut_line(items) -> str | None:
+    return LIST_CUT_LINE.format(n=len(items)) if getattr(items, "cut", False) else None
+
+
+def _next_path(body: dict) -> str | None:
+    link = next((l for l in (body.get("links") or []) if l.get("rel") == "next" and l.get("href")), None)
+    if link is None:
+        return None
+    href = link["href"]
+    base = "https://api-m.sandbox.paypal.com"
+    return href[len(base):] if href.startswith(base) else href
 
 
 def fetch_all_disputes(client, max_pages: int = 20):
     """PayPal's dispute list, the one reader every list consumer shares (the inbox, the deadline banner, the cliff line, the watch).
     In the hosted demo it returns only the judge pool's cases and the record case (copilot/core/pool_scope.py), and with nothing
     to show it does not read PayPal at all. Outside the hosted demo it is the pilot's function, unchanged."""
-    if pool_scope.active() and not pool_scope.listed_ids():
-        return [], 0
-    items, pages = _pilot_fetch_all_disputes(client, max_pages)
-    return pool_scope.filter_items(items), pages
+    if pool_scope.active():
+        # the hosted demo never lists the account: it reads its own cases one by one, by id
+        items = DisputeList()
+        # (the replay case is a local recording, not a PayPal dispute: it is never asked of PayPal)
+        for dispute_id in sorted(pool_scope.listed_ids() - {config.REPLAY_DEFAULT_CASE}):
+            try:
+                body = client.call("GET", f"/v1/customer/disputes/{dispute_id}", "show_dispute")
+            except (PayPalError, httpx.HTTPError):
+                continue                      # a case PayPal does not return is simply not listed
+            if isinstance(body, dict) and body.get("dispute_id") == dispute_id:
+                items.append(body)
+        return items, 1 if items else 0
+    items, pages = DisputeList(), 0
+    path = f"/v1/customer/disputes?page_size={LIST_PAGE_SIZE}"
+    while path is not None:
+        if pages >= max_pages:
+            items.cut = True                  # never a 500: what was read is shown, with one line saying so
+            break
+        try:
+            body = client.call("GET", path, "list_disputes")
+        except (PayPalError, httpx.HTTPError):
+            if not pages:
+                raise                         # nothing read at all: the caller's own PayPal-error page
+            items.cut = True
+            break
+        items += body.get("items") or []
+        pages += 1
+        path = _next_path(body)
+    return items, pages
 
 
 _DISPUTE_PATH = re.compile(r"^/v1/customer/disputes/([^/?]+)")

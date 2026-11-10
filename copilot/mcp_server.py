@@ -34,7 +34,7 @@ from copilot.core.attempt_store import SQLiteAttemptStore
 from copilot.core.checklist import UnknownCountryError, evaluate
 from copilot.core.checklist_input import cached_rules, extracted_docs_for
 from copilot.core.context import fetch_context
-from copilot.core.disputes import (PayPalError, SandboxClient, fetch_all_disputes, humanize_deadline,
+from copilot.core.disputes import (PayPalError, SandboxClient, fetch_all_disputes, list_cut_line, humanize_deadline,
                                    humanize_reason, humanize_status, normalize)
 from copilot.core.send import (PARTIAL_MESSAGE_MANY, approval_fingerprint_with_attachments, build_request_input,
                                pick_tracking, verify_after_with_attachments)
@@ -218,7 +218,10 @@ def list_disputes() -> dict:
                      "auto_prep": {"status": prep["status"], "detail": prep.get("detail")} if prep
                      else {"status": "not_prepared", "detail": None},
                      "review_url": _dispute_url(norm["dispute_id"])})
-    return {"count": len(rows), "disputes": rows, "note": APPROVAL_NOTE}
+    out = {"count": len(rows), "disputes": rows, "note": APPROVAL_NOTE}
+    if getattr(items, "cut", False):
+        out["list_cut"] = list_cut_line(items)
+    return out
 
 
 def get_dispute_file(dispute_id: str, include_text: bool = False) -> dict:

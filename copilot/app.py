@@ -88,6 +88,7 @@ def create_app() -> FastAPI:
         # lazy: off by default; imported only when its flag is on
         from copilot.features.outcome.routes import router as outcome_router
         app.include_router(outcome_router)
+        from copilot.features.outcome.money_routes import router as money_router; app.include_router(money_router)  # noqa: E702 - money kept, lost, held
     if config.feature_enabled("webhooks"):
         # lazy: off by default; imported only when its flag is on
         from copilot.features.webhooks.routes import router as webhooks_router

@@ -85,8 +85,15 @@ def build(data):
     return rows
 
 
+MAX_EXPLAINED_CASES = 200       # build()'s own bounds; the inbox explains at most this much, most urgent first
+MAX_EXPLAINED_BYTES = 50000
+
+
 def explain_cases(items, observed_at, webhook_rows_by_case=None):
-    """Annotate already-read Proofie cases. Caller retains the existing inbox order and action links."""
+    """Annotate already-read Proofie cases. Caller retains the existing inbox order and action links.
+
+    Never fails the inbox: it explains at most what build() accepts, in the caller's order (most urgent first); the rows
+    past that bound simply get no explanation, and a refusal from build() returns no explanations at all."""
     webhook_rows_by_case = webhook_rows_by_case or {}
     exposure = exposure_context(items, observed_at)
     cases, events = [], []
@@ -121,7 +128,7 @@ def explain_cases(items, observed_at, webhook_rows_by_case=None):
         if type(norm.get("amount_cents")) is int:
             case["amount_cents"] = norm["amount_cents"]
         case["currency"] = norm.get("currency") or ""
-        cases.append(case)
+        case_events = []
         for event in webhook_rows_by_case.get(case_id, ()):
             if not isinstance(event, dict) or event.get("verification") != "verified":
                 continue
@@ -131,12 +138,23 @@ def explain_cases(items, observed_at, webhook_rows_by_case=None):
                      "RESOLVED": "resolved", "OPEN": "open"}.get(readback)
             change = "Verified notice received; " + (f"Proofie's follow-up read said {label}." if label else
                                                       "no follow-up status was recorded.")
-            events.append({"id": event.get("event_id"), "case_id": case_id,
-                           "observed_at": event.get("received_at"), "source": "Proofie verified webhook store",
-                           "change": change})
+            case_events.append({"id": event.get("event_id"), "case_id": case_id,
+                                "observed_at": event.get("received_at"), "source": "Proofie verified webhook store",
+                                "change": change})
+        try:
+            size = len(json.dumps({"cases": cases + [case], "events": events + case_events}, ensure_ascii=False))
+        except (ValueError, TypeError):
+            continue
+        if len(cases) >= MAX_EXPLAINED_CASES or len(events) + len(case_events) > 1000 or size > MAX_EXPLAINED_BYTES:
+            break
+        cases.append(case)
+        events += case_events
     if not cases:
         return {}
-    rows = build({"cases": cases, "events": events})
+    try:
+        rows = build({"cases": cases, "events": events})
+    except ValueError:
+        return {}
     from copilot.features.draft.facts import money_text
     from copilot.web.timefmt import display
     for row in rows:   # house style: money by code from integer cents, dates in words (Mexico City time)

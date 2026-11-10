@@ -527,7 +527,9 @@ def test_an_attached_file_that_is_left_out_of_the_checks_is_still_listed_as_sent
     upload(c, token, "label.pdf")
     doc = repo.list_documents(db, DID)[0]["id"]
     c.post(f"/disputes/{DID}/packages/{pkg}/attach/{doc}", data={"csrf_token": token}, follow_redirects=False)
-    c.post(f"/disputes/{DID}/documents/{doc}/exclude", data={"csrf_token": token}, follow_redirects=False)
+    # v1.1.2: the leave-out route also takes the file out of the response; this state (attached and left out) now comes
+    # only from a file attached while it is left out, so the test sets it directly
+    repo.set_document_excluded(db, doc, True)
     assert repo.get_document(db, doc)["excluded"] is True
     assert [a["filename"] for a in repo.list_attachments(db, pkg)] == ["label.pdf"]     # the send would still carry it
     dom = parse(page(c, pkg).text)

@@ -691,7 +691,8 @@ def test_p1_40_what_will_be_sent_lists_text_tracking_carrier_and_files(mode_prep
     _attach_file(db, package, "label-proof.pdf")
     html = _approval_page(mode_prepared)
     assert "Files (1)" in html and "label-proof.pdf" in html
-    assert "<dt>Carrier</dt>" in html and "<dt>Tracking number</dt>" in html and "Exact text PayPal receives" in html
+    assert "<dt>Carrier</dt>" in html and "<dt>Tracking number</dt>" in html and "Your text, as PayPal receives it" in html
+    assert '<details data-state="send-prefix"><summary>Technical details</summary><p>PayPal receives this line before your text: DEMO DATA' in html
     assert "only when you press Send evidence to PayPal on the package page" in html
 
 

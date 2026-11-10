@@ -15,6 +15,7 @@ from dataclasses import dataclass
 
 from copilot import config
 from copilot.core import send_service
+from copilot.core.send import DEMO_PREFIX
 from copilot.web import timefmt
 from copilot.web.dispute_state import buyer_closed_raw
 from copilot.web.presentation import LARGE_LABELS, READS_ONLY_NOTE
@@ -54,6 +55,7 @@ class NextStep:
     note_state: str | None = None
     preview_text: str | None = None          # exact text drawn above the actions (the send step restates what PayPal receives)
     preview: tuple = ()                      # (label, value) rows drawn under it
+    technical: tuple = ()                    # (label, value) rows under a closed "Technical details" fold
     action_hint: str | None = None           # one line after the actions ("Editing clears your approval.")
 
 
@@ -453,7 +455,7 @@ def for_dispute(*, dispute_id, norm, raw=None, has_documents, latest_package=Non
 def for_package(*, dispute_id, package, norm, claims_count, files_count, has_tracking, carrier_missing,
                 approval_valid, record, other_unconfirmed, review_flags=(), hosted=False,
                 approval_stale=False, collision=None, earlier_partial=False, send_notes=None, send_tracking=None,
-                send_files=(), send_fingerprint=None) -> NextStep:
+                send_files=(), send_fingerprint=None, conflict_line=None) -> NextStep:
     """`approval_stale` (optional, added to the contract's signature) is True when an approval existed and the
     content changed after it; it only selects the sentence of the review step. `earlier_partial` is True
     when every earlier unconfirmed send reached PayPal without a file: it only selects the words of the paused step."""
@@ -534,6 +536,11 @@ def for_package(*, dispute_id, package, norm, claims_count, files_count, has_tra
                         data_state=EVIDENCE_LISTED,
                         secondary=(_act("View the dispute", href=base, kind="secondary"),))
     if not approval_valid:
+        if conflict_line and (not has_tracking or claims_count < 1):
+            # v1.1.2: a check that does not match blocks the approval with or without a statement, so the page says it
+            # here instead of asking for a statement or a tracking number first (those two steps hid it)
+            return NextStep("conflict_blocks", "Next step: fix the check that does not match.", conflict_line,
+                            action=_act("Review the difference", href="#checks"), data_state="conflict-blocks")
         if not has_tracking:
             return NextStep("no_tracking", "Next step: add the tracking number.",
                             "PayPal needs a tracking number before this package can be sent.",
@@ -572,18 +579,22 @@ def for_package(*, dispute_id, package, norm, claims_count, files_count, has_tra
     # One plain sentence before the send button, after a refused or blocked attempt too. True: the send path claims the
     # content first and refuses a repeat itself ("Package already received", never a second POST).
     body = f"{body} {SEND_FINAL_SENTENCE}" if body else SEND_FINAL_SENTENCE
-    preview_text, preview, secondary = None, (), ()
+    preview_text, preview, technical, secondary = None, (), (), ()
     if send_notes:
-        body = f"You are about to send this to the PayPal sandbox, dispute {dispute_id}. {body}"      # the refused/blocked sentence stays after it
-        preview_text = send_notes
+        body = f"You are about to send this to PayPal, dispute {dispute_id}. {body}"      # the refused/blocked sentence stays after it
+        # her own words first; the line the code adds before them, and the fingerprint, sit one click away (same content)
+        prefix = DEMO_PREFIX.strip()
+        own = send_notes[len(prefix):].lstrip() if send_notes.startswith(prefix) else send_notes
+        preview_text = own or send_notes
         preview = (("Tracking", send_tracking or "not set"),
-                   ("Files", ", ".join(send_files) if send_files else "none"),
-                   ("Fingerprint of the approved package", f"{send_fingerprint[:12]}… (SHA-256)" if send_fingerprint else "not available"))
+                   ("Files", ", ".join(send_files) if send_files else "none"))
+        technical = ((("PayPal receives this line before your text", prefix),) if preview_text != send_notes else ()) + (
+                     ("Fingerprint of the approved package", f"{send_fingerprint[:12]}… (SHA-256)" if send_fingerprint else "not available"),)
         secondary = (_act("Edit the package instead", href="#statements", kind="secondary"),)
     note = (f"Sends package v{n} ({_plural(int(claims_count), 'statement', 'statements')}, "
-            f"{_plural(int(files_count), 'file', 'files')}) to PayPal sandbox once. Proofie cannot withdraw it.")
+            f"{_plural(int(files_count), 'file', 'files')}) to PayPal once. Proofie cannot withdraw it.")
     return NextStep("send", "Next step: send the evidence.", body,
                     action=_act("Send evidence to PayPal", post=f"{url}/send", sending="Sending to PayPal…",
                                 sends=True),
-                    secondary=secondary, preview_text=preview_text, preview=preview,
+                    secondary=secondary, preview_text=preview_text, preview=preview, technical=technical,
                     action_hint="Editing clears your approval." if secondary else None, note=note, note_state="send-note")

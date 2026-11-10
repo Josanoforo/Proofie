@@ -65,9 +65,10 @@
 </tbody>
 </table>
 <div class="inbox-context">{{ inbox_context(summary, inaction, checked_at) }}</div>
-<p class="checked-at">Everything above was read from PayPal (read-only). {{ pages }} {{ 'page' if pages == 1 else 'pages' }} read.</p>
+{% if list_cut_line %}<p class="checked-at" data-state="list-cut">{{ list_cut_line }}</p>{% endif %}{% if unexplained %}<p class="checked-at" data-state="unexplained">{{ unexplained }} {{ 'case is' if unexplained == 1 else 'cases are' }} listed without the "Why this case is here" note.</p>{% endif %}<p class="checked-at">Everything above was read from PayPal (read-only). {{ pages }} {{ 'page' if pages == 1 else 'pages' }} read.</p>
 {% endif %}
 {% if feature_enabled("explainable_queue") %}{% include "features/explainable_queue/_exposure_context.html" %}{% endif -%}
+{% if feature_enabled("outcome") %}<p data-state="money-link"><a href="/money">Money in your cases: kept, lost and still held</a></p>{% endif -%}
 {% if account_cliff %}{% include "features/account_cliff/_line.html" %}{% endif %}
 {%- if feature_enabled("fulfilment") %}
 <p class="actions"><a href="/fulfilment">Tracking at the sale: files</a></p>{%- endif %}

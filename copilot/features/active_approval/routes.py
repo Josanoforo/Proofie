@@ -7,6 +7,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from copilot import config
 from copilot.core import carriers
+from copilot.core.checklist import ACKNOWLEDGEABLE_DATE_CHECKS
 from copilot.core.send import DEMO_PREFIX
 from copilot.db import repo
 from copilot.features.active_approval import reapproval, rules, service
@@ -49,6 +50,7 @@ def page(request: Request, dispute_id: str, package_id: int, client=Depends(get_
 
 # Where each non-delivery block is fixed on the package page: (start of the message, link text, anchor).
 _BLOCK_FIXES = (("Pick a carrier", "Choose the carrier", "#field-carrier"),
+                ("A file you left out of the checks", "Remove the file", "#attachments"),
                 ("A check conflicts", "Review the difference", "#checks"),
                 ("A statement or source includes private", "Edit the statement", "#statements"),
                 ("Add at least one statement", "Add a statement", "#statements"),
@@ -93,7 +95,10 @@ def _send_summary(db_path, package_id, review):
     files = [{"filename": a["filename"],
               "excluded": bool((repo.get_document(db_path, a["document_id"]) or {}).get("excluded"))}
              for a in repo.list_attachments(db_path, package_id)]
-    return {"notes": evidence["notes"], "was_cut": len(full) > 2000, "tracking": tracking.get("tracking_number", ""),
+    prefix = DEMO_PREFIX.strip()
+    notes = evidence["notes"]
+    own = notes[len(prefix):].lstrip() if notes.startswith(prefix) else notes
+    return {"notes": notes, "own_text": own or notes, "prefix": prefix if (own and own != notes) else "", "was_cut": len(full) > 2000, "tracking": tracking.get("tracking_number", ""),
             "carrier": carrier or "Not set", "files": files}
 
 
@@ -115,6 +120,31 @@ def _conflict_value_pairs(review, names):
         if len(sources) >= 2 and sources[0]["value"] != sources[1]["value"]:
             pairs[claim.key] = sources[:2]
     return pairs
+
+
+def proof_missing_words(checks) -> list:
+    """The proof PayPal's published rule asks for that is Missing, in the seller's words. Display only: it is shown at the head
+    of the approval page and beside the approve control; approval stays allowed exactly as before and nothing is bound to it."""
+    missing = {c.id for c in checks if c.state == "missing" and c.basis == "published_policy"}
+    words = []
+    if {"delivery_status", "delivery_date"} <= missing:
+        words.append("delivered status with a date")
+    elif "delivery_status" in missing:
+        words.append("delivered status")
+    elif "delivery_date" in missing:
+        words.append("delivery date")
+    if "signature" in missing:
+        words.append("signed receipt (the total is above the limit)")
+    return words
+
+
+def conflict_consequence(review) -> str | None:
+    """The first line of 'Cannot approve yet' when a conflict blocks: the address sentence only for the address conflict,
+    the general one for any other blocking conflict, nothing when no conflict blocks."""
+    if not any(m.startswith("A check conflicts") for m in review.blocked):
+        return None
+    from copilot.web.routes_package import blocking_conflict_line
+    return blocking_conflict_line(review.checks) or "This answer cannot be sent while a check does not match PayPal's data."
 
 
 def render_review(request, dispute_id, package_id, review, *, decisions=None, error=None, status_code=200,
@@ -170,7 +200,8 @@ def render_review(request, dispute_id, package_id, review, *, decisions=None, er
                                            "summary": _send_summary(db_path, package_id, review),
                                            "blocked_items": _blocked_items(review, package_url) if state == "blocked" else [],
                                            "blocked_claim_ids": blocked_claim_ids,
-                                           "has_delivery_block": bool(review.blocked_details), "earlier_approval": earlier,
+                                           "has_delivery_block": bool(review.blocked_details), "proof_missing": proof_missing_words(review.checks),
+                                           "conflict_blocks": conflict_consequence(review), "verdict_line": presentation.verdict_line(review.checks), "earlier_approval": earlier,
                                            "send_record": record, "sent_view": sent_view, "sent_at": record.sent_at or record.confirmed_at,
                                            "sendable": sendable, "send_fixes": send_fixes,
                                            "context_limitations": review.context_limitations,

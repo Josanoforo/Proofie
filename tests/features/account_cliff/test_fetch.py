@@ -57,7 +57,7 @@ def test_disputes_are_listed_and_normalised_through_the_pilot_function():
     assert result.complete
     assert [n["dispute_id"] for n in result.items] == ["PP-X-1", "PP-X-2"]
     assert result.items[0]["create_time"] == "2026-08-01T10:00:00Z"
-    assert [c[1] for c in fake.calls] == ["/v1/customer/disputes"] and fake.calls[0][2] == "list_disputes"
+    assert [c[1] for c in fake.calls] == ["/v1/customer/disputes?page_size=50"] and fake.calls[0][2] == "list_disputes"
 
 
 @pytest.mark.parametrize("status", [401, 403, 500])

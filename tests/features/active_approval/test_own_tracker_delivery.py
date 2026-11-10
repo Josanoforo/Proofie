@@ -102,7 +102,11 @@ def test_control_a_foreign_shipped_tracker_after_the_send_still_conflicts(delive
     assert _state(_raw_checks(sender, db), "delivery_status") == "conflict"
 
 
-def test_control_b_a_tracker_with_our_number_that_existed_before_the_send_still_conflicts(delivered):
+def test_control_b_an_existing_tracker_with_our_number_set_back_to_shipped_by_the_send_does_not_conflict(delivered):
+    """v1.1.2 reverses what this control pinned. It assumed an existing tracker going DELIVERED -> SHIPPED after the POST was
+    someone else's change. The sandbox does exactly that on our own send (take-902, copilot_web.jsonl rows 14 and 261: DELIVERED
+    at 00:11:20, SHIPPED at 00:15:19, the POST at 00:15:17), so the page keeps the status PayPal showed when she approved.
+    Any other status on that tracker still counts (test_own_send_resets_existing_tracker.py)."""
     _, fake, db, package, _ = delivered
     fake.raw["evidences"] = [{"evidence_type": "PROOF_OF_FULFILLMENT", "source": "REQUESTED_FROM_SELLER"}]
     review = service.read(fake, db, DID, package)
@@ -111,7 +115,7 @@ def test_control_b_a_tracker_with_our_number_that_existed_before_the_send_still_
         def call(self, method, path, op, **kwargs):
             result = super().call(method, path, op, **kwargs)
             if method == "POST":
-                self.trackers = [_tracker(OWN_NUMBER, "SHIPPED")]      # the tracker that was already there changes: not our effect
+                self.trackers = [_tracker(OWN_NUMBER, "SHIPPED")]      # PayPal sets the existing tracker back on our send
             return result
 
     sender = AlreadyThere(fake, review)
@@ -119,7 +123,7 @@ def test_control_b_a_tracker_with_our_number_that_existed_before_the_send_still_
     _approve(sender, db, package)
     assert _state(_raw_checks(sender, db), "delivery_status") == "verified"
     assert send_package(sender, db, DID, package).sent
-    assert _state(_raw_checks(sender, db), "delivery_status") == "conflict"
+    assert _state(_raw_checks(sender, db), "delivery_status") == "verified"
 
 
 def test_control_c_before_any_send_the_checks_are_unchanged(delivered):

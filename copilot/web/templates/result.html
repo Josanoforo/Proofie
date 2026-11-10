@@ -22,6 +22,7 @@
   {% else %}<p>PayPal lists no document with it.</p>{% endif %}</div>
   {% else %}<p data-state="readback-record-missing">This send was recorded before Proofie kept the list of documents PayPal showed. Open the dispute to see PayPal's current record.</p>{% endif %}
   {% if package %}<p>Package v{{ package.version }}.</p>{% endif %}
+  {% if package and feature_enabled("outcome") %}<p data-state="checked-link"><a href="/disputes/{{ dispute_id }}/packages/{{ package.id }}/checked">What Proofie checked before sending</a></p>{% endif %}
   <p class="what-next"><strong>What happens next:</strong> PayPal reviews your evidence. Follow PayPal's status on the dispute page.</p>
   <div class="actions actions--forward">{{ link_button('/disputes/' ~ dispute_id, "View the dispute and PayPal's answer") }}</div>
   {% else %}

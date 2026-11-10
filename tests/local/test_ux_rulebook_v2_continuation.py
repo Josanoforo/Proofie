@@ -490,7 +490,7 @@ def test_nine_views_render_at_desktop_and_phone_with_local_states(monkeypatch, t
             review_text, re.S)
         assert checks_details is not None
         assert "See the checks" in checks_details.group(1)
-        assert re.search(r"\d+ of \d+ checks verified; \d+ cannot be checked\.", checks_details.group(1))
+        assert re.search(r"\d+ checks? verified\.", checks_details.group(1))
         assert f'href="/disputes/{DID}/packages/{package_id}#checks"' in checks_details.group(1)
     package_identity = f"/disputes/{DID}/packages/{package_id}"
     for name in ("overview", "review-sources", "approve-preview", "package-approvable"):
@@ -737,7 +737,7 @@ def test_nine_views_render_at_desktop_and_phone_with_local_states(monkeypatch, t
                         else:
                             assert metrics["reviewRail"]["y"] > metrics["reviewMain"]["y"]
                         assert metrics["reviewCheckSummary"]["open"] is False, metrics
-                        assert "cannot be checked" in metrics["reviewCheckSummary"]["text"]
+                        assert "verified." in metrics["reviewCheckSummary"]["text"]
                         assert metrics["reviewCheckSummary"]["href"].endswith(f"/packages/{package_id}#checks")
                         assert page.locator('[data-state="mismatch-unchecked"]').is_visible()
                         assert "No differences found" in page.locator('[data-state="mismatch-unchecked"]').inner_text()

@@ -81,7 +81,7 @@ def test_an_attached_file_left_out_of_the_checks_is_printed_as_attached_not_as_s
     assert response.status_code==200,response.text
     assert "Exhibit 1" in response.text and sha in response.text
     assert 'data-state="excluded-sent"' in response.text
-    assert "Attached to the response (it is sent with it), but left out of the checks." in response.text
+    assert "Attached to the response, but left out of the checks: it must be removed from the response before it can be approved or sent." in response.text
     # the header now says "Not sent to PayPal", so the claim is checked on the note itself
     note=response.text.split('data-state="excluded-sent">',1)[1].split("</p>",1)[0]
     assert "sent to PayPal" not in note
